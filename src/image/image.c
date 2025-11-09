@@ -125,6 +125,23 @@ void set_color_24bit_ptr(uint24_t_ptr* color,const size_t i,const uint8_t r, con
     color->bytes[2][i] = b;
 }
 
+void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
+{
+   img->buffer[y * img->height + x] = get_color_32bit(r,g,b);
+}
+
+void put_color_at_24bit_ptr(Image_24bit_ptr* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
+{
+   img->buffer.bytes[0][y * img->height + x] = r;
+   img->buffer.bytes[1][y * img->height + x] = g;
+   img->buffer.bytes[2][y * img->height + x] = b;
+}
+
+void put_color_at_24bit(Image_24bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
+{
+   img->buffer[y * img->height + x] = (uint24_t){.byte={r,g,b}};
+}
+
 void write_pixel_color_24bit_ptr(FILE* img, uint24_t_ptr* color, const size_t i)
 {
     fprintf(img, "%d ", color->bytes[0][i]);

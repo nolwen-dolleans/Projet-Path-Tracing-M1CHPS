@@ -6,6 +6,8 @@
 #include <inttypes.h>
 #include <string.h>
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief Entier naturel sur 24-bit
  * @param byte Tableau de 3 bytes
@@ -69,24 +71,26 @@ typedef struct Image_32bit
     uint32_t*   buffer;
 }Image_32bit;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief Créer une image avec une taille de buffer de 3(24 bit) * width * height
  * @param width Longueur
  * @param height Hauteur
  */
-Image_24bit*        create_image_24bit(const size_t width, const size_t height);
+Image_24bit* create_image_24bit(const size_t width, const size_t height);
 /**
  * @brief Créer une image avec 3 buffer rgb de taille 3(24 bit) * width * height
  * @param width Longueur
  * @param height Hauteur
  */
-Image_24bit_ptr*    create_image_24bit_ptr(const size_t width, const size_t height);
+Image_24bit_ptr* create_image_24bit_ptr(const size_t width, const size_t height);
 /**
  * @brief Créer une image avec une taille de buffer de 4(32 bit) * width * height
  * @param width Longueur
  * @param height Hauteur
  */
-Image_32bit*        create_image_32bit(const size_t width, const size_t height);
+Image_32bit* create_image_32bit(const size_t width, const size_t height);
 
 /**
  * @brief
@@ -117,9 +121,43 @@ void set_color_24bit(uint24_t* color,const uint8_t r, const uint8_t g, const uin
  * @param i i-ème couleur
  * @param r La partie rouge de la couleur
  * @param g La partie verte de la couleur
- * @param b La partie bleu de la couleur*
+ * @param b La partie bleu de la couleur
  */
 void set_color_24bit_ptr(uint24_t_ptr* color,const size_t i,const uint8_t r, const uint8_t g, const uint8_t b);
+
+/**
+ * @brief Change la couleur d'un pixel de coordonnée x,y
+ * @param img Image
+ * @param x X
+ * @param y Y
+ * @param r La partie rouge de la couleur
+ * @param g La partie verte de la couleur
+ * @param b La partie bleu de la couleur
+ */
+void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
+
+/**
+ * @brief Change la couleur d'un pixel de coordonnée x,y
+ * @param img Image
+ * @param x X
+ * @param y Y
+ * @param r La partie rouge de la couleur
+ * @param g La partie verte de la couleur
+ * @param b La partie bleu de la couleur
+ */
+void put_color_at_24ptr(Image_24bit_ptr* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
+
+/**
+ * @brief Change la couleur d'un pixel de coordonnée x,y
+ * @param img Image
+ * @param x X
+ * @param y Y
+ * @param r La partie rouge de la couleur
+ * @param g La partie verte de la couleur
+ * @param b La partie bleu de la couleur
+ */
+void put_color_at_24bit(Image_24bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
+
 
 /**
  * @brief Ecrit un pixel sur une image

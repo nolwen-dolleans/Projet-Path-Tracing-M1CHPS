@@ -1,15 +1,13 @@
-#include "image.h"
+#include "image/image.h"
 
 int main(int argc, char** argv)
 {
-
 
     if(argc != 4)
     {
         fprintf(stderr,"Error : Icomplete arguments.\n");
         exit(1);
     }
-
 
     const size_t width  = atoi(argv[2]);
     const size_t height = atoi(argv[3]);
@@ -20,6 +18,9 @@ int main(int argc, char** argv)
         Image_32bit* image = create_image_32bit(width, height);
 
         clear_frame_sky_color_32bit(image);
+
+        for(size_t i = 400; i < image->width; ++i)
+            put_color_at_32bit(image, 400-i, 400, 0,0,0);
 
         write_image_file_32bit(image);
 
