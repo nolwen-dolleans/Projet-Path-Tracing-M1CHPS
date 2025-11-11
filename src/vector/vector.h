@@ -1,7 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include "../tools.h"
+#include "../tools/tools.h"
 
 /**
  * @brief Single precision 3D Vector (AoS version)
@@ -12,11 +12,19 @@ typedef struct Vector
     float Data[3];
 }Vector;
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief Create a single precision null 3D vector (AoS version)
  * @return A single precision 3D vector
  */
 Vector* create_vector_default();
+
+/**
+ * @brief Create a single precision null 3D vector (AoS version)
+ * @param u A single precision 3D vector
+ */
+void create_vector_default_ext(Vector* u);
 
 /**
  * @brief Create a random single precision 3D vector (AoS version)
@@ -26,9 +34,26 @@ Vector* create_vector_random_default();
 
 /**
  * @brief Create a random single precision 3D vector (AoS version)
+ * @param u A single precision 3D vector
+ */
+void create_vector_random_default_ext(Vector* u);
+
+/**
+ * @brief Create a random single precision 3D vector (AoS version)
+ * @param min Minimum componant value
+ * @param max Maximum componant value
  * @return A single precision 3D vector
  */
 Vector* create_vector_random(const float min, const float max);
+
+/**
+ * @brief Create a random single precision 3D vector (AoS version)
+ * @param u A pointer to an empty single precision 3D vector
+ * @param min Minimum componant value
+ * @param max Maximum componant value
+ * @return A single precision 3D vector
+ */
+void create_vector_random_ext(Vector* u, const float min, const float max);
 
 /**
  * @brief Create a single precision 3D vector (AoS version)
@@ -39,7 +64,16 @@ Vector* create_vector_random(const float min, const float max);
  */
 Vector* create_vector(const float x, const float y, const float z);
 
+/**
+ * @brief Create a single precision 3D vector (AoS version)
+ * @param u A single precision 3D vector pointer
+ * @param x x componant
+ * @param y y componant
+ * @param z z componant
+ */
+void create_vector_ext(Vector* u, const float x, const float y, const float z);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Sum of two single precision 3D vector
@@ -50,6 +84,14 @@ Vector* create_vector(const float x, const float y, const float z);
 Vector* add(const Vector* const u, const Vector* const v);
 
 /**
+ * @brief Sum of two single precision 3D vector
+ * @param u A single precision 3D vector
+ * @param v A single precision 3D vector
+ * @param w A single precision 3D vector
+ */
+void add_ext(const Vector* const u, const Vector* const v, Vector* w);
+
+/**
  * @brief Substraction of two single precision 3D vector
  * @param u A single precision 3D vector
  * @param v A single precision 3D vector
@@ -58,12 +100,28 @@ Vector* add(const Vector* const u, const Vector* const v);
 Vector* sub(const Vector* const u, const Vector* const v);
 
 /**
+ * @brief Substraction of two single precision 3D vector
+ * @param u A single precision 3D vector
+ * @param v A single precision 3D vector
+ * @param w A single precision 3D vector
+ */
+void sub_ext(const Vector* const u, const Vector* const v, Vector* w);
+
+/**
  * @brief Multiplication of a single precision 3D vector by a single precsion scalar
  * @param u A single precision 3D vector
  * @param k A single precision scalar
  * @return A single precision  3D vector
  */
 Vector* mul(const Vector* const u, const float k);
+
+/**
+ * @brief Multiplication of a single precision 3D vector by a single precsion scalar
+ * @param u A single precision 3D vector
+ * @param k A single precision scalar
+ * @param w A single precision 3D vector
+ */
+void mul_ext(const Vector* const u, const float k, Vector* w);
 
 /**
  * @brief Dot product of two single precision 3D vector
@@ -82,6 +140,16 @@ float dot(const Vector* const u, const Vector* const v);
 Vector* cross(const Vector* const u, const Vector* const v);
 
 /**
+ * @brief Cross product of two single precision 3D vector
+ * @param u A single precision 3D vector
+ * @param v A single precision 3D vector
+ * @param w A single precision 3D vector
+ */
+void cross_ext(const Vector* const u, const Vector* const v, Vector* w);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * @brief Single precision Length of single precsion 3D vector
  * @param u A single precision 3D vector
  * @return Single precision scalar 
@@ -94,6 +162,35 @@ float length(const Vector* const u);
  * @return A single precision normalized 3D vector
  */
 Vector* norm(const Vector* const u);
+
+/**
+ * @brief Normalize a single precsion 3D vector
+ * @param u A single single precision 3D vector
+ * @param w A single single precision 3D vector
+ */
+void norm_ext(const Vector* const u, Vector* w);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief Viewport transformation
+ * @param u A single single precision 3D vector
+ * @param width Width of the screen
+ * @param height Height of the screen
+ * @param near z minimum
+ * @param far z maximum
+ * @return A single precision normalized 3D vector
+ */
+Vector* viewport(const Vector* const u, const float width, const float height, const float near, const float far);
+
+/**
+ * @brief Viewport transformation
+ * @param u A single single precision 3D vector
+ * @param w A single single precision 3D vector
+ */
+void viewport_ext(const Vector* const u, Vector* w);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Display single precision 3D vector

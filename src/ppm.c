@@ -1,5 +1,5 @@
 #include "image/image.h"
-
+#include "ray/ray.h"
 int main(int argc, char** argv)
 {
 
@@ -18,9 +18,6 @@ int main(int argc, char** argv)
         Image_32bit* image = create_image_32bit(width, height);
 
         clear_frame_sky_color_32bit(image);
-
-        for(size_t i = 400; i < image->width; ++i)
-            put_color_at_32bit(image, 400-i, 400, 0,0,0);
 
         write_image_file_32bit(image);
 
