@@ -1,0 +1,79 @@
+\section{Demonstration sur les matrices de rotations}
+\noindent
+Dans le cadre de ce projet, nous fixons la caméra à la position : $\mathbf{E} = (0, 0, 0)\in \mathbb{R}^3$ et nous posons être dans la base canonique de $\mathbb{R}^3$ : $(\vec{t_0}, \vec{v_0}, \vec{b_0}) =
+\left(
+\left( \begin{smallmatrix} 1 \\ 0 \\ 0 \end{smallmatrix} \right),
+\left( \begin{smallmatrix} 0 \\ 1 \\ 0 \end{smallmatrix} \right),
+\left( \begin{smallmatrix} 0 \\ 0 \\ 1 \end{smallmatrix} \right)
+\right)$. Notons que jusqu'à maintenant la caméra pointe dans la direction de $\vec{t_0}$. En restant à cette position, nous allons implémenter la possibilité pour la caméra de pivoter dans n'importe quelle direction, nous cherchons donc ici à démontrer que l'application utilisée pour implémenter cela fonctionne pour n'importe quel angle choisi. \\
+Pour réaliser cela, nous considérons un angle $\alpha$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{b_0}$ et un second angle $\beta$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{v_0}$. \\
+L'application qui permet la rotation de la caméra est determinée par la composition des deux applications suivantes $\forall \alpha, \beta \in \mathbb{R}$ (nous pouvons restreindre $\alpha$ et $\beta$ à $[0, 2\pi]$ mais rien nous pose cette condition ici) : \\
+$\begin{array}{ccccc}
+pitch_\alpha & : & \mathbb{R}^3 & \to & \mathbb{R}^3 \\
+ & & (x, y, z) & \mapsto & pitch_\alpha (x, y, z) \\
+\end{array}
+\quad$ et $\quad
+\begin{array}{ccccc}
+yaw_\beta & : & \mathbb{R}^3 & \to & \mathbb{R}^3 \\
+ & & (x, y, z) & \mapsto & yaw_\beta (x, y, z) \\
+\end{array}$ \\
+Qui sont toutes deux définies grâce aux matrices de rotations sur leurs axes respectifs : \\
+\[ \forall \alpha \in \mathbb{R} : 
+pitch_{\alpha}(x,y,z) = 
+\begin{pmatrix} \cos\alpha & -\sin\alpha & 0 \\ \sin\alpha & \cos\alpha & 0 \\ 0 & 0 & 1 \end{pmatrix}
+\begin{pmatrix} x \\ y \\ z \end{pmatrix}
+= 
+\begin{pmatrix} x\cos\alpha - y\sin\alpha \\ x\sin\alpha + y\cos\alpha  \\ z \end{pmatrix}
+\]
+
+\[ \forall \beta \in \mathbb{R} : 
+yaw_{\beta}(x,y,z) = 
+\begin{pmatrix} \cos\beta & 0 & \sin\beta \\ 0 & 1 & 0 \\ -\sin\beta & 0 & \cos\beta \end{pmatrix}
+\begin{pmatrix} x \\ y \\ z \end{pmatrix}
+= 
+\begin{pmatrix} x\cos\beta + z\sin\beta \\ y \\ -x\sin\beta + z\cos\beta \end{pmatrix}
+\]
+\noindent
+Nous nous intérressons donc à l'application : $pitch_{\alpha} \circ yaw_{\beta}$ appliquée à chacun des vecteurs formant la base canonique. Soient les vecteurs $(\vec{t}, \vec{v}, \vec{b}) \in \mathbb{R}^3$ définis tels que $\forall \alpha, \beta \in \mathbb{R}$ : \\
+$ \begin{cases}
+pitch_{\alpha} \circ yaw_{\beta} \, (\vec{t_0}) = \vec{t} \\
+pitch_{\alpha} \circ yaw_{\beta} \, (\vec{v_0}) = \vec{v} \\
+pitch_{\alpha} \circ yaw_{\beta} \, (\vec{b_0}) = \vec{b} \\
+\end{cases}$ \\
+Nous voulons montrer que la famille de vecteurs $(\vec{t}, \vec{v}, \vec{b})$ forment une base orthonormée de $\mathbb{R}^3$. C'est-à-dire qu'après utiliser cette application sur la position de la caméra, celle-ci pointerait maintenant dans la direction de $\vec{t}$. Soient $\alpha, \beta \in \mathbb{R}$. \\
+Tout d'abord écrivons l'expression de $pitch_{\alpha} \circ yaw_{\beta} \; \forall (x, y, z) \in \mathbb{R}^3$ : \\
+$pitch_{\alpha} \circ yaw_{\beta} \, (x, y, z) =
+\begin{pmatrix} (x\cos\alpha - y\sin\alpha)\cos\beta + z\sin\beta \\ x\sin\alpha + y\cos\alpha \\ -(x\cos\alpha - y\sin\alpha)\sin\beta + z\cos\beta \end{pmatrix}$ \\ \\
+Appliquons-la maintenant aux vecteurs de la base canonique : \\
+$ \begin{cases}
+\vec{t} = pitch_{\alpha} \circ yaw_{\beta} \, (\vec{t_0}) = \begin{pmatrix} \cos\alpha\cos\beta \\ \sin\alpha \\ -\cos\alpha\sin\beta \end{pmatrix} \\
+\vec{v} = pitch_{\alpha} \circ yaw_{\beta} \, (\vec{v_0}) = \begin{pmatrix} -\sin\alpha\cos\beta \\ \cos\alpha \\ \sin\alpha\sin\beta \end{pmatrix} \\
+\vec{b} = pitch_{\alpha} \circ yaw_{\beta} \, (\vec{b_0}) = \begin{pmatrix} \sin\beta \\ 0 \\ \cos\beta \end{pmatrix} \\
+\end{cases}$ \\ \\
+Montrons premièrement que chacun de ces vecteurs sont de norme $1$ :
+\begin{align*}
+\| \vec{t} \|^2 &= \cos^2\alpha\cos^2\beta+\sin^2\alpha+\cos^2\alpha\sin^2\beta \\
+                &= \cos^2\alpha(\cos^2\beta+\sin^2\beta)+\sin^2\alpha \\
+                &= \cos^2\alpha+\sin^2\alpha \\
+                &= 1 \\[2mm]
+\| \vec{v} \|^2 &= \sin^2\alpha\cos^2\beta+\cos^2\alpha+\sin^2\alpha\sin^2\beta \\
+                &= \sin^2\alpha(\cos^2\beta+\sin^2\beta)+\cos^2\alpha \\
+                &= \sin^2\alpha+\cos^2\alpha \\
+                &= 1 \\[2mm]
+\| \vec{b} \|^2 &= \sin^2\beta+cos^2\beta \\
+                &= 1
+\end{align*}
+Calculons maintenant le produit vectoriel de $\vec{t}$ avec $\vec{v}$ :
+\begin{align*}
+\vec{t} \wedge \vec{v} &= \begin{pmatrix} \sin^2\alpha\sin\beta+\cos^2\alpha\sin\beta \\ -\cos\alpha\cos\beta\sin\alpha\sin\beta+\cos\alpha\sin\beta\sin\alpha\cos\beta \\ \cos^2\alpha\cos\beta+\sin^2\alpha\cos\beta \end{pmatrix} \\
+                       &= \begin{pmatrix} \sin\beta \\ 0 \\ \cos\beta \end{pmatrix} \\
+                       &= \vec{b}
+\end{align*}
+Nous remarquons que le vecteur $\vec{b}$ est normal au plan formé par $\vec{t}$ et $\vec{v}$. Il nous reste donc à montrer que $\vec{t}$ et $\vec{v}$ sont orthogonaux :
+\begin{align*}
+\langle \vec{t}, \vec{v} \rangle &= -\cos\alpha\sin\alpha\cos^2\beta+\sin\alpha\cos\alpha-\cos\alpha\sin\alpha\sin^2\beta \\
+                                 &= \cos\alpha\sin\alpha(-\cos^2\beta+1-\sin^2\beta) \\
+                                 &= 0
+\end{align*}
+Nous avons montré que $\vec{b}$ est normal à $\vec{t}$ et $\vec{v}$; que $\vec{t}$ et $\vec{v}$ sont orthogonaux entre eux et que les trois vecteurs ont pour norme $1$. Cela montre donc que $(\vec{t},\vec{v}, \vec{b})$ est une base orthonormée de $\mathbb{R}^3$, donc que l'application $pitch_{\alpha} \circ yaw_{\beta}$ établi une rotation de la base canonique $ (\vec{t_0}, \vec{v_0}, \vec{b_0})$ pour des $\alpha, \beta \in \mathbb{R}$ quelconques. Donc cette application nous permet bien de pivoter la caméra dans n'importe quelle direction, c'est-à-dire en considérant la sphère centrée en $\mathbf{E}$ de rayon $\| \vec{t_0} \| = 1 $ incluse dans $\mathbb{R}^3$ : \\
+$\forall x \in (\mathbf{E}, \| \vec{t_0} \|), \exists \alpha, \beta \in \mathbb{R} \, \, \text{tels que} \, pitch_{\alpha} \circ yaw_{\beta}(\vec{t_0}) = \vec{\mathbf{E}\mathbf{x}} $. \\
