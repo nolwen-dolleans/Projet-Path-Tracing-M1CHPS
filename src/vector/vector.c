@@ -1,4 +1,5 @@
 #include "vector.h"
+#include "float.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -24,9 +25,9 @@ Vector* create_vector_random_default()
 {
     Vector* v = (Vector*)malloc_check(sizeof(Vector));
 
-    v->Data[0] = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    v->Data[1] = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    v->Data[2] = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    v->Data[0] = generate_random_value(FLT_MAX, FLT_MIN);
+    v->Data[1] = generate_random_value(FLT_MAX, FLT_MIN);
+    v->Data[2] = generate_random_value(FLT_MAX, FLT_MIN);
 
     return v;
 }
@@ -34,9 +35,9 @@ Vector* create_vector_random_default()
 void create_vector_random_default_ext(Vector* u)
 {
 
-    u->Data[0] = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    u->Data[1] = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    u->Data[2] = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    u->Data[0] = generate_random_value(FLT_MAX, FLT_MIN);
+    u->Data[1] = generate_random_value(FLT_MAX, FLT_MIN);
+    u->Data[2] = generate_random_value(FLT_MAX, FLT_MIN);
 
 }
 
@@ -195,6 +196,8 @@ Vector* viewport(const Vector* const u, const float width, const float height, c
     w->Data[0] = u->Data[0]*width + width*0.5f;
     w->Data[1] = -u->Data[1]*height + height*0.5f;
     w->Data[2] = u->Data[2]*(far - near);
+	
+	return w;
 
 }
 
