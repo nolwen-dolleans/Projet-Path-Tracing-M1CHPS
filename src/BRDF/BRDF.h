@@ -30,9 +30,9 @@ extern Vector* get_intersection(Vector * position,Ray* r,Scene * S);
  * @param eye origine of the incomming ray
  * @param r incident ray
  * @param S pointer of the current scene
- * @param d current number of bounces
+ * @param d current number of bounces, initialized to 0
  * @param dmax maximum bounces number
- * @return color of the pixels at the e object
+ * @return color of the pixels at the eye position
  */
 uint24_t * ray_sampling(Vector * eye, Ray * r, Scene * S, int d, int dmax);
 
