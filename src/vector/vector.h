@@ -18,7 +18,7 @@ typedef struct Vector
  * @brief Create a single precision null 3D vector (AoS version)
  * @return A single precision 3D vector
  */
-Vector* create_vector_default();
+Vector* create_vector_default(void);
 
 /**
  * @brief Create a single precision null 3D vector (AoS version)
