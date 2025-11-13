@@ -8,14 +8,21 @@
 
 #include "BRDF.h"
 
-
-uint24_t * ray_sampling(struct * vector e, const Ray * r, const struct Scene * S, const int d, const int dmax){
-	uint24_t  * color = malloc(uint8_t*3);
+uint32_t * ray_sampling(Vector * eye, Ray * r, Scene * S, int d, int dmax){
+	uint32_t  * color = malloc_check(sizeof(uint32_t));
+	struct Vector * O = create_vector_default();
 	
 	if (d == dmax) {
-		set_color_24bit(color,0,0,0); 			// par défaut met en noir si le rayon est hors-limite
+		color = S->background_color; 			// par défaut met en noir si le rayon est hors-limite
 		return color;
 	}
-	e = get_intersection(e, r, S);				// par défaut met en noir si le rayon est hors-limite
+									 
+	O = intersect_in_scene(eye,r,S);				// O le point d'intersection du rayon sur l'objet et i le type d'objet rencontré
+	
+	Ray * r_new = random_Ray(O); 		// créé un rebond sur la zone d'intersection
+	uint32_t  * color_i = ray_sampling(O,r_new,S,d+1,dmax);
+	
+	*color = *color_i * *BRDF(r, r_new, 1)/2/M_PI;
+	return color;
 }
 

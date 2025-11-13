@@ -10,7 +10,7 @@
 
 /**
  * @brief Entier naturel sur 24-bit
- * @param byte Tableau de 3 bytes
+ * @var byte Tableau de 3 bytes
  */
 typedef struct uint24_t
 {
@@ -18,8 +18,9 @@ typedef struct uint24_t
 }uint24_t;
 
 /**
+ * @struct uint24\_t\_ptr
  * @brief Triple buffer d'entier naturel sur 24-bit
- * @param bytes 3 pointeurs sur 1 byte
+ * @var bytes 3 pointeurs sur 1 byte
  */
 typedef struct uint24_t_ptr
 {
@@ -27,11 +28,12 @@ typedef struct uint24_t_ptr
 }uint24_t_ptr;
 
 /**
+ * @struct Image24bit
  * @brief Image avec un buffer codé sur 24-bit
- * @param width Longueur de l'image
- * @param height Hauteur de l'image
- * @param img_file Pointeur sur notre fichier image
- * @param buffer Buffer 24-bit
+ * @var width Longueur de l'image
+ * @var height Hauteur de l'image
+ * @var img\_file Pointeur sur notre fichier image
+ * @var  buffer Buffer 24-bit
  */
 typedef struct Image_24bit
 {
@@ -43,10 +45,10 @@ typedef struct Image_24bit
 
 /**
  * @brief Image avec un triple buffer codé sur 24-bit
- * @param width Longueur de l'image
- * @param height Hauteur de l'image
- * @param img_file Pointeur sur notre fichier image
- * @param buffer Triple Buffer 24-bit
+ * @var width Longueur de l'image
+ * @var height Hauteur de l'image
+ * @var img\_file Pointeur sur notre fichier image
+ * @var buffer Triple Buffer 24-bit
  */
 typedef struct Image_24bit_ptr
 {
@@ -58,10 +60,10 @@ typedef struct Image_24bit_ptr
 
 /**
  * @brief Image avec un buffer codé sur 32-bit
- * @param width Longueur de l'image
- * @param height Hauteur de l'image
- * @param img_file Pointeur sur notre fichier image
- * @param buffer Buffer 32-bit
+ * @var width Longueur de l'image
+ * @var height Hauteur de l'image
+ * @var img_file Pointeur sur notre fichier image
+ * @var buffer Buffer 32-bit
  */
 typedef struct Image_32bit
 {

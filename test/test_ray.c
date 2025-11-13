@@ -4,7 +4,7 @@
 
 #define TOLERANCE 1e-2
 
-void test_create_ray()
+void test_create_ray(void)
 {
     // pos = -5, -5
     // dir = -3, -3;
@@ -64,7 +64,7 @@ void test_ray_create_sphere()
     free_sphere(r1);
 }
 
-void test_intersect_sphere()
+void test_intersect_sphere(void)
 {
     const float ox0 = -4.0f;
     const float oy0 = -4.0f;

@@ -1,6 +1,6 @@
 #include "ray.h"
 
-Ray* create_ray_default()
+Ray* create_ray_default(void)
 {
     Ray* ray = (Ray*)malloc_check(sizeof(Ray));
     create_vector_default_ext(&ray->position);
@@ -18,6 +18,8 @@ Ray* create_ray(const float x0, const float y0, const float z0, const float x1, 
     return ray;
 }
 
+Ray* random_Ray(Vector * Origin);
+
 Sphere* create_sphere(const float x, const float y, const float z, const float rad)
 {
     Sphere* sphere = (Sphere*)malloc_check(sizeof(Sphere));
@@ -27,7 +29,7 @@ Sphere* create_sphere(const float x, const float y, const float z, const float r
     return sphere;
 }
 
-Sphere* create_sphere_default()
+Sphere* create_sphere_default(void)
 {
     Sphere* sphere = (Sphere*)malloc_check(sizeof(Sphere));
     create_vector_ext(&sphere->position,0.0f, 0.0f, 0.0f);
