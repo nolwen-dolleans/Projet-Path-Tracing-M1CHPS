@@ -1,7 +1,11 @@
 #ifndef RAY_H
 #define RAY_H
 
+<<<<<<< HEAD:include/ray.h
 #include "vector.h"
+=======
+#include "../vector/vector.h"
+>>>>>>> 2896c00 (ajustements):src/ray/ray.h
 
 /**
  * @brief 3D ray
