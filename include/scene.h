@@ -14,9 +14,9 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "../tools/tools.h"
-#include "../vector/vector.h"
-#include "../ray/ray.h"
+#include "tools.h"
+#include "vector.h"
+#include "ray.h"
 
 
 typedef struct Scene{

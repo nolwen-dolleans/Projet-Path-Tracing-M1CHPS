@@ -1,5 +1,6 @@
-#include "ray/ray.h"
+#include "ray.h"
 #include "unity.h"
+#include "float.h"
 
 #define TOLERANCE 1e-2
 
@@ -9,13 +10,13 @@ void test_create_ray()
     // dir = -3, -3;
     srand(time(NULL));
 
-    const float pos_x = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float pos_y = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float pos_z = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float pos_x = generate_random_value(FLT_MAX, FLT_MIN);
+    const float pos_y = generate_random_value(FLT_MAX, FLT_MIN);
+    const float pos_z = generate_random_value(FLT_MAX, FLT_MIN);
 
-    const float dir_x = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float dir_y = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float dir_z = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float dir_x = generate_random_value(FLT_MAX, FLT_MIN);
+    const float dir_y = generate_random_value(FLT_MAX, FLT_MIN);
+    const float dir_z = generate_random_value(FLT_MAX, FLT_MIN);
 
     const float default_0[3] = {0.0f, 0.0f, 0.0f};
     const float default_1[3] = {0.0f, 0.0f, 1.0f};
@@ -40,11 +41,11 @@ void test_ray_create_sphere()
 {
     srand(time(NULL));
 
-    const float pos_x = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float pos_y = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float pos_z = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float pos_x = generate_random_value(FLT_MAX, FLT_MIN);
+    const float pos_y = generate_random_value(FLT_MAX, FLT_MIN);
+    const float pos_z = generate_random_value(FLT_MAX, FLT_MIN);
 
-    const float r = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float r = generate_random_value(FLT_MAX, FLT_MIN);
     
     const float default_0[3] = {0.0f, 0.0f, 0.0f};
 

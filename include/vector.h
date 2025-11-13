@@ -1,7 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include "../tools/tools.h"
+#include "tools.h"
 
 /**
  * @brief Single precision 3D Vector (AoS version)

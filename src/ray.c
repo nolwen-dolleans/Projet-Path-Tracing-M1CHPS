@@ -1,5 +1,4 @@
 #include "ray.h"
-#include "vector/vector.h"
 
 Ray* create_ray_default()
 {

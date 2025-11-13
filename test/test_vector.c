@@ -1,12 +1,13 @@
 #include "unity.h"
-#include "vector/vector.h"
+#include "vector.h"
+#include "float.h"
 
 #define TOLERANCE 1e-6
 
 
-void test_create_vector()
+void test_create_vector(void)
 {
-    srand(time(0));
+    srand(time(NULL));
 
     const float vector_result_0 [3] = {0.0f, 0.0f, 0.0f};
     const float vector_result_1 [3] = {2.0f, 64.0f, 32.0f};
@@ -30,15 +31,15 @@ void test_create_vector()
 
         TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(min_max[0], vector_test_2->Data[2]);
         TEST_ASSERT_LESS_OR_EQUAL_FLOAT(min_max[1], vector_test_2->Data[2]);
+		
+        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(FLT_MIN, vector_test_3->Data[0]);
+        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(FLT_MAX, vector_test_3->Data[0]);
 
-        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(__FLT32_MIN__, vector_test_3->Data[0]);
-        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(__FLT32_MAX__, vector_test_3->Data[0]);
+        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(FLT_MIN, vector_test_3->Data[1]);
+        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(FLT_MAX, vector_test_3->Data[1]);
 
-        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(__FLT32_MIN__, vector_test_3->Data[1]);
-        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(__FLT32_MAX__, vector_test_3->Data[1]);
-
-        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(__FLT32_MIN__, vector_test_3->Data[2]);
-        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(__FLT32_MAX__, vector_test_3->Data[2]);
+        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(FLT_MIN, vector_test_3->Data[2]);
+        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(FLT_MAX, vector_test_3->Data[2]);
 
         free_vector(vector_test_0);
         free_vector(vector_test_1);
@@ -69,14 +70,14 @@ void test_create_vector()
         TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(min_max[0], vector_test_2.Data[2]);
         TEST_ASSERT_LESS_OR_EQUAL_FLOAT(min_max[1], vector_test_2.Data[2]);
 
-        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(__FLT32_MIN__, vector_test_3.Data[0]);
-        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(__FLT32_MAX__, vector_test_3.Data[0]);
+        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(FLT_MIN, vector_test_3.Data[0]);
+        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(FLT_MAX, vector_test_3.Data[0]);
 
-        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(__FLT32_MIN__, vector_test_3.Data[1]);
-        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(__FLT32_MAX__, vector_test_3.Data[1]);
+        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(FLT_MIN, vector_test_3.Data[1]);
+        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(FLT_MAX, vector_test_3.Data[1]);
 
-        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(__FLT32_MIN__, vector_test_3.Data[2]);
-        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(__FLT32_MAX__, vector_test_3.Data[2]);
+        TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(FLT_MIN, vector_test_3.Data[2]);
+        TEST_ASSERT_LESS_OR_EQUAL_FLOAT(FLT_MAX, vector_test_3.Data[2]);
     }
 
 }
@@ -85,13 +86,13 @@ void test_sum_vector(void)
 {
     srand(time(0));
 
-    const float x_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_0 = generate_random_value(FLT_MAX, FLT_MIN);
 
-    const float x_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_1 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_1 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_1 = generate_random_value(FLT_MAX, FLT_MIN);
 
 
     float vector_result[3] = {0.0f, 0.0f, 0.0f};
@@ -129,13 +130,13 @@ void test_sub_vector(void)
 {
     srand(time(0));
 
-    const float x_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_0 = generate_random_value(FLT_MAX, FLT_MIN);
 
-    const float x_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_1 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_1 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_1 = generate_random_value(FLT_MAX, FLT_MIN);
 
 
     float vector_result[3] = {0.0f, 0.0f, 0.0f};
@@ -178,11 +179,11 @@ void test_mul_vector(void)
 {
     srand(time(0));
 
-    const float x_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_0 = generate_random_value(FLT_MAX, FLT_MIN);
 
-    const float k = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float k = generate_random_value(FLT_MAX, FLT_MIN);
 
 
     float vector_result[3] = {0.0f, 0.0f, 0.0f};
@@ -217,13 +218,13 @@ void test_dot_vector(void)
 {
     srand(time(0));
 
-    const float x_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_0 = generate_random_value(FLT_MAX, FLT_MIN);
 
-    const float x_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_1 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_1 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_1 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_1 = generate_random_value(FLT_MAX, FLT_MIN);
 
     const float vector_result = x_0 * x_1 + y_0 * y_1 + z_0 * z_1;
 
@@ -242,13 +243,13 @@ void test_cross_vector(void)
 {
     srand(time(0));
 
-    const float x_0 = generate_random_value(10000, __FLT32_MIN__);
-    const float y_0 = generate_random_value(10000, __FLT32_MIN__);
-    const float z_0 = generate_random_value(10000, __FLT32_MIN__);
+    const float x_0 = generate_random_value(10000, FLT_MIN);
+    const float y_0 = generate_random_value(10000, FLT_MIN);
+    const float z_0 = generate_random_value(10000, FLT_MIN);
 
-    const float x_1 = generate_random_value(10000, __FLT32_MIN__);
-    const float y_1 = generate_random_value(10000, __FLT32_MIN__);
-    const float z_1 = generate_random_value(10000, __FLT32_MIN__);
+    const float x_1 = generate_random_value(10000, FLT_MIN);
+    const float y_1 = generate_random_value(10000, FLT_MIN);
+    const float z_1 = generate_random_value(10000, FLT_MIN);
     
     float vector_result[3] = {0.0f, 0.0f, 0.0f};
 
@@ -286,9 +287,9 @@ void test_length_vector(void)
 {
     srand(time(0));
 
-    const float x_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_0 = generate_random_value(FLT_MAX, FLT_MIN);
 
     const float vector_result = sqrtf(x_0 * x_0 + y_0 * y_0 + z_0 * z_0);
 
@@ -304,9 +305,9 @@ void test_normalize_vector(void)
 {
     srand(time(0));
 
-    const float x_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float y_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
-    const float z_0 = generate_random_value(__FLT32_MAX__, __FLT32_MIN__);
+    const float x_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float y_0 = generate_random_value(FLT_MAX, FLT_MIN);
+    const float z_0 = generate_random_value(FLT_MAX, FLT_MIN);
 
     const float len = sqrtf(x_0 * x_0 + y_0 * y_0 + z_0 * z_0);
 

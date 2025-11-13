@@ -1,5 +1,8 @@
-#include "image/image.h"
-#include "ray/ray.h"
+
+#include "ray.h"
+
+#include "image.h"
+
 int main(int argc, char** argv)
 {
 

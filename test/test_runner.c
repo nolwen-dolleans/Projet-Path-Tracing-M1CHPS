@@ -17,15 +17,15 @@ extern void test_linear_resolution(void);
 extern void test_quadratic_resolution(void);
 
 // ray tests 
-extern void test_create_ray();
-extern void test_ray_create_sphere();
-extern void test_intersect_sphere();
+extern void test_create_ray(void);
+extern void test_ray_create_sphere(void);
+extern void test_intersect_sphere(void);
 
 void setUp(void) {
 }
 void tearDown(void) {}
 
-int main()
+int main(void)
 {
     UNITY_BEGIN();
 

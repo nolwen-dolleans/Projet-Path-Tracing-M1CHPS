@@ -58,4 +58,6 @@ Linear_info* linear_resolution(const float a, const float b)
 
     lin = (Linear_info*)malloc_check(sizeof(Linear_info));
     lin->x0 = -b/a;
+	
+	return lin;
 }

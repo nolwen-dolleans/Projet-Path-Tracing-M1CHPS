@@ -1,7 +1,7 @@
-#include "tools/tools.h"
+#include "tools.h"
 #include "unity.h"
 
-void test_linear_resolution()
+void test_linear_resolution(void)
 {
     const float a0 = 1.0f;
     const float b0 = 5.0f;
@@ -29,7 +29,7 @@ void test_linear_resolution()
     free(info_2);
 }
 
-void test_quadratic_resolution()
+void test_quadratic_resolution(void)
 {
     const float a0 = 1.0f;
     const float b0 = 5.0f;
