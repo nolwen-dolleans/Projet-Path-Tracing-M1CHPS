@@ -5,7 +5,7 @@
 
 /**
  * @brief Single precision 3D Vector (AoS version)
- * @param Data Componants values
+ * @var Data Componants values
  */
 typedef struct Vector
 {
@@ -30,7 +30,7 @@ void create_vector_default_ext(Vector* u);
  * @brief Create a random single precision 3D vector (AoS version)
  * @return A single precision 3D vector
  */
-Vector* create_vector_random_default();
+Vector* create_vector_random_default(void);
 
 /**
  * @brief Create a random single precision 3D vector (AoS version)

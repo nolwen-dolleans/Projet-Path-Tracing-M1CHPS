@@ -103,7 +103,7 @@ Image_32bit* create_image_32bit(const size_t width, const size_t height);
  * @param b La partie bleu de la couleur
  * @return une couleur en 32 bit
  */
-uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b);
+uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 
 
 /**

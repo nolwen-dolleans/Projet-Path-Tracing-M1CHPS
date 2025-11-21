@@ -9,8 +9,9 @@
 
 /**
  * @brief State of quadratic resolution
- * @param TWO_SOLUTION two solution available
- * @param ONE_SOLUTION one solution available
+ * @var TWO_SOLUTION two solution available
+ *
+ * @var ONE_SOLUTION one solution available
  */
 typedef enum QUADRATIC_STATE
 {
@@ -21,8 +22,8 @@ typedef enum QUADRATIC_STATE
 
 /**
  * @brief Quadratic solution info
- * @param x0 solution one
- * @param x1 solution two
+ * @var x0 solution one
+ * @var x1 solution two
  */
 typedef struct Quadratic_info
 {
@@ -33,7 +34,7 @@ typedef struct Quadratic_info
 
 /**
  * @brief Linear solution info
- * @param x0 solution one
+ * @var x0 solution one
  */
 typedef struct Linear_info
 {

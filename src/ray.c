@@ -14,11 +14,21 @@ Ray* create_ray(const float x0, const float y0, const float z0, const float x1, 
     Ray* ray = (Ray*)malloc_check(sizeof(Ray));
     create_vector_ext(&ray->position,x0, y0, z0);
     create_vector_ext(&ray->direction,x1, y1, z1);
+	norm(&ray->direction);
 
     return ray;
 }
 
-Ray* random_Ray(Vector * Origin);
+Ray* random_Ray(Vector const * Origin){
+	float x1 = rand()%2;
+	float y1 = rand()%2;
+	float z1 = rand()%2;
+	Ray * ray = create_ray(Origin->Data[0], Origin->Data[1], Origin->Data[2], x1, y1, z1);
+	norm(&ray->direction);
+	
+	return ray;
+}
+
 
 Sphere* create_sphere(const float x, const float y, const float z, const float rad)
 {
@@ -66,38 +76,62 @@ Vector* intersect_sphere(const Ray* const r, const Sphere* const s)
     const float A = bx2 + by2 + bz2;
     const float B = ax_bx + ay_by + az_bz - bx_xc - by_yc - bz_zc;
     const float C = ax2 + ay2 + az2 - xc2 - yc2 - zc2 - r2; */
+	
+	Vector const * O = &r->position;
+	Vector const * u = &r->direction;
+	Vector * w = sub(O,&s->position);
 
-    const float A = dot(&r->direction,&r->direction);
-    const float B = 2.0f * dot(&r->position,&r->direction) - 2.0f * dot(&r->direction,&s->position);
-    const float C = dot(&r->position,&r->position) - dot(&s->position,&s->position) - s->radius*s->radius;
+    const float A = dot(u,u);
+    const float B = 2.0f * dot(u,w);
+    const float C = dot(w,w) - s->radius*s->radius;
 
     Quadratic_info* quad = quadratic_resolution(A, B, C);
     Vector* solutions = NULL;
     Vector u0;
     Vector u1;
-
-    if(quad == NULL)return solutions;
+	if(quad == NULL)return solutions;
     switch (quad->state)
     {
     case ONE_SOLUTION:
         solutions = (Vector*)malloc_check(1 * sizeof(Vector));
-        mul_ext(&r->direction, quad->x0,&u0);
-        add_ext(&r->position, &u0, &solutions[0]);
+        mul_ext(u, quad->x0,&u0);
+        add_ext(O, &u0, solutions);
         break;
     case TWO_SOLUTION:
-        solutions = (Vector*)malloc_check(2 *sizeof(Vector));
-        mul_ext(&r->direction, quad->x0,&u0);
-        add_ext(&r->position, &u0, &solutions[0]);
+        solutions = (Vector*)malloc_check(1 *sizeof(Vector));
+        Vector s1;
+        Vector s2;
+        mul_ext(u, quad->x0,&u0);
+        add_ext(O, &u0, &s1);
 
-        mul_ext(&r->direction, quad->x1,&u1);
-        add_ext(&r->position, &u1, &solutions[1]);
-        break;
+        mul_ext(u, quad->x1,&u1);
+        add_ext(O, &u1, &s2);
+		
+		Vector * d1 = sub(&s1, O);
+		Vector * d2 = sub(&s2, O);
+		if(length(d1) < length(d2)){
+			*solutions = s1;
+		}
+		else{
+			*solutions = s2;
+		}
+			
+		free_vector(d1);
+		free_vector(d2);
+		break;
         
     default:
         break;
     }
+	free_vector(w);
     return solutions;
 
+}
+
+Vector* get_normal_vector(const Vector * point, const Sphere * s){
+	Vector * n = sub(point,&s->position);
+	norm_ext(n,n);
+	return n;
 }
 
 void free_ray(Ray* r)

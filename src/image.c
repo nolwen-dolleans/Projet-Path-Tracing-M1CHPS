@@ -106,9 +106,9 @@ Image_32bit* create_image_32bit(const size_t width, const size_t height)
 };
 
 
-uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b)
+uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
-    return r << 16 | g << 8 | b;
+    return a << 24 | r << 16 | g << 8 | b;
 }
 
 void set_color_24bit(uint24_t* color,const uint8_t r, const uint8_t g, const uint8_t b)

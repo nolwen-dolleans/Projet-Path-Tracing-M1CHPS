@@ -13,6 +13,9 @@ add_executable(test_runner
                             test/test_vector.c 
                             test/test_ray.c
                             test/test_tools.c
+                            test/test_scene.c
+                            src/scene.c
+                            src/ray.c
 )
 target_compile_options(test_runner PRIVATE -g -Wall -O3 -march=native)
 

@@ -66,29 +66,43 @@ void test_ray_create_sphere()
 
 void test_intersect_sphere(void)
 {
-    const float ox0 = -4.0f;
-    const float oy0 = -4.0f;
-    const float oz0 = 0;
+    const float ox0 = 0.0f;
+    const float oy0 = 0.0f;
+    const float oz0 = 0.0f;
 
-    const float dx0 = 2.0f;
-    const float dy0 = 2.0f;
-    const float dz0 = 0.0f;
+    const float dx0 = 0.0f;
+    const float dy0 = 0.0f;
+    const float dz0 = 1.0f;
 
     const float px0 = 0.0f;
     const float py0 = 0.0f;
-    const float pz0 = 0.0f;
+    const float pz0 = 2.0f;
 
-    const float r0 = 2;
+    const float r0 = 1;
 
-    const float result_00[3] = {-1.41, -1.41, 0};
-    const float result_01[3] = {1.41421, 1.41421, 0};
+	const float result_00[3] = {0, 0, 1};
 
     Ray* ray0 = create_ray(ox0, oy0, oz0, dx0,dy0,dz0);
     Sphere* spr0 = create_sphere(px0, py0, pz0, r0);
 
     Vector* points = intersect_sphere(ray0, spr0);
+	
+	
 
-    TEST_ASSERT_FLOAT_ARRAY_WITHIN(TOLERANCE,result_00, points[0].Data, 3);
-    TEST_ASSERT_FLOAT_ARRAY_WITHIN(TOLERANCE,result_01, points[1].Data, 3);
-
+    TEST_ASSERT_FLOAT_ARRAY_WITHIN(TOLERANCE,result_00, points->Data, 3);
+	
+	free_vector(points);
+	free_ray(ray0);
+	
+	ray0 = create_ray(1, oy0, oz0, dx0,dy0,dz0);
+	
+	points = intersect_sphere(ray0, spr0);
+	const float result_01[3] = {1, 0, 2};
+	
+	TEST_ASSERT_FLOAT_ARRAY_WITHIN(TOLERANCE,result_01, points->Data, 3);
+	
+	free_vector(points);
+	free_ray(ray0);
+	free_sphere(spr0);
+	
 }

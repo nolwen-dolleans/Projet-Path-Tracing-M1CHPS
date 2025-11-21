@@ -16,21 +16,27 @@
 #include "ray.h"
 #include "vector.h"
 #include "scene.h"
+#include "time.h"
 
 
 
 /**
  * @brief  recursive path-tracing algorithm to compute a single sample with Lambertian materials.
- * @param eye origine of the incomming ray
  * @param r incident ray
  * @param S pointer of the current scene
  * @param d current number of bounces
  * @param dmax maximum bounces number
  * @return color of the pixels at the e object
  */
-uint32_t * ray_sampling(Vector * eye, Ray * r, Scene * S, int d, int dmax);
+Vector * ray_sampling(Ray * r, Scene * S, int d, int dmax);
 
 
-uint32_t * BRDF(Ray * r1, Ray * r2, int i);
+/**
+ * @brief  Lambertan BRDF equation
+ * @param ray indident ray
+ * @param normal pointer to the normal vector
+ * @return color of the pixels at the e object
+ */
+float BRDF_lambertian(Ray const * ray, Vector const * normal, Sphere const * s, float const albedo);
 
 #endif /* BRDF_h */
