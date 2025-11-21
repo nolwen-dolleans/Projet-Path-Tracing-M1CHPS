@@ -133,6 +133,13 @@ void mul_ext(const Vector* const u, const float k, Vector* w)
     w->Data[2] = u->Data[2] * k;
 }
 
+void linear_ext(const Vector* const u, const Vector* const v, const float k, Vector* w)
+{
+    w->Data[0] = u->Data[0] + v->Data[0] * k;
+    w->Data[1] = u->Data[1] + v->Data[1] * k;
+    w->Data[2] = u->Data[2] + v->Data[2] * k;
+}
+
 float dot(const Vector* const u, const Vector* const v)
 {
     const float scalar = u->Data[0] * v->Data[0] + u->Data[1] * v->Data[1] + u->Data[2] * v->Data[2]; 

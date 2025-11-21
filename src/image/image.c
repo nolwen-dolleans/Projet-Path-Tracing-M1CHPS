@@ -2,7 +2,7 @@
 
 Image_24bit* create_image_24bit(const size_t width, const size_t height)
 {
-    Image_24bit* img = (Image_24bit*)malloc(width * height * sizeof(Image_24bit));
+    Image_24bit* img = (Image_24bit*)malloc(sizeof(Image_24bit));
 
     if(img == NULL)
     {
@@ -29,14 +29,14 @@ Image_24bit* create_image_24bit(const size_t width, const size_t height)
         exit(1);  
     }
 
-    memset(img->buffer, 0, width * height);
+    memset(img->buffer, 0, width * height * sizeof(uint24_t));
 
     return img;
 };
 
 Image_24bit_ptr* create_image_24bit_ptr(const size_t width, const size_t height)
 {
-    Image_24bit_ptr* img = (Image_24bit_ptr*)malloc(width * height * sizeof(Image_24bit_ptr));
+    Image_24bit_ptr* img = (Image_24bit_ptr*)malloc(sizeof(Image_24bit_ptr));
     
     if(img == NULL)
     {
@@ -65,7 +65,7 @@ Image_24bit_ptr* create_image_24bit_ptr(const size_t width, const size_t height)
             fprintf(stderr, "Error : Failed to allocate memory buffer n°%ld.\n", i);
             exit(1);  
         }
-        memset(img->buffer.bytes[i], 0, width * height);
+        memset(img->buffer.bytes[i], 0, width * height * sizeof(uint24_t_ptr));
     }
 
     return img;
@@ -74,7 +74,7 @@ Image_24bit_ptr* create_image_24bit_ptr(const size_t width, const size_t height)
 
 Image_32bit* create_image_32bit(const size_t width, const size_t height)
 {
-    Image_32bit* img = (Image_32bit*)malloc(width * height * sizeof(Image_32bit));
+    Image_32bit* img = (Image_32bit*)malloc(sizeof(Image_32bit));
     if(img == NULL)
     {
         fprintf(stderr,"Failed to allocate memory.\n");
@@ -127,19 +127,19 @@ void set_color_24bit_ptr(uint24_t_ptr* color,const size_t i,const uint8_t r, con
 
 void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
 {
-   img->buffer[y * img->height + x] = get_color_32bit(r,g,b);
+   img->buffer[y * img->width + x] = get_color_32bit(r,g,b);
 }
 
 void put_color_at_24bit_ptr(Image_24bit_ptr* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
 {
-   img->buffer.bytes[0][y * img->height + x] = r;
-   img->buffer.bytes[1][y * img->height + x] = g;
-   img->buffer.bytes[2][y * img->height + x] = b;
+   img->buffer.bytes[0][y * img->width + x] = r;
+   img->buffer.bytes[1][y * img->width + x] = g;
+   img->buffer.bytes[2][y * img->width + x] = b;
 }
 
 void put_color_at_24bit(Image_24bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
 {
-   img->buffer[y * img->height + x] = (uint24_t){.byte={r,g,b}};
+   img->buffer[y * img->width + x] = (uint24_t){.byte={r,g,b}};
 }
 
 void write_pixel_color_24bit_ptr(FILE* img, uint24_t_ptr* color, const size_t i)
@@ -186,7 +186,8 @@ void clear_frame_color_24bit_ptr(Image_24bit_ptr *const img, const uint8_t r, co
 void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b)
 {
     const uint32_t color = get_color_32bit(r, g, b);
-    memset(img->buffer, color, img->height * img->width * sizeof(uint32_t));
+    for(size_t i = 0; i < img->height * img->width; ++i)
+        img->buffer[i] = color;
 }
 
 void clear_frame_sky_color_24bit(Image_24bit *const img)
@@ -196,7 +197,7 @@ void clear_frame_sky_color_24bit(Image_24bit *const img)
         for(size_t j = 0; j < img->width; ++j)
         {
             // Génere un effet de ciel bleu selon la hauteur de l'image 
-            const uint8_t k = i * 255 / img->height;
+            const uint8_t k = i * 210 / img->height;
             set_color_24bit(&img->buffer[i * img->width + j], k % 255, k % 255, 255);
         }
     }
@@ -209,7 +210,7 @@ void clear_frame_sky_color_24bit_ptr(Image_24bit_ptr *const img)
         for(size_t j = 0; j < img->width; ++j)
         {
             // Génere un effet de ciel bleu selon la hauteur de l'image 
-            const uint8_t k = i * 255 / img->height;
+            const uint8_t k = i * 210 / img->height;
             const size_t index = i * img->width + j;
             set_color_24bit_ptr(&img->buffer, index, k % 255, k % 255, 255);
         }
@@ -223,7 +224,7 @@ void clear_frame_sky_color_32bit(Image_32bit *const img)
         for(size_t j = 0; j < img->width; ++j)
         {
             // Génere un effet de ciel bleu selon la hauteur de l'image 
-            const uint8_t k = i * 255 / img->height;
+            const uint8_t k = i * 210 / img->height;
             img->buffer[i * img->width + j] = get_color_32bit( k % 255, k % 255, 255);
         }
     }   
@@ -231,7 +232,7 @@ void clear_frame_sky_color_32bit(Image_32bit *const img)
 
 void write_image_file_24bit(Image_24bit *const img)
 {
-    fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->height, img->width, 255);
+    fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->width, img->height, 255);
 
     for(size_t i = 0; i < img->height * img->width; ++i)
     {
@@ -242,7 +243,7 @@ void write_image_file_24bit(Image_24bit *const img)
 
 void write_image_file_24bit_ptr(Image_24bit_ptr *const img)
 {
-    fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->height, img->width, 255);
+    fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->width, img->height, 255);
 
     for(size_t i = 0; i < img->height * img->width; ++i)
     {
@@ -253,7 +254,7 @@ void write_image_file_24bit_ptr(Image_24bit_ptr *const img)
 
 void write_image_file_32bit(Image_32bit *const img)
 {
-    fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->height, img->width, 255);
+    fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->width, img->height, 255);
 
     for(size_t i = 0; i < img->height * img->width; ++i)
     {

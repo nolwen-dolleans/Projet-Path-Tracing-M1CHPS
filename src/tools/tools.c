@@ -25,37 +25,36 @@ const float generate_random_value(const float max, const float min)
 
 Quadratic_info* quadratic_resolution(const float a, const float b, const float c)
 {
-    Quadratic_info* quad = NULL;
+    Quadratic_info* info = NULL;
 
     const float delta = b * b - 4.0f * a * c;
 
-    if(delta < 0) return quad;
+    if(delta < 0) return info;
     else if(delta == 0.0f)
     {
-        quad = (Quadratic_info*)malloc_check(sizeof(Quadratic_info));
-        quad->state = ONE_SOLUTION;
-        quad->x0 = -b/(2.0f*a);
-        quad->x1 = 0.0f; 
+        info = (Quadratic_info*)malloc_check(sizeof(Quadratic_info));
+        info->state = ONE_SOLUTION;
+        info->x0 = -b/(2.0f*a);
+        info->x1 = 0.0f; 
     }
     else
     {
-        quad = (Quadratic_info*)malloc_check(sizeof(Quadratic_info));
-        quad->state = TWO_SOLUTION;
-        quad->x0 = (-b - sqrtf(delta))/(2.0f*a);
-        quad->x1 = (-b + sqrtf(delta))/(2.0f*a);
+        info = (Quadratic_info*)malloc_check(sizeof(Quadratic_info));
+        info->state = TWO_SOLUTION;
+        info->x0 = (-b + sqrtf(delta))/(2.0f*a);
+        info->x1 = (-b - sqrtf(delta))/(2.0f*a);
     }
 
-    return quad;
+    return info;
 } 
 
 
 Linear_info* linear_resolution(const float a, const float b)
 {
-    Linear_info* lin = NULL;
+    Linear_info* info = NULL;
 
-    if(a == 0.0f)
-        return lin;
+    info = (Linear_info*)malloc_check(sizeof(Linear_info));
+    info->x0 = -b/a;
 
-    lin = (Linear_info*)malloc_check(sizeof(Linear_info));
-    lin->x0 = -b/a;
+    return info;
 }

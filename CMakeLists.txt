@@ -8,7 +8,8 @@ set(SOURCES src/image/image.c src/image/image.h)
 add_library(img SHARED src/image/image.c)
 
 add_library(vector SHARED src/vector/vector.c src/tools/tools.c)
-target_link_libraries(vector PRIVATE  m)
+target_link_libraries(vector PRIVATE m)
+target_include_directories(vector PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 add_library(ray SHARED src/ray/ray.c src/tools/tools.c)
 target_link_libraries(ray PUBLIC vector)
@@ -16,7 +17,7 @@ target_include_directories(ray PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 
 add_executable(ppm src/ppm.c ${SOURCES})
-target_link_libraries(ppm PRIVATE img ray)
+target_link_libraries(ppm PRIVATE img ray m)
 target_compile_options(ppm PRIVATE -O3 -Wall -march=native)
 target_include_directories(ppm PRIVATE ${PROJECT_SOURCE_DIR}/src)
 

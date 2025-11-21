@@ -7,6 +7,8 @@
 #include <time.h>
 #include <stdbool.h>
 
+#define PI 3.14159265359
+
 /**
  * @brief State of quadratic resolution
  * @param TWO_SOLUTION two solution available

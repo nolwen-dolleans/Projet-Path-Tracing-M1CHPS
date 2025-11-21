@@ -1,5 +1,6 @@
 #include "image/image.h"
 #include "ray/ray.h"
+
 int main(int argc, char** argv)
 {
 
@@ -14,10 +15,37 @@ int main(int argc, char** argv)
 
     if(strcmp(argv[1], "32") == 0)
     {
-        fprintf(stdout,"Using 32-bit image %ldx%ld.\n",width,height);
         Image_32bit* image = create_image_32bit(width, height);
+        fprintf(stdout,"Using 32-bit image %ldx%ld.\n",image->width,image->height);
 
-        clear_frame_sky_color_32bit(image);
+        //clear_frame_sky_color_32bit(image);
+        clear_frame_color_32bit(image, 0, 0, 0);
+        
+        const float x0 = 0;
+        const float y0 = 0;
+        const float z0 = 8;
+        const float fov = 100;
+
+        Camera cam;
+        Sphere sphere;
+        AABB box;
+
+        create_camera(&cam, width, height, fov, x0, y0, z0);
+        create_sphere(&sphere, 0,0,0,2);
+        create_ray_box(&box, BLU,RED,GRN,RED | BLU,RED | GRN, BLU | GRN);
+        
+
+        for(size_t y1 = 0; y1 < height; ++y1)
+        {
+            for(size_t x1 = 0; x1 < width; ++x1)
+            {
+                trace_ray(&cam, x1, y1);
+                if(box_intersection(&cam, &box)) put_color_at_32bit(image, x1,y1,box.color_hit_r,box.color_hit_g, box.color_hit_b);
+                if(sphere_intersection(&cam, &sphere)) put_color_at_32bit(image, x1,y1, sphere.color.Data[0], sphere.color.Data[1], sphere.color.Data[2]);
+
+
+            }
+        }
 
         write_image_file_32bit(image);
 

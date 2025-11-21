@@ -17,9 +17,8 @@ extern void test_linear_resolution(void);
 extern void test_quadratic_resolution(void);
 
 // ray tests 
-extern void test_create_ray();
-extern void test_ray_create_sphere();
-extern void test_intersect_sphere();
+extern void test_create_sphere();
+extern void test_sphere_intersection();
 
 void setUp(void) {
 }
@@ -44,9 +43,8 @@ int main()
     RUN_TEST(test_linear_resolution);
     RUN_TEST(test_quadratic_resolution);
 
-    RUN_TEST(test_create_ray);
-    RUN_TEST(test_ray_create_sphere);
-    RUN_TEST(test_intersect_sphere);
+    RUN_TEST(test_create_sphere);
+    RUN_TEST(test_sphere_intersection);
 
 
     UNITY_END();
