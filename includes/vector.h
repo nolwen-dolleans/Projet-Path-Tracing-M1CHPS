@@ -124,6 +124,15 @@ Vector* mul(const Vector* const u, const float k);
 void mul_ext(const Vector* const u, const float k, Vector* w);
 
 /**
+ * @brief Multiplication of a single precision 3D vector by a single precsion scalar
+ * @param u A single precision 3D vector
+ * @param v A single precision 3D vector
+ * @param k A single precision scalar
+ * @param w A single precision 3D vector
+ */
+void linear_ext(const Vector* const u, const Vector* const v, const float k, Vector* w);
+
+/**
  * @brief Dot product of two single precision 3D vector
  * @param u A single precision 3D vector
  * @param v A single precision 3D vector

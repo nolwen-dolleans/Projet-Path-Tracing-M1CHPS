@@ -5,18 +5,18 @@
 //  Created by Nolwen Dolléans on 12/11/2025.
 //
 
-#ifndef BRDF_h
-#define BRDF_h
+#ifndef light_h
+#define light_h
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
 #include "image.h"
-#include "ray.h"
 #include "vector.h"
 #include "scene.h"
 #include "time.h"
+#include "ray.h"
 
 
 
@@ -39,4 +39,6 @@ Vector * ray_sampling(Ray * r, Scene * S, int d, int dmax);
  */
 float BRDF_lambertian(Ray const * ray, Vector const * normal, Sphere const * s, float const albedo);
 
-#endif /* BRDF_h */
+void phong_light(const float ambient_str, Vector* normal, const Vector* color_light, Vector* hitPoint, Vector* lightPos, const Vector* color_in, Vector* color_out);
+
+#endif /* light_h */

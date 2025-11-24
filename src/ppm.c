@@ -1,59 +1,84 @@
-
-#include "ray.h"
 #include "image.h"
+#include "ray.h"
 
 int main(int argc, char** argv)
 {
 
-	srand((unsigned int)time(NULL));
-    if(argc != 4)
-    {
-        fprintf(stderr,"Error : Icomplete arguments.\n");
-        exit(1);
-    }
+	if(argc != 4)
+	{
+		fprintf(stderr,"Error : Icomplete arguments.\n");
+		exit(1);
+	}
 
-    const size_t width  = atoi(argv[2]);
-    const size_t height = atoi(argv[3]);
+	const size_t width  = atoi(argv[2]);
+	const size_t height = atoi(argv[3]);
 
-    if(strcmp(argv[1], "32") == 0)
-    {
-        fprintf(stdout,"Using 32-bit image %ldx%ld.\n",width,height);
-        Image_32bit* image = create_image_32bit(width, height);
+	if(strcmp(argv[1], "32") == 0)
+	{
+		Image_32bit* image = create_image_32bit(width, height);
+		fprintf(stdout,"Using 32-bit image %ldx%ld.\n",image->width,image->height);
 
-        clear_frame_sky_color_32bit(image);
+		//clear_frame_sky_color_32bit(image);
+		clear_frame_color_32bit(image, 0, 0, 0, 0);
+		
+		const float x0 = 0;
+		const float y0 = 0;
+		const float z0 = 8;
+		const float fov = 100;
 
-        write_image_file_32bit(image);
+		Camera cam;
+		Sphere sphere;
+		AABB box;
 
-        free_image_32bit(image);
-    }
-    else if(strcmp(argv[1], "24") == 0)
-    {
-        fprintf(stdout,"Using 24-bit image %ldx%ld.\n",width,height);
+		create_camera(&cam, width, height, fov, x0, y0, z0);
+		create_sphere(&sphere, 0,0,0,2);
+		create_ray_box(&box, BLU,RED,GRN,RED | BLU,RED | GRN, BLU | GRN);
+		
 
-        Image_24bit* image = create_image_24bit(width, height);
+		for(size_t y1 = 0; y1 < height; ++y1)
+		{
+			for(size_t x1 = 0; x1 < width; ++x1)
+			{
+				trace_ray(&cam, x1, y1);
+				if(box_intersection(&cam, &box)) put_color_at_32bit(image, x1,y1,box.color_hit_r,box.color_hit_g, box.color_hit_b, 0);
+				if(sphere_intersection(&cam, &sphere)) put_color_at_32bit(image, x1,y1, sphere.color.Data[0], sphere.color.Data[1], sphere.color.Data[2], 0);
 
-        clear_frame_sky_color_24bit(image);
 
-        write_image_file_24bit(image);
+			}
+		}
 
-        free_image_24bit(image);
-    }
-    else if(strcmp(argv[1], "24ptr") == 0)
-    {
-        fprintf(stdout,"Using 24-bit ptr image %ldx%ld.\n",width,height);
+		write_image_file_32bit(image);
 
-        Image_24bit_ptr* image = create_image_24bit_ptr(width, height);
+		free_image_32bit(image);
+	}
+	else if(strcmp(argv[1], "24") == 0)
+	{
+		fprintf(stdout,"Using 24-bit image %ldx%ld.\n",width,height);
 
-        clear_frame_sky_color_24bit_ptr(image);
+		Image_24bit* image = create_image_24bit(width, height);
 
-        write_image_file_24bit_ptr(image);
+		clear_frame_sky_color_24bit(image);
 
-        free_image_24bit_ptr(image);
-    }
-    else
-    {
-        fprintf(stderr, "Erreur : argument incorect");
-    }
+		write_image_file_24bit(image);
 
-    return 0;
+		free_image_24bit(image);
+	}
+	else if(strcmp(argv[1], "24ptr") == 0)
+	{
+		fprintf(stdout,"Using 24-bit ptr image %ldx%ld.\n",width,height);
+
+		Image_24bit_ptr* image = create_image_24bit_ptr(width, height);
+
+		clear_frame_sky_color_24bit_ptr(image);
+
+		write_image_file_24bit_ptr(image);
+
+		free_image_24bit_ptr(image);
+	}
+	else
+	{
+		fprintf(stderr, "Erreur : argument incorect");
+	}
+
+	return 0;
 }

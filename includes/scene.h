@@ -17,6 +17,7 @@
 #include "tools.h"
 #include "vector.h"
 #include "ray.h"
+#include "image.h"
 
 
 typedef struct Scene{
@@ -55,6 +56,6 @@ void free_scene(Scene * S);
  * @param backgroundColor a uint32_t represent the background color
  * @return Scene
  */
-Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint32_t backgroundColor);
+Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint24_t backgroundColor);
 
 #endif /* scene_h */
