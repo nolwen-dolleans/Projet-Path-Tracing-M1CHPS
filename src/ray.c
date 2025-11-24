@@ -82,7 +82,7 @@ Ray random_Ray(Vector const * Origin){
 }
 
 
-void create_sphere(Sphere* const sph ,const float x, const float y, const float z, const float rad)
+void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad)
 {
 	create_vector_ext(&sph->position,x, y, z);
 	sph->radius = rad;
@@ -92,7 +92,7 @@ Sphere* create_sphere_default(void)
 {
     Sphere* sphere = (Sphere*)malloc_check(sizeof(Sphere));
     create_vector_ext(&sphere->position,0.0f, 0.0f, 0.0f);
-    sphere->radius = 2.0f;
+    sphere->radius = 0.0f;
 
     return sphere;
 }
@@ -150,7 +150,7 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 }
 
 
-Vector* intersect_sphere(const Ray* const r, const Sphere* const s)
+Vector intersect_sphere(const Ray* const r, const Sphere* const s)
 {
 /*     const float bx2 = r->direction.Data[0]*r->direction.Data[0];
     const float by2 = r->direction.Data[1]*r->direction.Data[1];
@@ -187,19 +187,18 @@ Vector* intersect_sphere(const Ray* const r, const Sphere* const s)
     const float C = dot(w,w) - s->radius*s->radius;
 
     Quadratic_info* quad = quadratic_resolution(A, B, C);
-    Vector* solutions = NULL;
+	Vector solutions;
+	create_vector_ext(&solutions, 0, 0, 0);
     Vector u0;
     Vector u1;
 	if(quad == NULL)return solutions;
     switch (quad->state)
     {
     case ONE_SOLUTION:
-        solutions = (Vector*)malloc_check(1 * sizeof(Vector));
         mul_ext(u, quad->x0,&u0);
-        add_ext(O, &u0, solutions);
+        add_ext(O, &u0, &solutions);
         break;
     case TWO_SOLUTION:
-        solutions = (Vector*)malloc_check(1 *sizeof(Vector));
         Vector s1;
         Vector s2;
         mul_ext(u, quad->x0,&u0);
@@ -211,10 +210,10 @@ Vector* intersect_sphere(const Ray* const r, const Sphere* const s)
 		Vector * d1 = sub(&s1, O);
 		Vector * d2 = sub(&s2, O);
 		if(length(d1) < length(d2)){
-			*solutions = s1;
+			solutions = s1;
 		}
 		else{
-			*solutions = s2;
+			solutions = s2;
 		}
 			
 		free_vector(d1);

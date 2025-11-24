@@ -75,6 +75,14 @@ void create_vector_ext(Vector* u, const float x, const float y, const float z);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+/**
+ * @brief Retrun a bool: true if the vector is null, false else
+ * @param v A single precision 3D vector
+ * @return bool
+ */
+bool is_null(const Vector * v);
+
 /**
  * @brief Sum of two single precision 3D vector
  * @param u A single precision 3D vector

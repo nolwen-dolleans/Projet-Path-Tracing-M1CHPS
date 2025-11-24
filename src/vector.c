@@ -218,3 +218,10 @@ void free_vector(Vector* u)
     if(u) free(u);
     else fprintf(stderr,"No need to free memory.\n");
 }
+
+bool is_null(const Vector * v){
+	for(int i = 0; i<3; ++i){
+		if(v->Data[i] != 0) return false;
+	}
+	return true;
+}
