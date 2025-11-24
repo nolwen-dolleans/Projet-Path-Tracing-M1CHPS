@@ -19,12 +19,13 @@ Ray* create_ray(const float x0, const float y0, const float z0, const float x1, 
     return ray;
 }
 
-Ray* random_Ray(Vector const * Origin){
-	float x1 = rand()%2;
-	float y1 = rand()%2;
-	float z1 = rand()%2;
-	Ray * ray = create_ray(Origin->Data[0], Origin->Data[1], Origin->Data[2], x1, y1, z1);
-	norm(&ray->direction);
+Ray random_Ray(Vector const * Origin){
+	Ray ray;
+	ray.position = *Origin;
+	for (int i = 0; i<3; ++i) {
+		ray.direction.Data[i] = rand()%2;
+	}
+	norm(&ray.direction);
 	
 	return ray;
 }
@@ -128,9 +129,12 @@ Vector* intersect_sphere(const Ray* const r, const Sphere* const s)
 
 }
 
-Vector* get_normal_vector(const Vector * point, const Sphere * s){
-	Vector * n = sub(point,&s->position);
-	norm_ext(n,n);
+Vector get_normal_vector(const Vector * point, const Sphere * s){
+	Vector n;
+	for (int i = 0; i<3; ++i) {
+		n.Data[i] = point->Data[i]-s->position.Data[i];
+	}
+	norm_ext(&n,&n);
 	return n;
 }
 

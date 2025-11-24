@@ -101,6 +101,7 @@ Image_32bit* create_image_32bit(const size_t width, const size_t height);
  * @param r La partie rouge de la couleur
  * @param g La partie verte de la couleur
  * @param b La partie bleu de la couleur
+ * @param a La partie Alpha 
  * @return une couleur en 32 bit
  */
 uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
@@ -135,8 +136,9 @@ void set_color_24bit_ptr(uint24_t_ptr* color,const size_t i,const uint8_t r, con
  * @param r La partie rouge de la couleur
  * @param g La partie verte de la couleur
  * @param b La partie bleu de la couleur
+ * @param a La partie Alpha
  */
-void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
+void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 
 /**
  * @brief Change la couleur d'un pixel de coordonnée x,y
@@ -207,8 +209,9 @@ void clear_frame_color_24bit_ptr(Image_24bit_ptr *const img, const uint8_t r, co
  * @param r Rouge
  * @param g Vert
  * @param b Bleu
+ * @param a Alpha
  */
-void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b);
+void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 
 /**
  * @brief Remplit les pixel de couleur pour créer un effet de ciel

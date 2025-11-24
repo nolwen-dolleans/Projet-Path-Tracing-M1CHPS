@@ -57,7 +57,7 @@ Sphere* create_sphere_default(void);
  * @param Origin Ray 3D position
  * @return A 3D ray with random direction
  */
-Ray* random_Ray(Vector const * Origin);
+Ray random_Ray(Vector const * Origin);
 
 /**
  * @brief Create a 3D sphere
@@ -83,7 +83,7 @@ Vector* intersect_sphere(const Ray* const r, const Sphere* const s);
  * @param s pointer of sphere
  * @return pointer to the normal vector
  */
-Vector* get_normal_vector(const Vector * point, const Sphere * s);
+Vector get_normal_vector(const Vector * point, const Sphere * s);
 
 /**
  * @brief Free ray

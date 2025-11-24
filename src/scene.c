@@ -23,7 +23,7 @@ void free_scene(Scene * S){
 }
 
 
-Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint32_t * backgroundColor){
+Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint32_t backgroundColor){
 	Scene * s = malloc(sizeof(Scene));
 	s->objects = malloc(sizeof(Sphere)*n_objects);
 	s->lightsources = malloc(sizeof(Vector)*n_lightsources);
@@ -43,7 +43,7 @@ void add_object_to_scene(Scene * S, Sphere * s){
 	S->objects[i] = s;
 }
 
-Vector *  intersect_in_scene(const Ray* const r, const Scene* const S, int * object){
+Vector intersect_in_scene(const Ray* const r, const Scene* const S, int * object){
 	int object_index = -1;
 	double t = 10000; 				//distance minimale entre l'origine du rayon et de l'objet
 	const Vector * origins = &r->position;
