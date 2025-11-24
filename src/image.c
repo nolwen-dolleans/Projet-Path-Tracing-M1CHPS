@@ -106,9 +106,9 @@ Image_32bit* create_image_32bit(const size_t width, const size_t height)
 };
 
 
-uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b)
+uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
-    return r << 16 | g << 8 | b;
+    return a << 24 | r << 16 | g << 8 | b;
 }
 
 void set_color_24bit(uint24_t* color,const uint8_t r, const uint8_t g, const uint8_t b)
@@ -125,9 +125,9 @@ void set_color_24bit_ptr(uint24_t_ptr* color,const size_t i,const uint8_t r, con
     color->bytes[2][i] = b;
 }
 
-void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
+void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
-   img->buffer[y * img->height + x] = get_color_32bit(r,g,b);
+   img->buffer[y * img->height + x] = get_color_32bit(r,g,b,a);
 }
 
 void put_color_at_24bit_ptr(Image_24bit_ptr* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
@@ -183,9 +183,9 @@ void clear_frame_color_24bit_ptr(Image_24bit_ptr *const img, const uint8_t r, co
     }
 }
 
-void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b)
+void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
-    const uint32_t color = get_color_32bit(r, g, b);
+    const uint32_t color = get_color_32bit(r, g, b, a);
     memset(img->buffer, color, img->height * img->width * sizeof(uint32_t));
 }
 
@@ -224,7 +224,7 @@ void clear_frame_sky_color_32bit(Image_32bit *const img)
         {
             // Génere un effet de ciel bleu selon la hauteur de l'image 
             const uint8_t k = i * 255 / img->height;
-            img->buffer[i * img->width + j] = get_color_32bit( k % 255, k % 255, 255);
+            img->buffer[i * img->width + j] = get_color_32bit( k % 255, k % 255, 255, 0);
         }
     }   
 }

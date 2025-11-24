@@ -4,6 +4,7 @@ add_library(LibPathTracing
     scene.c
     tools.c
     vector.c
+    BRDF.c
 )
 
 target_include_directories(LibPathTracing     PUBLIC ${PROJECT_SOURCE_DIR}/include)

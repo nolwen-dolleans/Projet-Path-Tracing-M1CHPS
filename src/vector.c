@@ -3,7 +3,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Vector* create_vector_default()
+Vector* create_vector_default(void)
 {
     Vector* v = (Vector*)malloc_check(sizeof(Vector));
 
@@ -21,7 +21,7 @@ void create_vector_default_ext(Vector* u)
     u->Data[2] = 0.0f;
 }
 
-Vector* create_vector_random_default()
+Vector* create_vector_random_default(void)
 {
     Vector* v = (Vector*)malloc_check(sizeof(Vector));
 

@@ -1,11 +1,11 @@
 
 #include "ray.h"
-
 #include "image.h"
 
 int main(int argc, char** argv)
 {
 
+	srand((unsigned int)time(NULL));
     if(argc != 4)
     {
         fprintf(stderr,"Error : Icomplete arguments.\n");

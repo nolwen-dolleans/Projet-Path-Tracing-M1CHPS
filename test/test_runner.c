@@ -21,6 +21,11 @@ extern void test_create_ray(void);
 extern void test_ray_create_sphere(void);
 extern void test_intersect_sphere(void);
 
+// scene tests
+extern void test_create_scene(void);
+extern void test_intersect_scene(void);
+
+
 void setUp(void) {
 }
 void tearDown(void) {}
@@ -47,6 +52,10 @@ int main(void)
     RUN_TEST(test_create_ray);
     RUN_TEST(test_ray_create_sphere);
     RUN_TEST(test_intersect_sphere);
+	
+	
+    RUN_TEST(test_create_scene);
+    RUN_TEST(test_intersect_scene);
 
 
     UNITY_END();

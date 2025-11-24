@@ -10,7 +10,7 @@
 
 /**
  * @brief Entier naturel sur 24-bit
- * @param byte Tableau de 3 bytes
+ * @var byte Tableau de 3 bytes
  */
 typedef struct uint24_t
 {
@@ -18,8 +18,9 @@ typedef struct uint24_t
 }uint24_t;
 
 /**
+ * @struct uint24\_t\_ptr
  * @brief Triple buffer d'entier naturel sur 24-bit
- * @param bytes 3 pointeurs sur 1 byte
+ * @var bytes 3 pointeurs sur 1 byte
  */
 typedef struct uint24_t_ptr
 {
@@ -27,11 +28,12 @@ typedef struct uint24_t_ptr
 }uint24_t_ptr;
 
 /**
+ * @struct Image24bit
  * @brief Image avec un buffer codé sur 24-bit
- * @param width Longueur de l'image
- * @param height Hauteur de l'image
- * @param img_file Pointeur sur notre fichier image
- * @param buffer Buffer 24-bit
+ * @var width Longueur de l'image
+ * @var height Hauteur de l'image
+ * @var img\_file Pointeur sur notre fichier image
+ * @var  buffer Buffer 24-bit
  */
 typedef struct Image_24bit
 {
@@ -43,10 +45,10 @@ typedef struct Image_24bit
 
 /**
  * @brief Image avec un triple buffer codé sur 24-bit
- * @param width Longueur de l'image
- * @param height Hauteur de l'image
- * @param img_file Pointeur sur notre fichier image
- * @param buffer Triple Buffer 24-bit
+ * @var width Longueur de l'image
+ * @var height Hauteur de l'image
+ * @var img\_file Pointeur sur notre fichier image
+ * @var buffer Triple Buffer 24-bit
  */
 typedef struct Image_24bit_ptr
 {
@@ -58,10 +60,10 @@ typedef struct Image_24bit_ptr
 
 /**
  * @brief Image avec un buffer codé sur 32-bit
- * @param width Longueur de l'image
- * @param height Hauteur de l'image
- * @param img_file Pointeur sur notre fichier image
- * @param buffer Buffer 32-bit
+ * @var width Longueur de l'image
+ * @var height Hauteur de l'image
+ * @var img_file Pointeur sur notre fichier image
+ * @var buffer Buffer 32-bit
  */
 typedef struct Image_32bit
 {
@@ -99,9 +101,10 @@ Image_32bit* create_image_32bit(const size_t width, const size_t height);
  * @param r La partie rouge de la couleur
  * @param g La partie verte de la couleur
  * @param b La partie bleu de la couleur
+ * @param a La partie Alpha 
  * @return une couleur en 32 bit
  */
-uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b);
+uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 
 
 /**
@@ -133,8 +136,9 @@ void set_color_24bit_ptr(uint24_t_ptr* color,const size_t i,const uint8_t r, con
  * @param r La partie rouge de la couleur
  * @param g La partie verte de la couleur
  * @param b La partie bleu de la couleur
+ * @param a La partie Alpha
  */
-void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
+void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 
 /**
  * @brief Change la couleur d'un pixel de coordonnée x,y
@@ -205,8 +209,9 @@ void clear_frame_color_24bit_ptr(Image_24bit_ptr *const img, const uint8_t r, co
  * @param r Rouge
  * @param g Vert
  * @param b Bleu
+ * @param a Alpha
  */
-void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b);
+void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 
 /**
  * @brief Remplit les pixel de couleur pour créer un effet de ciel
