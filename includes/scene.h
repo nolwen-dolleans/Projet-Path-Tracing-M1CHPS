@@ -40,9 +40,6 @@ typedef struct Scene{
 Vector intersect_in_scene(const Ray* const r, const Scene* const S, int * object);
 
 
-
-void add_object_to_scene(Scene * S, Sphere * s);
-
 /**
  * @brief Free scene
  * @param S A pointer of a scene

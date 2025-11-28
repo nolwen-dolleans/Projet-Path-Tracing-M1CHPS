@@ -1,0 +1,105 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{Equation de rendu}
+\author{}
+\date{12/11/2025}
+
+\begin{document}
+
+    \maketitle
+
+    \section{Équation de rendu}
+    L'équation de rendu représente l'impact de la radiance de la lumière sur une surface. En effet, elle va nous permettre de déterminer la manière dont la lumière se reflète sur un objet. \\
+    
+    L'équation de rendu se définie comme suit:\\
+    $$\boxed{L_{o}\left(x, \omega_o\right) = L_{e}\left(x, \omega_o,\right) + \int_{\Omega}f\left(x, \omega_o, \omega_i,\right)\cdot L_{i}\left(x, \omega_i\right)\cdot \left(\textbf{n}\bullet\omega_{i}\right)\cdot d_{\omega_i}}$$
+    
+    avec: 
+	\begin{itemize}
+  		\item[$\_$] $L_o$ : La radiance réfléchis sur la surface au point $x$ de direction $\omega_o$.
+  		\item[$\_$] $L_e$ : La radiance émise par la surface au point $x$ de direction $\omega_o$.
+  		\item[$\_$] $L_i$ : La radiance d'un des rayons incidents sur la surface au point $x$ de direction $\omega_i\subset\Omega$, le hémisphère centré autour de la normale $\textbf{n}$ du point x.
+  		\item[$\_$] $f$ : le BRDF qui représente la manière dont le matériaux reflète la lumière.
+	\end{itemize}\
+	
+	\subsection{Démonstrations}
+	
+    \subsubsection{Cas Général}
+	
+	Par définition, la radiance incidente se détermine comme suit:\\
+    $$L_{o} = L_{e} + L_{r}$$
+    
+    $L_r$ représente l'ensemble des rayons incidents sur la surface qui se réfléchi en un rayon de direction $\omega_i$ dont la formule est:
+    $$L_r = \int_{\Omega}f\left(x, \omega_o, \omega_i\right)\cdot L_{i}\left(x, \omega_i\right)\cdot \left(\textbf{n}\bullet\omega_{i}\right)\cdot d_{\omega_i}$$
+    
+    Ce qui nous donne l'équation de rendu ci-dessus.\\
+    
+    
+    
+    \subsubsection{Matériaux Lambertiens}
+    Cette équation n'est pas résoluble analytiquement. Pour faciliter les calculs et l'implémentation de notre path tracing, nous allons nous prendre le cas des matériaux dit "Lambertien".\\
+    
+    Les matériaux lambertiens ont les propriétés suivantes:
+    \begin{itemize}
+  		\item[$\_$] Ils sont isotropes (leur structures sont identiques peu importe où l'on regarde)
+  		\item[$\_$] Ils sont diffus (les rayons réfléchis sont dans l'hémisphère $\Omega$ de manière équiprobable)
+  		\item[$\_$] Ils n'émettent pas de lumière dans le visible.
+	\end{itemize}
+	Les conséquences sont que pour un matériau lambertien, le BRDF est invariant de $x$ et $\omega$.\\
+	Les rayons de direction $\omega_i$ sont seulement dans l'hémisphère $\Omega$.\\
+	
+	De ces faits, nous pouvons réécrire l'équation de rendu:
+	 $$L_{o}\left(x, \omega_o,\right) = f_{const}\int_{\Omega}L_{i}\left(x, \omega_i,\right)\cdot \left(\textbf{n}\bullet\omega_{i}\right)\cdot d_{\omega_i}$$\\
+	 
+	 On définie l'irradiance incidente $E_i=\int_{\Omega}L_{i}\left(x, \omega_i,\right)\cdot \left(\textbf{n}\bullet\omega_{i}\right)\cdot d_{\omega_i}$ et l'irradiance réfléchie $E_o=\int_{\Omega}L_{o}\left(x, \omega_o,\right)\cdot \left(\textbf{n}\bullet\omega\right)\cdot d_{\omega}$ la puissance d'un rayonnement électromagnétique frappant sur une unité de surface.\\
+	 
+	 On définit également l'albédo $\rho\left( x, \omega_i, \omega_o\right)$qui représente le rapport entre le radiance émise et la radiance incidente:$\rho\left( x, \omega_i, \omega_o\right) =\frac{L_o\left( x, \omega_i, \omega_o\right)}{L_r\left( x, \omega_i, \omega_o\right)} = \frac{E_o\left( x, \omega_i, \omega_o\right)}{E_r\left( x, \omega_i, \omega_o\right)}$
+	 
+	 Nous avons donc le système suivant:
+	 $$
+	 \left\{
+		\begin{array}{rcr}
+			L_o = f_{const}*E_i \\
+			E_o = L_o\int_{\Omega}\left(\textbf{n}\bullet\omega\right)\cdot d_{\omega}
+		\end{array}
+	\right.
+	 $$
+	 
+	 $$
+	 \Leftrightarrow\left\{
+		\begin{array}{rcr}
+			L_o = f_{const}*E_i \\
+			E_o = L_o\int_{\Omega}\cos(\theta)\cdot d_{\omega}
+		\end{array}
+	\right.
+	 $$\\
+	 
+	 En se plaçant en coordonnées cylindriques pour un hémisphère de rayon 1: $d_\omega = \sin(\theta)\cdot d_\theta\cdot d_\varphi$ avec $\theta\in\left[0,\frac\pi{2}\right]$ et $\varphi\in\left[-\pi,\pi\right]$.\\
+	 Donc $\int_{\Omega}\cos(\theta)\cdot d_{\omega}$ devient:
+	 $$\int_{\Omega}\cos(\theta)\cdot d_{\omega} = \int_{-\pi}^\pi\int_0^\frac{\pi}{2}\cos(\theta)\sin(\theta)d_\theta d_\varphi=2\pi\cdot\left[\frac{\sin^2(\theta)}{2}\right]_0^\frac{\pi}{2}=\boxed{\pi}$$
+	 
+	 Donc le système devient:
+	 $$
+	 \left\{
+		\begin{array}{rcr}
+			L_o = f_{const}*E_i \\
+			L_o = \frac{E_o}{\pi}
+		\end{array}
+	\right.
+	 $$
+	 
+	 Donc nous avons la formule du BRDF suivante:
+	 $$\frac{E_o}{\pi} = f_{const}*E_i$$
+	 $$ \Leftrightarrow f_{const} = \frac{E_o}{E_i}\cdot\frac1{\pi} = \boxed{\frac\rho\pi}$$\\
+	 
+	 
+	 Ceci nous permet de conclure avec l'équation sur laquelle nous allons travailler dans cette première partie du projet:
+	 
+	 $$ 
+	 \boxed{L_o\left(x, \omega_i,\right) = \frac\rho\pi\int_\Omega L_i\left(x, \omega_i,\right)\left(\textbf{n}\bullet\omega_i\right) d_{\omega_i}}
+	 $$\\
+	 
+	 \subsection{Approximation avec la méthode Monte-Carlo}
+\end{document}

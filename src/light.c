@@ -25,8 +25,10 @@ inline Vector * convert_to_vect(uint24_t rgb){
 	return result;
 }
 
+
+
 Vector * ray_sampling(Ray * r, Scene * S, int d, int dmax){
-	Vector * color = create_vector_default();                         //ceci va représenter la réflectance du rayon incident avec RGB comme composante
+	Vector * L_incident = create_vector_default();                         //ceci va représenter la réflectance du rayon incident avec RGB comme composante
 	int object = -1;
 	if (d == dmax) {
 		return convert_to_vect(S->background_color);// par défaut met en noir si le rayon à fait un certain nombre de rebond
@@ -40,19 +42,19 @@ Vector * ray_sampling(Ray * r, Scene * S, int d, int dmax){
 	Vector n = get_normal_vector(&intersection, S->objects[object]);
 	Ray r_new = random_Ray_demi_sphere(&intersection,&n); 		// créé un rebond sur la zone d'intersection
 	
-	Vector * color_i = ray_sampling(&r_new,S,d+1,dmax);
+	Vector * L_emitted_i = ray_sampling(&r_new,S,d+1,dmax);
 	
 	float cos_teta = dot(&n,&r_new.direction);
 	float albedo = 0.9f;
-	//float pdf = 1 / M_PI;
+	//float pdf = cos+teta / M_PI;
 	//float BRDF = S->objects[object]->color * albedo / M_PI;
-	Vector BRDF_pdf = *mul(mul(&S->objects[object]->color, albedo), cos_teta);
+	Vector BRDF_pdf = *mul(&S->objects[object]->color, albedo);
 	
 	for(int i = 0; i<3; ++i){
-		color_i->Data[i] *= BRDF_pdf.Data[i];
-		color->Data[i]+= color_i->Data[i];
+		L_emitted_i->Data[i] *= BRDF_pdf.Data[i];
+		L_incident->Data[i]+= L_emitted_i->Data[i];
 	}
-	return color;
+	return L_incident;
 }
 
 
