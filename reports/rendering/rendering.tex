@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{amsfonts}
 
 \title{Equation de rendu}
 \author{}
@@ -14,7 +15,7 @@
     L'équation de rendu représente l'impact de la radiance de la lumière sur une surface. En effet, elle va nous permettre de déterminer la manière dont la lumière se reflète sur un objet. \\
     
     L'équation de rendu se définie comme suit:\\
-    $$\boxed{L_{o}\left(x, \omega_o\right) = L_{e}\left(x, \omega_o,\right) + \int_{\Omega}f\left(x, \omega_o, \omega_i,\right)\cdot L_{i}\left(x, \omega_i\right)\cdot \left(\textbf{n}\bullet\omega_{i}\right)\cdot d_{\omega_i}}$$
+    $$\boxed{L_{o}\left(x, \omega_o\right) = L_{e}\left(x, \omega_o\right) + \int_{\Omega}f\left(x, \omega_o, \omega_i,\right)\cdot L_{i}\left(x, \omega_i\right)\cdot \left(\textbf{n}\bullet\omega_{i}\right)\cdot d_{\omega_i}}$$
     
     avec: 
 	\begin{itemize}
@@ -98,8 +99,32 @@
 	 Ceci nous permet de conclure avec l'équation sur laquelle nous allons travailler dans cette première partie du projet:
 	 
 	 $$ 
-	 \boxed{L_o\left(x, \omega_i,\right) = \frac\rho\pi\int_\Omega L_i\left(x, \omega_i,\right)\left(\textbf{n}\bullet\omega_i\right) d_{\omega_i}}
+	 \boxed{L_o\left(x, \omega_i\right) = \frac\rho\pi\int_\Omega L_i\left(x, \omega_i\right)\left(\textbf{n}\bullet\omega_i\right) d_{\omega_i}}
 	 $$\\
 	 
 	 \subsection{Approximation avec la méthode Monte-Carlo}
+	 
+	 La méthode de Monte-Carlo est une méthode itérative permettant de passer d'une intégrale à une somme d'échantillons aléatoires pondérée par une loi de probabilité notée $pdf$ (Probability Density Function). Cette somme converge vers la solution vraie en fonction du nombre d'échantillons.
+	 Ainsi, nous avons l'approximation suivante:\\
+	 
+	 Soit g, une fonction telle que: $g:\ \left\{
+	 \begin{array}{l}
+	 \mathbb{R} \longmapsto \mathbb{R}\\
+	 x\longrightarrow g(x)
+	 \end{array}
+	 \right.$:
+	 $$
+	 I = \int_\Omega g(x)d_x \approx \frac1{N}\sum_k^N\frac{g(x_k)}{pdf(x_k)}
+	 $$
+	 
+	 Pour des matériau lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted" dans l'hémisphère orienté sur $\textbf{n}$. Nous avons donc $pdf(\omega_i)=\frac{(\textbf{n}\bullet\omega_i)}{\pi}$.\\
+	 
+	 Ainsi, nous pouvons donc approximer la radiance $L_o$ de la manière suivante:
+	 
+	 $$ 
+	 \boxed{L_o\left(x, \omega_i\right) = \frac\rho N\sum_i^N L_i\left(x, \omega_i\right)}
+	 $$\\
+	 
+	 Ce qui simplifie grandement l'équation de rendu, et nous permettra de l'implémenter avec un appel récursif.\\
+	 Plus précisément, notre fonction calculera $\rho\ L_i\left(x, \omega_i\right)$ puis nous l'appellerons récursivement pour un certain nombre de rebonds. Cette fonction sera ensuite appelée N fois par pixels.
 \end{document}
