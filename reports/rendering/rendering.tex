@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{tikz-cd}
 
 \title{Equation de rendu}
 \author{}
@@ -13,6 +14,7 @@
 
     \section{Équation de rendu}
     L'équation de rendu représente l'impact de la radiance de la lumière sur une surface. En effet, elle va nous permettre de déterminer la manière dont la lumière se reflète sur un objet. \\
+ 
     
     L'équation de rendu se définie comme suit:\\
     $$\boxed{L_{o}\left(x, \omega_o\right) = L_{e}\left(x, \omega_o\right) + \int_{\Omega}f\left(x, \omega_o, \omega_i,\right)\cdot L_{i}\left(x, \omega_i\right)\cdot \left(\textbf{n}\bullet\omega_{i}\right)\cdot d_{\omega_i}}$$

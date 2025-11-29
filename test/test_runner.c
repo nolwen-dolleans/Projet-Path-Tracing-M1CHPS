@@ -52,11 +52,9 @@ int main(void)
     RUN_TEST(test_create_ray);
     RUN_TEST(test_ray_create_sphere);
     RUN_TEST(test_intersect_sphere);
-	
-	
+    
     RUN_TEST(test_create_scene);
     RUN_TEST(test_intersect_scene);
 
-
-    UNITY_END();
+    return UNITY_END();
 }

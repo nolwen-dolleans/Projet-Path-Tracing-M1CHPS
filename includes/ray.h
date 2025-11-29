@@ -71,7 +71,7 @@ typedef struct Camera
 	size_t height;
 	float inv_width;
 	float inv_height;
-	Vector ray;
+	Ray ray;
 }Camera;
 
 /**
@@ -122,6 +122,12 @@ Ray* create_ray_default(void);
 
 /**
  * @brief Create 3D ray
+ * @return A 3D ray
+ */
+void create_ray_default_ext(Ray * ray);
+
+/**
+ * @brief Create 3D ray
  * @param x0 position x
  * @param y0 position y
  * @param z0 position z
@@ -131,6 +137,18 @@ Ray* create_ray_default(void);
  * @return A 3D ray
  */
 Ray* create_ray(const float x0, const float y0, const float z0, const float x1, const float y1, const float z1);
+
+/**
+ * @brief Create 3D ray
+ * @param x0 position x
+ * @param y0 position y
+ * @param z0 position z
+ * @param x1 direction x
+ * @param y1 direction y
+ * @param z1 direction z
+ * @return A 3D ray
+ */
+void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, const float x1, const float y1, const float z1);
 
 /**
  * @brief Create a 3D sphere

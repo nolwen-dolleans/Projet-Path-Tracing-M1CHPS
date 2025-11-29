@@ -7,11 +7,6 @@
 
 #include "scene.h"
 
-
-
-
-
-
 void free_scene(Scene * S){
 	for(int i = 0;i<S->size_objects;++i){
 		free_sphere(S->objects[i]);
@@ -25,7 +20,7 @@ void free_scene(Scene * S){
 
 Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint24_t backgroundColor){
 	Scene * s = malloc(sizeof(Scene));
-	s->objects = malloc(sizeof(Sphere)*n_objects);
+	s->objects = malloc(sizeof(Sphere*)*n_objects);
 	for(int i = 0; i<n_objects; ++i){
 		s->objects[i] = malloc(sizeof(Sphere));
 	}
@@ -36,7 +31,7 @@ Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint24_t backg
 	return s;
 }
 
-Vector intersect_in_scene(const Ray* const r, const Scene* const S, int * object){
+Vector intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object){
 	int object_index = -1;
 	double t = 10000; 				//distance minimale entre l'origine du rayon et de l'objet
 	const Vector * origins = &r->position;
@@ -61,8 +56,6 @@ Vector intersect_in_scene(const Ray* const r, const Scene* const S, int * object
 		intersection = intersect_sphere(r, S->objects[object_index]);
 	}
 	*object = object_index;
-	printf("%d\n", object_index);
-	printf("%f %f %f\n",intersection.Data[0],intersection.Data[1],intersection.Data[2]);
 	return intersection;
 	
 	

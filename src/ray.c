@@ -1,4 +1,6 @@
 #include "ray.h"
+#include "light.h"
+
 
 void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0)
 {
@@ -60,23 +62,36 @@ Ray* create_ray_default(void)
     return ray;
 }
 
+void create_ray_default_ext(Ray * ray)
+{
+    create_vector_default_ext(&ray->position);
+    create_vector_ext(&ray->direction,0.0f, 0.0f, 0.0f);
+}
+
 Ray* create_ray(const float x0, const float y0, const float z0, const float x1, const float y1, const float z1)
 {
     Ray* ray = (Ray*)malloc_check(sizeof(Ray));
     create_vector_ext(&ray->position,x0, y0, z0);
     create_vector_ext(&ray->direction,x1, y1, z1);
-	norm(&ray->direction);
+	norm_ext(&ray->direction,&ray->direction);
 
     return ray;
+}
+void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, const float x1, const float y1, const float z1)
+{
+    create_vector_ext(&ray->position,x0, y0, z0);
+    create_vector_ext(&ray->direction,x1, y1, z1);
+	norm_ext(&ray->direction,&ray->direction);
+
 }
 
 Ray random_Ray(Vector const * Origin){
 	Ray ray;
 	ray.position = *Origin;
 	for (int i = 0; i<3; ++i) {
-		ray.direction.Data[i] = rand()%2;
+		ray.direction.Data[i] = rand();
 	}
-	norm(&ray.direction);
+	norm_ext(&ray.direction, &ray.direction);
 	
 	return ray;
 }
@@ -178,13 +193,13 @@ Vector intersect_sphere(const Ray* const r, const Sphere* const s)
     const float B = ax_bx + ay_by + az_bz - bx_xc - by_yc - bz_zc;
     const float C = ax2 + ay2 + az2 - xc2 - yc2 - zc2 - r2; */
 	
-	Vector const * O = &r->position;
-	Vector const * u = &r->direction;
-	Vector * w = sub(O,&s->position);
-
-    const float A = dot(u,u);
-    const float B = 2.0f * dot(u,w);
-    const float C = dot(w,w) - s->radius*s->radius;
+	Vector const O = r->position;
+	Vector const u = r->direction;
+	Vector w;
+	sub_ext(&O,&s->position,&w);
+    const float A = dot(&u,&u);
+    const float B = 2.0f * dot(&u,&w);
+    const float C = dot(&w,&w) - s->radius*s->radius;
 
     Quadratic_info* quad = quadratic_resolution(A, B, C);
 	Vector solutions;
@@ -195,35 +210,33 @@ Vector intersect_sphere(const Ray* const r, const Sphere* const s)
     switch (quad->state)
     {
     case ONE_SOLUTION:
-        mul_ext(u, quad->x0,&u0);
-        add_ext(O, &u0, &solutions);
+        mul_ext(&u, quad->x0,&u0);
+        add_ext(&O, &u0, &solutions);
         break;
     case TWO_SOLUTION:
         Vector s1;
         Vector s2;
-        mul_ext(u, quad->x0,&u0);
-        add_ext(O, &u0, &s1);
+        mul_ext(&u, quad->x0,&u0);
+        add_ext(&O, &u0, &s1);
 
-        mul_ext(u, quad->x1,&u1);
-        add_ext(O, &u1, &s2);
-		
-		Vector * d1 = sub(&s1, O);
-		Vector * d2 = sub(&s2, O);
-		if(length(d1) < length(d2)){
+        mul_ext(&u, quad->x1,&u1);
+        add_ext(&O, &u1, &s2);
+		Vector d1;
+		Vector d2;
+		sub_ext(&s1, &O, &d1);
+		sub_ext(&s2, &O, &d2);
+		if(length(&d1) < length(&d2)){
 			solutions = s1;
 		}
 		else{
 			solutions = s2;
 		}
-			
-		free_vector(d1);
-		free_vector(d2);
 		break;
         
     default:
         break;
     }
-	free_vector(w);
+	free(quad);
     return solutions;
 
 }

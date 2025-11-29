@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#include "vector.h"
 
 
 #define RED 0x0F00
@@ -167,6 +168,12 @@ void put_color_at_24ptr(Image_24bit_ptr* const img, const size_t x, const size_t
  */
 void put_color_at_24bit(Image_24bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
 
+/**
+ * @brief Convert a vector to a color 24bits
+ * @param vec the vector to convert
+ * @return converted vector
+ */
+uint24_t convert_to_color(const Vector * vec);
 
 /**
  * @brief Ecrit un pixel sur une image

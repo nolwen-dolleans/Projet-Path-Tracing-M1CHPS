@@ -1,5 +1,8 @@
 #include "image.h"
 #include "ray.h"
+#include "light.h"
+#include "scene.h"
+#include "vector.h"
 
 int main(int argc, char** argv)
 {
@@ -31,7 +34,7 @@ int main(int argc, char** argv)
 		AABB box;
 
 		create_camera(&cam, width, height, fov, x0, y0, z0);
-		create_sphere(&sphere, 0,0,0,2);
+		create_sphere(&sphere, 0,0,2,1);
 		create_ray_box(&box, BLU,RED,GRN,RED | BLU,RED | GRN, BLU | GRN);
 		
 
@@ -74,6 +77,61 @@ int main(int argc, char** argv)
 		write_image_file_24bit_ptr(image);
 
 		free_image_24bit_ptr(image);
+	}
+	else if(strcmp(argv[1], "path") == 0)
+	{
+		Image_24bit* image = create_image_24bit(width, height);
+		fprintf(stdout,"Using path tracing image %ldx%ld.\n",image->width,image->height);
+
+		//clear_frame_sky_color_32bit(image);
+		clear_frame_color_24bit(image, 0, 0, 0);
+		
+		const float x0 = 0;
+		const float y0 = 0;
+		const float z0 = 8;
+		const float fov = 100;
+
+		Camera cam;
+		Sphere * sphere1 = malloc(sizeof(Sphere));
+		Sphere * sphere2 = malloc(sizeof(Sphere));
+		AABB box;
+
+		create_camera(&cam, width, height, fov, x0, y0, z0);
+		
+		create_sphere(sphere1, 0.4,0,3,1);
+		Vector sphere_color1;
+		create_vector_default_ext(&sphere_color1);
+		sphere_color1.Data[0] = 255;
+		sphere1->color = sphere_color1;
+		
+		create_sphere(sphere2, -1,0,3,0.5);
+		Vector sphere_color2;
+		create_vector_default_ext(&sphere_color2);
+		sphere_color2.Data[1] = 255;
+		sphere2->color = sphere_color2;
+		
+		
+		create_ray_box(&box, BLU,RED,GRN,RED | BLU,RED | GRN, BLU | GRN);
+		uint24_t bg;
+		set_color_24bit(&bg, 120, 120, 255);
+		Scene * scene = create_scene_ptr(2, 0, bg);
+		scene->objects[0] = sphere1;
+		scene->objects[1] = sphere2;
+		Vector color;
+		uint24_t rcolor;
+
+		for(size_t y1 = 0; y1 < height; ++y1)
+		{
+			for(size_t x1 = 0; x1 < width; ++x1)
+			{
+				color = path_trace(&cam, x1, y1, scene);
+				put_color_at_24bit(image, x1, y1, (uint8_t)color.Data[0], (uint8_t)color.Data[1], (uint8_t)color.Data[2]);
+			}
+		}
+		write_image_file_24bit(image);
+		free_scene(scene);
+		free_image_24bit(image);
+
 	}
 	else
 	{

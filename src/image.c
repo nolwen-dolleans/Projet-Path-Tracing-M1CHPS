@@ -1,4 +1,5 @@
 #include "image.h"
+#include "vector.h"
 
 Image_24bit* create_image_24bit(const size_t width, const size_t height)
 {
@@ -278,6 +279,19 @@ void free_image_24bit(Image_24bit* img)
     {
         fprintf(stderr, "Image already freed.\n");
     }
+}
+
+uint24_t convert_to_color(const Vector * vec){
+	uint24_t res;
+	for(int i = 0; i<3; ++i){
+		if(vec->Data[i]<0 || vec->Data[0]>255){
+			printf("Error color range:%f\n",vec->Data[i]);
+			exit(1);
+			
+		}
+		else res.byte[i] = (uint8_t)vec->Data[i];
+	}
+	return res;
 }
 
 void free_image_24bit_ptr(Image_24bit_ptr* img)

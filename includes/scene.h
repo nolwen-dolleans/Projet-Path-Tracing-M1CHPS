@@ -16,8 +16,8 @@
 #include <stdio.h>
 #include "tools.h"
 #include "vector.h"
-#include "ray.h"
 #include "image.h"
+#include "ray.h"
 
 
 typedef struct Scene{
@@ -37,7 +37,7 @@ typedef struct Scene{
  * @return index of the object
  * @return intersection:  The poter to the intersection point
  */
-Vector intersect_in_scene(const Ray* const r, const Scene* const S, int * object);
+Vector intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object);
 
 
 /**
