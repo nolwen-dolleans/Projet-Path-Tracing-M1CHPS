@@ -2,9 +2,25 @@ cmake_minimum_required(VERSION 3.15)
 
 project(ppm LANGUAGES C)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
 set(CMAKE_C_STANDARD 11)
+
+add_library(LibPathTracing
+    src/image.c
+    src/ray.c
+    src/scene.c
+    src/tools.c
+    src/vector.c
+    src/light.c
+)
+
+target_include_directories(LibPathTracing PUBLIC ${PROJECT_SOURCE_DIR}/includes)
+
+target_link_libraries(LibPathTracing m)
+
+add_executable(ppm src/ppm.c)
+target_link_libraries(ppm PRIVATE LibPathTracing)
+
 
 target_compile_options(ppm PRIVATE -O3 -Wall -march=native)
 
