@@ -18,7 +18,7 @@
 #include "time.h"
 #include "ray.h"
 
-#define N 100
+#define N 1000
 
 
 /**
@@ -33,7 +33,7 @@ Vector ray_sampling(Ray * r, const Scene * S, int d, int dmax);
 
 Ray random_Ray_demi_sphere(Vector * origin, Vector * normal);
 
-Vector convert_to_vect(uint24_t rgb);
+Vector convert_to_vect(const uint24_t * rgb);
 
 /**
  * @brief  Lambertan BRDF equation
@@ -55,5 +55,23 @@ void phong_light(const float ambient_str, Vector* normal, const Vector* color_li
  * @return color the color of the pixel
  */
 Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, Scene const * S);
+
+/**
+ * @brief Set a simple diffuse point light at a given position with RGB intensity.
+ * @param position World position of the light
+ * @param intensity RGB intensity (radiant intensity)
+ */
+void add_diffuse_point_light(const Vector* position, const Vector* intensity);
+
+/**
+ * @brief Accumulate diffuse contribution from the configured point light to a shading point if visible.
+ * @param point Shading point position
+ * @param normal Shading normal (will be normalized internally)
+ * @param albedo Diffuse albedo scalar in [0,1]
+ * @param surfaceColor RGB surface color
+ * @param S Scene for shadow testing
+ * @param L_inout Accumulator to add the direct lighting contribution
+ */
+void accumulate_diffuse_point_light(const Vector* point, const Vector* normal, float albedo, const Vector* surfaceColor, const Scene* S, Vector* L_inout);
 
 #endif /* light_h */

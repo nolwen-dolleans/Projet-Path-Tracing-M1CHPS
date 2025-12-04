@@ -6,6 +6,7 @@
 
 int main(int argc, char** argv)
 {
+	srand((unsigned int)time(NULL));
 
 	if(argc != 4)
 	{

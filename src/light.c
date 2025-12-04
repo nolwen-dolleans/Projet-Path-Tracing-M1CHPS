@@ -18,10 +18,56 @@ Ray random_Ray_demi_sphere(Vector * origin, Vector * normal){
 	return ray;
 }
 
+//https://www.mathematik.uni-marburg.de/~thormae/lectures/graphics1/code/ImportanceSampling/index.html?utm_source=chatgpt.com
+static inline Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal){
+	const float u1 = (float)rand() / (float)RAND_MAX;
+	const float u2 = (float)rand() / (float)RAND_MAX;
+	const float atheta = sqrtf(u1);
+	const float phi = 2*M_PI*u2;
+	//les coordonnées dans la base locale
+	const float x = atheta*cosf(phi);
+	const float y = atheta*sinf(phi);
+	const float z = sqrtf(1 - u1);
+	
+	//coordonnées dans la base orthonormée (up,right,forward) https://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-13-normal-mapping/
+	Vector up;
+	Vector norm = *normal;
+	create_vector_ext(&up, 0, 1, 0);
+	
+	Vector tangent;
+	cross_ext(&norm, &up, &tangent);
+	norm_ext(&tangent, &tangent);
+	
+	Vector bitangent;
+	cross_ext(&norm, &tangent, &bitangent);
+	norm_ext(&bitangent, &bitangent);
+	
+	//vecteur direction = x*tangent + y*bitangent + z*normal
+	Vector direction;
+	mul_ext(&tangent, x, &tangent);
+	mul_ext(&bitangent, y, &bitangent);
+	mul_ext(&norm, z, &norm);
+	
+	add_ext(&tangent, &bitangent, &direction);
+	add_ext(&direction, &norm, &direction);
+	
+	Ray ray;
+	ray.position = *origin;
+	ray.direction = direction;
+	norm_ext(&ray.direction, &ray.direction);
+	if (dot(&ray.direction, &ray.direction)<0){
+		for (short int i = 0; i<3; i++) {
+			ray.direction.Data[i] *= -1;
+		}
+	}
+	
+	return ray;
+}
 
-Vector convert_to_vect(uint24_t rgb){
+
+Vector convert_to_vect(const uint24_t * rgb){
 	Vector result;
-	create_vector_ext(&result, (float)rgb.byte[0], (float)rgb.byte[1], (float)rgb.byte[2]);
+	create_vector_ext(&result, (float)rgb->byte[0], (float)rgb->byte[1], (float)rgb->byte[2]);
 	return result;
 }
 
@@ -37,24 +83,22 @@ Vector ray_sampling(Ray * r, const Scene * S, int d, int dmax){
 	Vector intersection = intersect_in_scene(r,S,&object);				// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
 	
 	if (object < 0) {
-		return convert_to_vect(S->background_color);// par défaut met la couleur de fond si le rayon est hors-limite
+		return convert_to_vect(&S->background_color);// par défaut met la couleur de fond si le rayon est hors-limite
 	}
-	float albedo = 0.9f;
 	Vector n = get_normal_vector(&intersection, S->objects[object]);
+
+	accumulate_diffuse_point_light(&intersection, &n, 0.9f, &S->objects[object]->color, S, &L_incident);
 	
-	
-	
-	
-	Ray r_new = random_Ray_demi_sphere(&intersection,&n); 		// créé un rebond sur la zone d'intersection
+	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&intersection,&n); 		// créé un rebond sur la zone d'intersection
 	
 	Vector L_emitted_i = ray_sampling(&r_new,S,d+1,dmax);
 	
+	float albedo = 0.3f;
 	float cos_teta = dot(&n,&r_new.direction);
-	
 	//float pdf = 1 / 2*M_PI;
 	//float BRDF = S->objects[object]->color * albedo / M_PI;
 	Vector BRDF_pdf;
-	mul_ext(&S->objects[object]->color, albedo * cos_teta,&BRDF_pdf);
+	mul_ext(&S->objects[object]->color, albedo,&BRDF_pdf);
 	
 	for(int i = 0; i<3; ++i){
 		L_emitted_i.Data[i] *= BRDF_pdf.Data[i];
@@ -106,20 +150,20 @@ Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, 
 	const float fov = tanf(cam->fov * (M_PI / 180.0f) * 0.5f);
 	const float pixel_nc_x = (2.0f*(pixel_x + 0.5f) * cam->inv_width - 1.0f) * aspect_ratio * fov;
 	const float pixel_nc_y = (1.0f - 2.0f*(pixel_y + 0.5f) * cam->inv_height) * fov;
-
+	
 	Ray ray;
 	create_ray_ext(&ray, 0, 0, 0, pixel_nc_x, pixel_nc_y, 1);
 	Vector color;
-	create_vector_ext(&color,255, 255, 255);
+	create_vector_ext(&color,0, 0, 0);
 	
 	for(size_t i = 0; i<N; ++i){
-		Vector radiance = ray_sampling(&ray, S, 0, 1);
+		Vector radiance = ray_sampling(&ray, S, 0, 10);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}
 	}
 	for (int i = 0; i<3; ++i) {
-		color.Data[i] = color.Data[i]/(N+1);
+		color.Data[i] = color.Data[i]/(float)(N);
 	}
 	return color;
 }
