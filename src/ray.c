@@ -143,7 +143,7 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 		free(quad);
 		return true;
 		break;
-	case TWO_SOLUTION:
+	case TWO_SOLUTION: {
 		Vector hit_point;
 
 		const float t = quad->x0;
@@ -158,6 +158,7 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 		free(quad);
 		return true;
 		break;
+	}
 	default:
 		break;
 	}
@@ -165,7 +166,7 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 }
 
 
-Vector intersect_sphere(const Ray* const r, const Sphere* const s)
+bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)
 {
 	
 	Vector const oc = r->position;
@@ -173,51 +174,48 @@ Vector intersect_sphere(const Ray* const r, const Sphere* const s)
 	
 	Vector w;
 	sub_ext(&oc,&s->position,&w);
-    const float A = dot(&u,&u);
-    const float B = 2.0f * dot(&u,&w);
-    const float C = dot(&w,&w) - s->radius*s->radius;
+	const float A = dot(&u,&u);
+	const float B = 2.0f * dot(&u,&w);
+	const float C = dot(&w,&w) - s->radius*s->radius;
 
-    Quadratic_info* quad = quadratic_resolution(A, B, C);
-	Vector solutions;
-	create_vector_ext(&solutions, 0, 0, 0);
-    Vector u0;
-    Vector u1;
-	if(quad == NULL)return solutions;
+	Quadratic_info* quad = quadratic_resolution(A, B, C);
+	Vector u0;
+	Vector u1;
+	if(quad == NULL)return false;
 	const float t = quad->x0;
-    switch (quad->state)
-    {
-    case ONE_SOLUTION:
-        mul_ext(&u, t,&u0);
-        add_ext(&oc, &u0, &solutions);
-        break;
-    case TWO_SOLUTION:
-        Vector s1;
-        Vector s2;
-		const float t1 = quad->x0;
-		const float t2 = quad->x1;
-        mul_ext(&u, t1, &u0);
-        add_ext(&oc, &u0, &s1);
+	switch (quad->state)
+	{
+	case ONE_SOLUTION:
+		mul_ext(&u, t,&u0);
+		add_ext(&oc, &u0, hit);
+		break;
+	case TWO_SOLUTION: {
+		Vector s1;
+		Vector s2;
+		mul_ext(&u, quad->x0, &u0);
+		add_ext(&oc, &u0, &s1);
 
-        mul_ext(&u, t2,&u1);
-        add_ext(&oc, &u1, &s2);
+		mul_ext(&u, quad->x1,&u1);
+		add_ext(&oc, &u1, &s2);
 			
 		Vector d1;
 		Vector d2;
 		sub_ext(&s1, &oc, &d1);
 		sub_ext(&s2, &oc, &d2);
 		if(length(&d1) < length(&d2)){
-			solutions = s1;
+			*hit = s1;
 		}
 		else{
-			solutions = s2;
+			*hit = s2;
 		}
 		break;
-        
-    default:
-        break;
-    }
+	}
+		
+	default:
+		break;
+	}
 	free(quad);
-    return solutions;
+	return true;
 
 }
 
@@ -302,3 +300,4 @@ void free_sphere(Sphere* s)
     if(s) free(s);
     else fprintf(stdout, "No need to free memory.\n");
 }
+

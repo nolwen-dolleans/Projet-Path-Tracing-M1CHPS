@@ -111,10 +111,10 @@ int main(int argc, char** argv)
 		sphere2->color = sphere_color2;
 		sphere2->emited = true;
 		
-		
+		int pixels = 0;
 		uint24_t bg;
 		set_color_24bit(&bg, 0, 120, 255);
-		Scene * scene = create_scene_ptr(3, 0, bg);
+		Scene * scene = create_scene_ptr(2, 0, bg);
 		scene->objects[0] = sphere1;
 		scene->objects[1] = sphere2;
 		Vector color;

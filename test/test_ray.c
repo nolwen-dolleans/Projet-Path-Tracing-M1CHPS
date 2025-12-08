@@ -89,7 +89,8 @@ void test_intersect_sphere(void)
 	Sphere* spr0 =malloc_check(sizeof(Sphere));
 	create_sphere(spr0,px0, py0, pz0, r0);
 
-    Vector points = intersect_sphere(ray0, spr0);
+	Vector points;
+	intersect_sphere(ray0, spr0, &points);
 	
 	
 
@@ -99,7 +100,7 @@ void test_intersect_sphere(void)
 	
 	ray0 = create_ray(1, oy0, oz0, dx0,dy0,dz0);
 	
-	points = intersect_sphere(ray0, spr0);
+	intersect_sphere(ray0, spr0, &points);
 	const float result_01[3] = {1, 0, 2};
 	
 	TEST_ASSERT_FLOAT_ARRAY_WITHIN(TOLERANCE,result_01, points.Data, 3);

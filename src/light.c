@@ -74,21 +74,20 @@ Vector convert_to_vect(const uint24_t * rgb){
 Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax){
 	Vector L_incident;                         //ceci va représenter la réflectance du rayon incident avec RGB comme composante
 	create_vector_default_ext(&L_incident);
+	Vector hit;
 	bool check = false;
 	int object = -1;
 	if (d == dmax) {
 		Vector black;
 		create_vector_ext(&black, 0, 0, 0);
 		return black;// par défaut met en noir si le rayon à fait un certain nombre de rebond
-	}
-	Vector intersection = intersect_in_scene(r,S,&object);				// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
-	
-	if (object < 0) {
-		Vector res = convert_to_vect(&S->background_color);// par défaut met la couleur de fond si le rayon est hors-limite
-		return res;
+	}			// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
+	if (intersect_in_scene(r, S, &object, &hit) == false) {
+			Vector res = convert_to_vect(&S->background_color);// par défaut met la couleur de fond si le rayon est hors-limite
+			return res;
 	}
 	
-	Vector n = get_normal_vector(&intersection, S->objects[object]);
+	Vector n = get_normal_vector(&hit, S->objects[object]);
 
 	// Assurer une normale unitaire et orientée à l’opposé du rayon incident
 	norm_ext(&n, &n);
@@ -110,7 +109,7 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	Vector n_eps;
 	// n_eps = n * 1e-3
 	mul_ext(&n, 1e-3f, &n_eps);
-	add_ext(&intersection, &n_eps, &offset_origin);
+	add_ext(&hit, &n_eps, &offset_origin);
 	
 	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
 	

@@ -31,32 +31,29 @@ Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint24_t backg
 	return s;
 }
 
-Vector intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object){
+bool intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object, Vector *hit){
 	int object_index = -1;
 	const Vector * origin = &r->position;
-	Vector intersection;
-	create_vector_ext(&intersection, 0, 0, 0);
 	double closest_t = 1e30; //distance minimale entre l'origine du rayon et de l'objet
 	
 	for (int i = 0; i<S->size_objects; ++i) {
 		Sphere sp = *S->objects[i];
-		Vector proche_intersection = intersect_sphere(r, &sp);
-		if (is_null(&proche_intersection)){
+		if (!intersect_sphere(r, &sp, hit)){
 			continue;
 		}
-		
-		
-		Vector diff;
-		sub_ext(&intersection, origin, &diff);
-		double t = sqrt(dot(&diff, &diff));
-		
-		if  (t<closest_t){
-			closest_t = t;
-			object_index = i;
-			proche_intersection = intersection;
+		else{
+			Vector diff;
+			sub_ext(hit, origin, &diff);
+			double t = sqrt(dot(&diff, &diff));
+			
+			if  (t<closest_t){
+				closest_t = t;
+				object_index = i;
+			}
 		}
 		
 	}
+	if(object_index == -1) return false;
 	*object = object_index;
-	return intersection;
+	return true;
 }

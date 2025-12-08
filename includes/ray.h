@@ -207,7 +207,7 @@ bool box_intersection(const Camera* const cam, AABB* const box);
  * @param s Sphere
  * @return Set of points
  */
-Vector intersect_sphere(const Ray* const r, const Sphere* const s);
+bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit);
 
 /**
  * @brief Compute the sphere normal vector at a point

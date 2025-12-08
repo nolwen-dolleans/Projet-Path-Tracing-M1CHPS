@@ -37,7 +37,7 @@ typedef struct Scene{
  * @return index of the object
  * @return intersection:  The poter to the intersection point
  */
-Vector intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object);
+bool intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object, Vector *hit);
 
 
 /**
