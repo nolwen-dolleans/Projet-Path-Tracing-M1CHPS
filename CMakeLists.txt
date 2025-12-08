@@ -18,11 +18,11 @@ target_include_directories(LibPathTracing PUBLIC ${PROJECT_SOURCE_DIR}/includes)
 
 target_link_libraries(LibPathTracing m)
 
-add_executable(ppm src/ppm.c)
+add_executable(ppm src/ppm.c src/light.c)
 target_link_libraries(ppm PRIVATE LibPathTracing)
 
 
-target_compile_options(ppm PRIVATE -O3 -Wall -march=native)
+target_compile_options(ppm PRIVATE -O0 -Wall -march=native -g)
 
 add_executable(test_runner 
                             test/test_runner.c 

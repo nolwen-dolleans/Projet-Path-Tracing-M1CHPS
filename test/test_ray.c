@@ -22,7 +22,9 @@ void test_create_ray(void)
     const float default_1[3] = {0.0f, 0.0f, 1.0f};
 
     const float pos[3] = {pos_x, pos_y, pos_z};
-    const float dir[3] = {dir_x, dir_y, dir_z};
+	Vector dir;
+	create_vector_ext(&dir, dir_x, dir_y, dir_z);
+	norm_ext(&dir, &dir);
 
     Ray* r0 = create_ray_default();
     Ray* r1 = create_ray(pos_x, pos_y, pos_z, dir_x, dir_y, dir_z);
@@ -31,7 +33,7 @@ void test_create_ray(void)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(default_1, r0->direction.Data, 3);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(pos, r1->position.Data, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dir, r1->direction.Data, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dir.Data, r1->direction.Data, 3);
 
     free_ray(r0);
     free_ray(r1);

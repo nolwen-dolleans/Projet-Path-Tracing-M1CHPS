@@ -6,8 +6,8 @@
 
 int main(int argc, char** argv)
 {
-	srand((unsigned int)time(NULL));
 
+	srand((unsigned int)time(NULL));
 	if(argc != 4)
 	{
 		fprintf(stderr,"Error : Icomplete arguments.\n");
@@ -99,27 +99,26 @@ int main(int argc, char** argv)
 
 		create_camera(&cam, width, height, fov, x0, y0, z0);
 		
-		create_sphere(sphere1, 0.4,0,3,1);
+		create_sphere(sphere1, 0.1,-0.05,-0.3,0.05);
 		Vector sphere_color1;
-		create_vector_default_ext(&sphere_color1);
-		sphere_color1.Data[0] = 255;
+		create_vector_ext(&sphere_color1, 255, 0, 0);
 		sphere1->color = sphere_color1;
+		sphere1->emited = false;
 		
-		create_sphere(sphere2, -1,0,3,0.5);
+		create_sphere(sphere2, 0,-0.05,-0.3,0.05);
 		Vector sphere_color2;
-		create_vector_default_ext(&sphere_color2);
-		sphere_color2.Data[1] = 255;
+		create_vector_ext(&sphere_color2, 255, 255, 255);
 		sphere2->color = sphere_color2;
+		sphere2->emited = true;
 		
 		
-		create_ray_box(&box, BLU,RED,GRN,RED | BLU,RED | GRN, BLU | GRN);
 		uint24_t bg;
-		set_color_24bit(&bg, 120, 120, 255);
-		Scene * scene = create_scene_ptr(2, 0, bg);
+		set_color_24bit(&bg, 0, 120, 255);
+		Scene * scene = create_scene_ptr(3, 0, bg);
 		scene->objects[0] = sphere1;
 		scene->objects[1] = sphere2;
 		Vector color;
-		uint24_t rcolor;
+		
 
 		for(size_t y1 = 0; y1 < height; ++y1)
 		{

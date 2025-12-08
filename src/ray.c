@@ -167,36 +167,12 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 
 Vector intersect_sphere(const Ray* const r, const Sphere* const s)
 {
-/*     const float bx2 = r->direction.Data[0]*r->direction.Data[0];
-    const float by2 = r->direction.Data[1]*r->direction.Data[1];
-    const float bz2 = r->direction.Data[2]*r->direction.Data[2];
-
-    const float ax2 = r->position.Data[0]*r->position.Data[0];
-    const float ay2 = r->position.Data[1]*r->position.Data[1];
-    const float az2 = r->position.Data[2]*r->position.Data[2];
- 
-    const float xc2 = s->position.Data[0]*s->position.Data[0];
-    const float yc2 = s->position.Data[1]*s->position.Data[1];
-    const float zc2 = s->position.Data[2]*s->position.Data[2];
-
-    const float r2 = s->radius*s->radius;
-
-    const float ax_bx = 2.0f*r->position.Data[0]*r->direction.Data[0];
-    const float ay_by = 2.0f*r->position.Data[1]*r->direction.Data[1];
-    const float az_bz = 2.0f*r->position.Data[2]*r->direction.Data[2];
-
-    const float bx_xc = 2.0f*r->direction.Data[0]*s->position.Data[0];
-    const float by_yc = 2.0f*r->direction.Data[1]*s->position.Data[1];
-    const float bz_zc = 2.0f*r->direction.Data[2]*s->position.Data[2];
-
-    const float A = bx2 + by2 + bz2;
-    const float B = ax_bx + ay_by + az_bz - bx_xc - by_yc - bz_zc;
-    const float C = ax2 + ay2 + az2 - xc2 - yc2 - zc2 - r2; */
 	
-	Vector const O = r->position;
+	Vector const oc = r->position;
 	Vector const u = r->direction;
+	
 	Vector w;
-	sub_ext(&O,&s->position,&w);
+	sub_ext(&oc,&s->position,&w);
     const float A = dot(&u,&u);
     const float B = 2.0f * dot(&u,&w);
     const float C = dot(&w,&w) - s->radius*s->radius;
@@ -207,24 +183,28 @@ Vector intersect_sphere(const Ray* const r, const Sphere* const s)
     Vector u0;
     Vector u1;
 	if(quad == NULL)return solutions;
+	const float t = quad->x0;
     switch (quad->state)
     {
     case ONE_SOLUTION:
-        mul_ext(&u, quad->x0,&u0);
-        add_ext(&O, &u0, &solutions);
+        mul_ext(&u, t,&u0);
+        add_ext(&oc, &u0, &solutions);
         break;
     case TWO_SOLUTION:
         Vector s1;
         Vector s2;
-        mul_ext(&u, quad->x0,&u0);
-        add_ext(&O, &u0, &s1);
+		const float t1 = quad->x0;
+		const float t2 = quad->x1;
+        mul_ext(&u, t1, &u0);
+        add_ext(&oc, &u0, &s1);
 
-        mul_ext(&u, quad->x1,&u1);
-        add_ext(&O, &u1, &s2);
+        mul_ext(&u, t2,&u1);
+        add_ext(&oc, &u1, &s2);
+			
 		Vector d1;
 		Vector d2;
-		sub_ext(&s1, &O, &d1);
-		sub_ext(&s2, &O, &d2);
+		sub_ext(&s1, &oc, &d1);
+		sub_ext(&s2, &oc, &d2);
 		if(length(&d1) < length(&d2)){
 			solutions = s1;
 		}
@@ -306,9 +286,7 @@ bool box_intersection(const Camera* const cam, AABB* const box)
 }
 Vector get_normal_vector(const Vector * point, const Sphere * s){
 	Vector n;
-	for (int i = 0; i<3; ++i) {
-		n.Data[i] = point->Data[i]-s->position.Data[i];
-	}
+	sub_ext(point, &s->position, &n);
 	norm_ext(&n,&n);
 	return n;
 }
