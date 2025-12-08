@@ -67,7 +67,8 @@ static inline Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, 
 
 Vector convert_to_vect(const uint24_t * rgb){
 	Vector result;
-	create_vector_ext(&result, (float)rgb->byte[0], (float)rgb->byte[1], (float)rgb->byte[2]);
+	float weight = 1.0 / 255.0;
+	create_vector_ext(&result, (float)rgb->byte[0]*weight, (float)rgb->byte[1]*weight, (float)rgb->byte[2]*weight);
 	return result;
 }
 
@@ -100,8 +101,10 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	Sphere obj = *S->objects[object];
 	
 	if (obj.emited) {
-		check = 0<d;
-		return obj.color;
+		Vector res;
+		float weight = 1 / 255.0 * 0.9f;
+		mul_ext(&obj.color, weight, &res);
+		return res;
 	}
 
 	// Offset the new ray origin to avoid self-intersections
@@ -115,10 +118,7 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	
 	const float albedo = 0.9f;
 	Vector L_reflected_i = ray_sampling(&r_new, S, cam, d+1, dmax);
-	
 	const float cos_theta = dot(&n,&r_new.direction);
-	printf("pour d=%d cos=%f\n ",d, cos_theta);
-	
 	Vector weight;
 	mul_ext(&obj.color, albedo, &weight);
 
@@ -184,12 +184,12 @@ Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, 
 	
 	
 	for(size_t i = 0; i<N; ++i){
-		Vector radiance = ray_sampling(&ray, S, cam, 0, 1);
+		Vector radiance = ray_sampling(&ray, S, cam, 0, 5);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}
 	}
-	float inv_N = (float)1/N;
+	float inv_N = (float)1/N * 255;
 	for (int i = 0; i<3; ++i) {
 		color.Data[i] = color.Data[i]*inv_N;
 	}

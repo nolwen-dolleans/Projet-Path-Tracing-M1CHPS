@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 	srand((unsigned int)time(NULL));
 	if(argc != 4)
 	{
-		fprintf(stderr,"Error : Icomplete arguments.\n");
+		fprintf(stderr,"Error : Incomplete arguments.\n");
 		exit(1);
 	}
 
@@ -90,28 +90,29 @@ int main(int argc, char** argv)
 		const float x0 = 0;
 		const float y0 = 0;
 		const float z0 = 8;
-		const float fov = 100;
+		const float fov = 90;
 
 		Camera cam;
 		Sphere * sphere1 = malloc(sizeof(Sphere));
 		Sphere * sphere2 = malloc(sizeof(Sphere));
+		Sphere * sphere3 = malloc(sizeof(Sphere));
 		AABB box;
 
 		create_camera(&cam, width, height, fov, x0, y0, z0);
 		
-		create_sphere(sphere1, 0.1,-0.05,-0.3,0.05);
+		create_sphere(sphere1, 0,0,-0.3,0.05);
 		Vector sphere_color1;
 		create_vector_ext(&sphere_color1, 255, 0, 0);
 		sphere1->color = sphere_color1;
 		sphere1->emited = false;
 		
-		create_sphere(sphere2, 0,-0.05,-0.3,0.05);
+		create_sphere(sphere2, 0,100,-0.3,50);
 		Vector sphere_color2;
 		create_vector_ext(&sphere_color2, 255, 255, 255);
 		sphere2->color = sphere_color2;
 		sphere2->emited = true;
 		
-		int pixels = 0;
+		
 		uint24_t bg;
 		set_color_24bit(&bg, 0, 120, 255);
 		Scene * scene = create_scene_ptr(2, 0, bg);

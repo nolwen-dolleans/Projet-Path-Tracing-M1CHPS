@@ -181,39 +181,42 @@ bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)
 	Quadratic_info* quad = quadratic_resolution(A, B, C);
 	Vector u0;
 	Vector u1;
+	
 	if(quad == NULL)return false;
-	const float t = quad->x0;
+	
+	const float EPS = 1e-4f;
+	float t = -1;
 	switch (quad->state)
 	{
-	case ONE_SOLUTION:
-		mul_ext(&u, t,&u0);
-		add_ext(&oc, &u0, hit);
-		break;
-	case TWO_SOLUTION: {
-		Vector s1;
-		Vector s2;
-		mul_ext(&u, quad->x0, &u0);
-		add_ext(&oc, &u0, &s1);
-
-		mul_ext(&u, quad->x1,&u1);
-		add_ext(&oc, &u1, &s2);
-			
-		Vector d1;
-		Vector d2;
-		sub_ext(&s1, &oc, &d1);
-		sub_ext(&s2, &oc, &d2);
-		if(length(&d1) < length(&d2)){
-			*hit = s1;
-		}
-		else{
-			*hit = s2;
-		}
+	case ONE_SOLUTION: {
+		float t0 = quad->x0;
+		if (t0 > EPS) {t = t0;}
 		break;
 	}
-		
+	case TWO_SOLUTION: {
+		float t0 = quad->x0;
+		float t1 = quad->x1;
+
+		if (t0 > t1) {
+			float tmp = t0; t0 = t1; t1 = tmp;
+		}
+		if (t0 > EPS) {t = t0;}
+		else if (t1 > EPS) {t = t1;}
+		break;
+	}
 	default:
 		break;
 	}
+
+	if (t <= 0.0f) {
+		free(quad);
+		return false;
+	}
+
+	// Sinon on calcule le point d’impact
+	Vector tu;
+	mul_ext(&r->direction, t, &tu);
+	add_ext(&r->position, &tu, hit);
 	free(quad);
 	return true;
 
