@@ -11,21 +11,25 @@ mkdir measures
 fi
 
 for IMGSIZE in "24" "24ptr" "32";do
+PATH_MEASURES="measures/time_$IMGSIZE: width=$WIDTH height=$HEIGHT samples=$SAMPLES"
+
+for N in 1..3; do
+
 cd ..
 START=`date +%s%N`
 ./build/ppm $IMGSIZE $WIDTH $HEIGHT $SAMPLES
 END=`date +%s%N`
 cd performance
-EXE_TIME=$(($END - $START))
 
+EXE_TIME=$((($END - $START)*0.000000001))
 
-
-if [ -e "measures/time_$IMGSIZE _WIDTH=$WIDTH HEIGHT=$HEIGHT SAMPLES=$SAMPLES" ]
+if [ -e $PATH_MEASURES ]
 then
-rm -rf "measures/time_$IMGSIZE _WIDTH=$WIDTH HEIGHT=$HEIGHT SAMPLES=$SAMPLES"
+rm -rf $PATH_MEASURES
 fi
 
-echo "Time (s)\n $EXE_TIME" >> "measures/time_$IMGSIZE _WIDTH=$WIDTH HEIGHT=$HEIGHT SAMPLES=$SAMPLES"
+echo "Time (s)\n $EXE_TIME" >> $PATH_MEASURES
 
 done
-rm -rf tmp.csv
+
+done

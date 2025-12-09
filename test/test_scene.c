@@ -12,7 +12,7 @@ void test_intersect_scene(void){
 	Scene * s = create_scene_ptr(1, 1, &BLACK);
 	printf("%p\n", s->objects[0]);
 	
-	create_sphere(s->objects[0], 0, 0, 2, 1, NULL, false);
+	create_sphere(s->objects[0], 0, 0, 2, 1, NULL, false, 0);
 	Vector hit;
 	int object = -1;
 	Ray ray;
@@ -43,7 +43,7 @@ void test_create_scene(void){
 		float y = rand();
 		float z = rand();
 		Sphere * s = malloc_check(sizeof(Sphere));
-		create_sphere(s,x, y, z, 1, NULL, false);
+		create_sphere(s,x, y, z, 1, NULL, false, 0);
 		S->objects[i] = s;
 		TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,S->objects[i]->radius,1);
 		

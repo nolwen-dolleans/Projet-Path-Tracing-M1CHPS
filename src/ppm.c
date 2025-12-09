@@ -36,27 +36,34 @@ int main(int argc, char** argv)
 	Sphere * sphere1 = malloc(sizeof(Sphere));
 	Sphere * sphere2 = malloc(sizeof(Sphere));
 	Sphere * sphere3 = malloc(sizeof(Sphere));
+	Sphere * sphere4 = malloc(sizeof(Sphere));
 	AABB box;
 
 	Vector sphere_color1;
-	create_vector_ext(&sphere_color1, 255, 100, 30);
-	create_sphere(sphere1, 0.05,0.05,-0.3,0.05, &sphere_color1, false);
+	create_vector_ext(&sphere_color1, 255, 255, 255);
+	create_sphere(sphere1, 0.05,0.05,-0.3,0.05, &sphere_color1, false, 0.8);
 	
 	Vector sphere_color2;
-	create_vector_ext(&sphere_color2, 255, 255, 255);
-	create_sphere(sphere2, 0,0.2,-0.3,0.1, &sphere_color2, true);
+	create_vector_ext(&sphere_color2, 120, 255, 20);
+	create_sphere(sphere2, -0.05,0,-0.3,0.05, &sphere_color2, false, 0.5);
 	
 	Vector sphere_color3;
-	create_vector_ext(&sphere_color3, 120, 255, 20);
-	create_sphere(sphere3, -0.05,0,-0.3,0.05, &sphere_color3, false);
+	create_vector_ext(&sphere_color3, 255, 255, 255);
+	create_sphere(sphere3, 0,0.2,-0.3,0.1, &sphere_color3, true, 10);
+	
+	Vector sphere_color4;
+	create_vector_ext(&sphere_color4, 255, 255, 255);
+	create_sphere(sphere4, -0.2,-0.2,-0.3,0.1, &sphere_color4, true, 15);
+	
 	
 	
 	Vector bg;
 	create_vector_ext(&bg, 0, 120, 255);
-	Scene * scene = create_scene_ptr(3, 0, &bg);
+	Scene * scene = create_scene_ptr(4, 0, &bg);
 	scene->objects[0] = sphere1;
 	scene->objects[1] = sphere2;
 	scene->objects[2] = sphere3;
+	scene->objects[3] = sphere4;
 	Vector color;
 //#############################################################################
 	

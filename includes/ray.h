@@ -85,6 +85,7 @@ typedef struct Sphere
     Vector position;
 	Vector color;
 	bool emitted;
+	float albedo;
 }Sphere;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,8 +136,9 @@ Ray random_Ray(Vector const * Origin);
  * @param rad Radius
  * @param color vector rgb with r,g,b in [0,255]
  * @param is_emitted bool if the sphere emitt or not
+ * @param albedo reprense the albedo of the sphere, or the light intensity for an emitted one
  */
-void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted);
+void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted, const float albedo);
 
 /**
  * @brief Compute the intersection of a camra ray and a sphere

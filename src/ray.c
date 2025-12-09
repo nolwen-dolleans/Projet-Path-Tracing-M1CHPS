@@ -57,13 +57,14 @@ Ray random_Ray(Vector const * Origin){
 }
 
 
-void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted)
+void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted, const float albedo)
 {
 	float inv255 = 1.0f/255.0f;
 	create_vector_ext(&sph->position,x, y, z);
 	sph->radius = rad;
 	mul_ext(color, inv255, &sph->color);
 	sph->emitted = is_emitted;
+	sph->albedo = albedo;
 }
 
 bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)

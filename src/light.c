@@ -100,7 +100,7 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	
 	if (obj.emitted) {
 		Vector res;
-		float intensity = 5.0f;
+		float intensity = obj.albedo;
 		mul_ext(&obj.color, intensity, &res);
 		return res;
 	}
@@ -114,7 +114,7 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	
 	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
 	
-	const float albedo = 0.8f;
+	const float albedo = obj.albedo;
 	Vector L_reflected_i = ray_sampling(&r_new, S, cam, d+1, dmax);
 	const float cos_theta = dot(&n,&r_new.direction);
 	Vector weight;
