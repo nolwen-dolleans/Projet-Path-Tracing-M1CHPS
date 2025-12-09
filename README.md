@@ -6,4 +6,6 @@
     ./build/ppm 32 width height
     #ou 
     ./build/ppm 24ptr width height
+    #ou 
+    ./build/ppm path width height
 <br>
