@@ -79,8 +79,6 @@ bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)
 	const float C = dot(&w,&w) - s->radius*s->radius;
 
 	Quadratic_info* quad = quadratic_resolution(A, B, C);
-	Vector u0;
-	Vector u1;
 	
 	if(quad == NULL)return false;
 	

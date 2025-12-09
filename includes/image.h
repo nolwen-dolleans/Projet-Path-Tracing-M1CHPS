@@ -155,7 +155,7 @@ void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, 
  * @param g La partie verte de la couleur
  * @param b La partie bleu de la couleur
  */
-void put_color_at_24ptr(Image_24bit_ptr* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
+void put_color_at_24bit_ptr(Image_24bit_ptr* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b);
 
 /**
  * @brief Change la couleur d'un pixel de coordonnée x,y

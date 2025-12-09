@@ -140,7 +140,6 @@ void put_color_at_24bit_ptr(Image_24bit_ptr* const img, const size_t x, const si
 
 void put_color_at_24bit(Image_24bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
 {
-	printf("x = %ld, y = %ld, y*height+x = %ld\n",x,y,y * img->width + x);
    img->buffer[y * img->width + x] = (uint24_t){.byte={r,g,b}};
 }
 

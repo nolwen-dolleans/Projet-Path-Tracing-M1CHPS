@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 		Image_24bit* image = create_image_24bit(width, height);
 
 		//clear_frame_sky_color_32bit(image);
-		clear_frame_sky_color_24bit(image);
+		clear_frame_color_24bit(image,0,0,0);
 
 		for(size_t y1 = 0; y1 < height; ++y1)
 		{
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 
 		Image_24bit_ptr* image = create_image_24bit_ptr(width, height);
 		
-		clear_frame_sky_color_24bit_ptr(image);
+		clear_frame_color_24bit_ptr(image,0,0,0);
 		
 		for(size_t y1 = 0; y1 < height; ++y1)
 		{
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 				g = minf(255, color.Data[1]);
 				b = maxf(0, color.Data[2]);
 				b = minf(255, color.Data[2]);
-				put_color_at_24ptr(image, x1, y1, (uint8_t)r, (uint8_t)g, (uint8_t)b);
+				put_color_at_24bit_ptr(image, x1, y1, (uint8_t)r, (uint8_t)g, (uint8_t)b);
 			}
 		}
 
