@@ -26,17 +26,16 @@ void test_create_ray(void)
 	create_vector_ext(&dir, dir_x, dir_y, dir_z);
 	norm_ext(&dir, &dir);
 
-    Ray* r0 = create_ray_default();
-    Ray* r1 = create_ray(pos_x, pos_y, pos_z, dir_x, dir_y, dir_z);
+	Ray r0;
+	create_ray_default_ext(&r0);
+	Ray r1;
+	create_ray_ext(&r1,pos_x, pos_y, pos_z, dir_x, dir_y, dir_z);
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(default_0, r0->position.Data, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(default_1, r0->direction.Data, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(default_0, r0.position.Data, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(default_1, r0.direction.Data, 3);
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(pos, r1->position.Data, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dir.Data, r1->direction.Data, 3);
-
-    free_ray(r0);
-    free_ray(r1);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(pos, r1.position.Data, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dir.Data, r1.direction.Data, 3);
 }
 
 void test_ray_create_sphere(void)
@@ -53,15 +52,20 @@ void test_ray_create_sphere(void)
 
     const float pos[3] = {pos_x, pos_y, pos_z};
 
-    Sphere* r0 = create_sphere_default();
+	Sphere* r0 = malloc_check(sizeof(Sphere));;
+	create_sphere(r0,0, 0, 0, 0, NULL, false);
 	Sphere* r1 = malloc_check(sizeof(Sphere));
-	create_sphere(r1,pos_x, pos_y, pos_z, r, NULL, false);
+	create_sphere(r1,pos_x, pos_y, pos_z, r, NULL, true);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(default_0, r0->position.Data, 3);
     TEST_ASSERT_EQUAL_FLOAT(0.0f, r0->radius);
+	TEST_ASSERT_NULL(&r0->color);
+	TEST_ASSERT_FALSE(r0->emitted);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(pos, r1->position.Data, 3);
     TEST_ASSERT_EQUAL_FLOAT(r, r1->radius);
+	TEST_ASSERT_NULL(&r1->color);
+	TEST_ASSERT_TRUE(r1->emitted);
 
     free_sphere(r0);
     free_sphere(r1);
@@ -85,27 +89,24 @@ void test_intersect_sphere(void)
 
 	const float result_00[3] = {0, 0, 1};
 
-    Ray* ray0 = create_ray(ox0, oy0, oz0, dx0,dy0,dz0);
+	Ray ray0;
+	create_ray_ext(&ray0,ox0, oy0, oz0, dx0,dy0,dz0);
 	Sphere* spr0 =malloc_check(sizeof(Sphere));
 	create_sphere(spr0,px0, py0, pz0, r0, NULL, false);
 
 	Vector points;
-	intersect_sphere(ray0, spr0, &points);
+	intersect_sphere(&ray0, spr0, &points);
 	
-	
-
     TEST_ASSERT_FLOAT_ARRAY_WITHIN(TOLERANCE,result_00, points.Data, 3);
 	
-	free_ray(ray0);
 	
-	ray0 = create_ray(1, oy0, oz0, dx0,dy0,dz0);
+	create_ray_ext(&ray0, 1, oy0, oz0, dx0,dy0,dz0);
 	
-	intersect_sphere(ray0, spr0, &points);
+	intersect_sphere(&ray0, spr0, &points);
 	const float result_01[3] = {1, 0, 2};
 	
 	TEST_ASSERT_FLOAT_ARRAY_WITHIN(TOLERANCE,result_01, points.Data, 3);
 	
-	free_ray(ray0);
 	free_sphere(spr0);
 	
 }

@@ -11,126 +11,68 @@ int main(int argc, char** argv)
 {
 
 	srand((unsigned int)time(NULL));
-	if(argc != 4)
+	if(argc != 5)
 	{
-		fprintf(stderr,"Error : Incomplete arguments.\n");
+		fprintf(stderr,"Error : Incomplete arguments.\n Please using: %s width height samples",argv[0]);
 		exit(1);
 	}
 
 	const size_t width  = atoi(argv[2]);
 	const size_t height = atoi(argv[3]);
+	const size_t smpls = atoi(argv[4]);
 
+	
+//######################### Create the entier scene ###########################
+//############ Camera ############
+	const float x0 = 0;
+	const float y0 = 0;
+	const float z0 = 8;
+	const float fov = 50;
+	
+	Camera cam;
+	create_camera(&cam, width, height, fov, x0, y0, z0);
+
+//############ Objects ############
+	Sphere * sphere1 = malloc(sizeof(Sphere));
+	Sphere * sphere2 = malloc(sizeof(Sphere));
+	Sphere * sphere3 = malloc(sizeof(Sphere));
+	AABB box;
+
+	Vector sphere_color1;
+	create_vector_ext(&sphere_color1, 255, 100, 30);
+	create_sphere(sphere1, 0.05,0.05,-0.3,0.05, &sphere_color1, false);
+	
+	Vector sphere_color2;
+	create_vector_ext(&sphere_color2, 255, 255, 255);
+	create_sphere(sphere2, 0,0.2,-0.3,0.1, &sphere_color2, true);
+	
+	Vector sphere_color3;
+	create_vector_ext(&sphere_color3, 120, 255, 20);
+	create_sphere(sphere3, -0.05,0,-0.3,0.05, &sphere_color3, false);
+	
+	
+	Vector bg;
+	create_vector_ext(&bg, 0, 120, 255);
+	Scene * scene = create_scene_ptr(3, 0, &bg);
+	scene->objects[0] = sphere1;
+	scene->objects[1] = sphere2;
+	scene->objects[2] = sphere3;
+	Vector color;
+//#############################################################################
+	
 	if(strcmp(argv[1], "32") == 0)
-	{
-		Image_32bit* image = create_image_32bit(width, height);
-		fprintf(stdout,"Using 32-bit image %ldx%ld.\n",image->width,image->height);
-
-		//clear_frame_sky_color_32bit(image);
-		clear_frame_color_32bit(image, 0, 0, 0, 0);
-		
-		const float x0 = 0;
-		const float y0 = 0;
-		const float z0 = 8;
-		const float fov = 100;
-
-		Camera cam;
-		Sphere sphere;
-		AABB box;
-		Vector WHITE;
-		create_vector_ext(&WHITE, 0, 0, 0);
-		create_camera(&cam, width, height, fov, x0, y0, z0);
-		create_sphere(&sphere, 0,0,2,1, &WHITE, true);
-		create_ray_box(&box, BLU,RED,GRN,RED | BLU,RED | GRN, BLU | GRN);
-		
-
-		for(size_t y1 = 0; y1 < height; ++y1)
-		{
-			for(size_t x1 = 0; x1 < width; ++x1)
-			{
-				trace_ray(&cam, x1, y1);
-				if(box_intersection(&cam, &box)) put_color_at_32bit(image, x1,y1,box.color_hit_r,box.color_hit_g, box.color_hit_b, 0);
-				if(sphere_intersection(&cam, &sphere)) put_color_at_32bit(image, x1,y1, sphere.color.Data[0], sphere.color.Data[1], sphere.color.Data[2], 0);
-
-
-			}
-		}
-
-		write_image_file_32bit(image);
-
-		free_image_32bit(image);
-	}
-	else if(strcmp(argv[1], "24") == 0)
-	{
-		fprintf(stdout,"Using 24-bit image %ldx%ld.\n",width,height);
-
-		Image_24bit* image = create_image_24bit(width, height);
-
-		clear_frame_sky_color_24bit(image);
-
-		write_image_file_24bit(image);
-
-		free_image_24bit(image);
-	}
-	else if(strcmp(argv[1], "24ptr") == 0)
-	{
-		fprintf(stdout,"Using 24-bit ptr image %ldx%ld.\n",width,height);
-
-		Image_24bit_ptr* image = create_image_24bit_ptr(width, height);
-
-		clear_frame_sky_color_24bit_ptr(image);
-
-		write_image_file_24bit_ptr(image);
-
-		free_image_24bit_ptr(image);
-	}
-	else if(strcmp(argv[1], "path") == 0)
 	{
 		Image_32bit * image = create_image_32bit(width, height);
 		fprintf(stdout,"Using path tracing image %ldx%ld.\n",image->width,image->height);
 
 		//clear_frame_sky_color_32bit(image);
 		clear_frame_color_32bit(image, 0, 0, 0, 0);
-		
-		const float x0 = 0;
-		const float y0 = 0;
-		const float z0 = 8;
-		const float fov = 90;
-
-		Camera cam;
-		Sphere * sphere1 = malloc(sizeof(Sphere));
-		Sphere * sphere2 = malloc(sizeof(Sphere));
-		Sphere * sphere3 = malloc(sizeof(Sphere));
-		AABB box;
-
-		create_camera(&cam, width, height, fov, x0, y0, z0);
-		
-		Vector sphere_color1;
-		create_vector_ext(&sphere_color1, 255, 100, 30);
-		create_sphere(sphere1, 0.05,0.05,-0.3,0.05, &sphere_color1, false);
-		
-		Vector sphere_color2;
-		create_vector_ext(&sphere_color2, 255, 255, 255);
-		create_sphere(sphere2, 0,100,0,50, &sphere_color2, true);
-		
-		Vector sphere_color3;
-		create_vector_ext(&sphere_color3, 120, 255, 20);
-		create_sphere(sphere3, -0.05,0,-0.3,0.05, &sphere_color3, false);
-		
-		
-		Vector bg;
-		create_vector_ext(&bg, 0, 120, 255);
-		Scene * scene = create_scene_ptr(3, 0, &bg);
-		scene->objects[0] = sphere1;
-		scene->objects[1] = sphere2;
-		scene->objects[2] = sphere3;
-		Vector color;
-		
 
 		for(size_t y1 = 0; y1 < height; ++y1)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, scene);
+				color = path_trace(&cam, x1, y1, scene, smpls);
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = maxf(0, color.Data[0]);
 				r = minf(255, color.Data[0]);
@@ -145,6 +87,62 @@ int main(int argc, char** argv)
 		free_scene(scene);
 		free_image_32bit(image);
 
+	}
+	else if(strcmp(argv[1], "24") == 0)
+	{
+		fprintf(stdout,"Using 24-bit image %ldx%ld.\n",width,height);
+
+		Image_24bit* image = create_image_24bit(width, height);
+
+		//clear_frame_sky_color_32bit(image);
+		clear_frame_sky_color_24bit(image);
+
+		for(size_t y1 = 0; y1 < height; ++y1)
+		{
+			for(size_t x1 = 0; x1 < width; ++x1)
+			{
+				color = path_trace(&cam, x1, y1, scene, smpls);
+				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
+				r = maxf(0, color.Data[0]);
+				r = minf(255, color.Data[0]);
+				g = maxf(0, color.Data[1]);
+				g = minf(255, color.Data[1]);
+				b = maxf(0, color.Data[2]);
+				b = minf(255, color.Data[2]);
+				put_color_at_24bit(image, x1, y1, (uint8_t)r, (uint8_t)g, (uint8_t)b);
+			}
+		}
+		write_image_file_24bit(image);
+		free_scene(scene);
+		free_image_24bit(image);
+	}
+	else if(strcmp(argv[1], "24ptr") == 0)
+	{
+		fprintf(stdout,"Using 24-bit ptr image %ldx%ld.\n",width,height);
+
+		Image_24bit_ptr* image = create_image_24bit_ptr(width, height);
+		
+		clear_frame_sky_color_24bit_ptr(image);
+		
+		for(size_t y1 = 0; y1 < height; ++y1)
+		{
+			for(size_t x1 = 0; x1 < width; ++x1)
+			{
+				color = path_trace(&cam, x1, y1, scene, smpls);
+				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
+				r = maxf(0, color.Data[0]);
+				r = minf(255, color.Data[0]);
+				g = maxf(0, color.Data[1]);
+				g = minf(255, color.Data[1]);
+				b = maxf(0, color.Data[2]);
+				b = minf(255, color.Data[2]);
+				put_color_at_24ptr(image, x1, y1, (uint8_t)r, (uint8_t)g, (uint8_t)b);
+			}
+		}
+
+		write_image_file_24bit_ptr(image);
+
+		free_image_24bit_ptr(image);
 	}
 	else
 	{

@@ -35,9 +35,9 @@ typedef struct Ray
 
 /**
  * @brief A 3D AAB
- * @param min Minimum coordinate
- * @param max Maximum coordinate
- * @param color color faces
+ * @var min Minimum coordinate
+ * @var max Maximum coordinate
+ * @var color color faces
  */
 typedef struct AABB
 {
@@ -51,13 +51,13 @@ typedef struct AABB
 
 /**
  * @brief Camera
- * @param Up Up vector
- * @param Right Right vector
- * @param position Camera position/ray position
- * @param fov Filed of View
- * @param width Width
- * @param height Height
- * @param ray Up vector
+ * @var Up Up vector
+ * @var Right Right vector
+ * @var position Camera position/ray position
+ * @var fov Filed of View
+ * @var width Width
+ * @var height Height
+ * @var ray Up vector
  */
 typedef struct Camera
 {
@@ -84,7 +84,7 @@ typedef struct Sphere
     float radius;
     Vector position;
 	Vector color;
-	bool emited;
+	bool emitted;
 }Sphere;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,54 +102,29 @@ typedef struct Sphere
 void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0);
 
 /**
- * @brief Trace 3D ray from the camera
- * @param cam Camera that trace the ray
- * @param width Screen Width
- * @param height Screen Height
- * @param x0 position x
- * @param y0 position y
- * @param z0 position z
- * @param x1 direction x
- * @param y1 direction y
- * @param z1 direction z
- */
-void trace_ray(Camera * const cam, const float x1, const float y1);
-
-/**
- * @brief Create 3D ray
- * @return A 3D ray
- */
-Ray* create_ray_default(void);
-
-/**
- * @brief Create 3D ray
- * @return A 3D ray
+ * @brief Create 3D ray with (0,0,0) as origin and direction
+ * @param ray 3D ray
  */
 void create_ray_default_ext(Ray * ray);
 
 /**
- * @brief Create 3D ray
+ * @brief Create 3D ray with (x0,y0,z0) as origin and (x1,y1,z1) as direction
  * @param x0 position x
  * @param y0 position y
  * @param z0 position z
  * @param x1 direction x
  * @param y1 direction y
  * @param z1 direction z
- * @return A 3D ray
- */
-Ray* create_ray(const float x0, const float y0, const float z0, const float x1, const float y1, const float z1);
-
-/**
- * @brief Create 3D ray
- * @param x0 position x
- * @param y0 position y
- * @param z0 position z
- * @param x1 direction x
- * @param y1 direction y
- * @param z1 direction z
- * @return A 3D ray
+ * @param ray A 3D ray
  */
 void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, const float x1, const float y1, const float z1);
+
+/**
+ * @brief Create random 3D ray from a position
+ * @param Origin Ray 3D position
+ * @return A 3D ray with random direction
+ */
+Ray random_Ray(Vector const * Origin);
 
 /**
  * @brief Create a 3D sphere
@@ -164,12 +139,6 @@ void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, c
 void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted);
 
 /**
- * @brief Create a 3D sphere
- * @return A 3D sphere
- */
-Sphere* create_sphere_default(void);
-
-/**
  * @brief Compute the intersection of a camra ray and a sphere
  * @param cam Camera that trace the ray
  * @param sph Sphere
@@ -177,12 +146,6 @@ Sphere* create_sphere_default(void);
  */
 bool sphere_intersection(const Camera* const cam, Sphere* const sph);
 
-/**
- * @brief Create random 3D ray from a position
- * @param Origin Ray 3D position
- * @return A 3D ray with random direction
- */
-Ray random_Ray(Vector const * Origin);
 /**
  * @brief Create an AABB ray box
  * @param box Ray box to setup

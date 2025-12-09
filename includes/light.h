@@ -18,7 +18,6 @@
 #include "time.h"
 #include "ray.h"
 
-#define N 2000
 
 
 /**
@@ -31,29 +30,14 @@
  */
 Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax);
 
-Ray random_Ray_demi_sphere(Vector * origin, Vector * normal);
-
-Vector convert_to_vect(const uint24_t * rgb);
-
 /**
- * @brief  Lambertan BRDF equation
- * @param ray indident ray
- * @param normal pointer to the normal vector
- * @return color of the pixels at the e object
- */
-float BRDF_lambertian(Ray const * ray, Vector const * normal, Sphere const * s, float const albedo);
-
-void phong_light(const float ambient_str, Vector* normal, const Vector* color_light, Vector* hitPoint, Vector* lightPos, const Vector* color_in, Vector* color_out);
-
-
-
-/**
- * @brief Trace 3D ray from the camera with Path Tracing
+ * @brief Trace 3D ray from the camera with Path Tracing with N samples
  * @param pixel_x index x of the pixel
  * @param pixel_y index y of the pixel
  * @param S the scene of objects
+ * @param N number of samples
  * @return color the color of the pixel
  */
-Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, Scene const * S);
+Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, Scene const * S, size_t N);
 
 #endif /* light_h */

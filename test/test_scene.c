@@ -15,9 +15,10 @@ void test_intersect_scene(void){
 	create_sphere(s->objects[0], 0, 0, 2, 1, NULL, false);
 	Vector hit;
 	int object = -1;
-	Ray * ray = create_ray(0, 0, 0, 0, 0, 0.5);
+	Ray ray;
+	create_ray_ext(&ray, 0, 0, 0, 0, 0, 0.5);
 	
-	intersect_in_scene(ray, s, &object, &hit);
+	intersect_in_scene(&ray, s, &object, &hit);
 	
 	
 	TEST_ASSERT_EQUAL_INT(object, 0);
@@ -27,7 +28,6 @@ void test_intersect_scene(void){
 	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,1,hit.Data[2]);
 	
 	free_scene(s);
-	free_ray(ray);
 }
 
 

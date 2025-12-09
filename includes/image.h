@@ -226,24 +226,6 @@ void clear_frame_color_24bit_ptr(Image_24bit_ptr *const img, const uint8_t r, co
 void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 
 /**
- * @brief Remplit les pixel de couleur pour créer un effet de ciel
- * @param img Image à remplir
- */
-void clear_frame_sky_color_24bit(Image_24bit *const img);
-
-/**
- * @brief Remplit les pixel de couleur pour créer un effet de ciel
- * @param img Image à remplir
- */
-void clear_frame_sky_color_24bit_ptr(Image_24bit_ptr *const img);
-
-/**
- * @brief Remplit les pixel de couleur pour créer un effet de ciel
- * @param img Image à remplir
- */
-void clear_frame_sky_color_32bit(Image_32bit *const img);
-
-/**
  * @brief Ecrit sur le fichier image
  * @param img Image à écrire
  */

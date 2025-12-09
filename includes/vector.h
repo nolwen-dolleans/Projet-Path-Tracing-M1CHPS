@@ -14,11 +14,6 @@ typedef struct Vector
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @brief Create a single precision null 3D vector (AoS version)
- * @return A single precision 3D vector
- */
-Vector* create_vector_default(void);
 
 /**
  * @brief Create a single precision null 3D vector (AoS version)
@@ -28,42 +23,17 @@ void create_vector_default_ext(Vector* u);
 
 /**
  * @brief Create a random single precision 3D vector (AoS version)
- * @return A single precision 3D vector
- */
-Vector* create_vector_random_default(void);
-
-/**
- * @brief Create a random single precision 3D vector (AoS version)
  * @param u A single precision 3D vector
  */
 void create_vector_random_default_ext(Vector* u);
 
 /**
  * @brief Create a random single precision 3D vector (AoS version)
- * @param min Minimum componant value
- * @param max Maximum componant value
- * @return A single precision 3D vector
- */
-Vector* create_vector_random(const float min, const float max);
-
-/**
- * @brief Create a random single precision 3D vector (AoS version)
  * @param u A pointer to an empty single precision 3D vector
  * @param min Minimum componant value
  * @param max Maximum componant value
- * @return A single precision 3D vector
  */
 void create_vector_random_ext(Vector* u, const float min, const float max);
-
-/**
- * @brief Create a single precision 3D vector (AoS version)
- * @param x x componant
- * @param y y componant
- * @param z z componant
- * @return A single precision 3D vector
- */
-Vector* create_vector(const float x, const float y, const float z);
-
 /**
  * @brief Create a single precision 3D vector (AoS version)
  * @param u A single precision 3D vector pointer
@@ -87,14 +57,6 @@ bool is_null(const Vector * v);
  * @brief Sum of two single precision 3D vector
  * @param u A single precision 3D vector
  * @param v A single precision 3D vector
- * @return A single precision  3D vector
- */
-Vector* add(const Vector* const u, const Vector* const v);
-
-/**
- * @brief Sum of two single precision 3D vector
- * @param u A single precision 3D vector
- * @param v A single precision 3D vector
  * @param w A single precision 3D vector
  */
 void add_ext(const Vector* const u, const Vector* const v, Vector* w);
@@ -103,25 +65,9 @@ void add_ext(const Vector* const u, const Vector* const v, Vector* w);
  * @brief Substraction of two single precision 3D vector
  * @param u A single precision 3D vector
  * @param v A single precision 3D vector
- * @return A single precision  3D vector
- */
-Vector* sub(const Vector* const u, const Vector* const v);
-
-/**
- * @brief Substraction of two single precision 3D vector
- * @param u A single precision 3D vector
- * @param v A single precision 3D vector
  * @param w A single precision 3D vector
  */
 void sub_ext(const Vector* const u, const Vector* const v, Vector* w);
-
-/**
- * @brief Multiplication of a single precision 3D vector by a single precsion scalar
- * @param u A single precision 3D vector
- * @param k A single precision scalar
- * @return A single precision  3D vector
- */
-Vector* mul(const Vector* const u, const float k);
 
 /**
  * @brief Multiplication of a single precision 3D vector by a single precsion scalar
@@ -152,14 +98,6 @@ float dot(const Vector* const u, const Vector* const v);
  * @brief Cross product of two single precision 3D vector
  * @param u A single precision 3D vector
  * @param v A single precision 3D vector
- * @return A single precision  3D vector perpandicular to u and v
- */
-Vector* cross(const Vector* const u, const Vector* const v);
-
-/**
- * @brief Cross product of two single precision 3D vector
- * @param u A single precision 3D vector
- * @param v A single precision 3D vector
  * @param w A single precision 3D vector
  */
 void cross_ext(const Vector* const u, const Vector* const v, Vector* w);
@@ -172,13 +110,6 @@ void cross_ext(const Vector* const u, const Vector* const v, Vector* w);
  * @return Single precision scalar 
  */
 float length(const Vector* const u);
-
-/**
- * @brief Normalize a single precsion 3D vector
- * @param u A single single precision 3D vector
- * @return A single precision normalized 3D vector
- */
-Vector* norm(const Vector* const u);
 
 /**
  * @brief Normalize a single precsion 3D vector

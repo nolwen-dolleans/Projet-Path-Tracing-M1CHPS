@@ -31,52 +31,12 @@ void to_world_space(Camera * const cam, Vector* u, Vector* w)
 	w->Data[2] = cam->right.Data[2] * u->Data[0] + cam->up.Data[2] * u->Data[1] + cam->up.Data[2] * u->Data[2] - cam->position.Data[2];
 }
 
-void trace_ray(Camera * const cam, const float pixel_x, const float pixel_y)
-{
-	const float aspect_ratio = (float)cam->width * cam->inv_height;
-	const float fov = tanf(cam->fov * (M_PI / 180.0f) * 0.5f);
-	const float pixel_nc_x = (2.0f*(pixel_x + 0.5f) * cam->inv_width - 1.0f) * aspect_ratio * fov;
-	const float pixel_nc_y = (1.0f - 2.0f*(pixel_y + 0.5f) * cam->inv_height) * fov;
-
-	Vector ray0;
-	Vector ray1;
-	Vector ray2;
-
-	create_vector_ext(&ray0,pixel_nc_x, pixel_nc_y, -1);
-	//to_world_space(cam, &ray0, &ray1);
-	norm_ext(&ray0,&ray1);
-	cam->direction = ray1;
-
-	cam->inv_direction.Data[0] = 1.0f/ray1.Data[0];
-	cam->inv_direction.Data[1] = 1.0f/ray1.Data[1];
-	cam->inv_direction.Data[2] = 1.0f/ray1.Data[2];
-
-}
-
-Ray* create_ray_default(void)
-{
-    Ray* ray = (Ray*)malloc_check(sizeof(Ray));
-    create_vector_default_ext(&ray->position);
-    create_vector_ext(&ray->direction,0.0f, 0.0f, 1.0f);
-
-    return ray;
-}
-
 void create_ray_default_ext(Ray * ray)
 {
     create_vector_default_ext(&ray->position);
     create_vector_ext(&ray->direction,0.0f, 0.0f, 0.0f);
 }
 
-Ray* create_ray(const float x0, const float y0, const float z0, const float x1, const float y1, const float z1)
-{
-    Ray* ray = (Ray*)malloc_check(sizeof(Ray));
-    create_vector_ext(&ray->position,x0, y0, z0);
-    create_vector_ext(&ray->direction,x1, y1, z1);
-	norm_ext(&ray->direction,&ray->direction);
-
-    return ray;
-}
 void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, const float x1, const float y1, const float z1)
 {
     create_vector_ext(&ray->position,x0, y0, z0);
@@ -103,73 +63,8 @@ void create_sphere(Sphere* sph ,const float x, const float y, const float z, con
 	create_vector_ext(&sph->position,x, y, z);
 	sph->radius = rad;
 	mul_ext(color, inv255, &sph->color);
-	sph->emited = is_emitted;
+	sph->emitted = is_emitted;
 }
-
-Sphere* create_sphere_default(void)
-{
-    Sphere* sphere = (Sphere*)malloc_check(sizeof(Sphere));
-    create_vector_ext(&sphere->position,0.0f, 0.0f, 0.0f);
-    sphere->radius = 0.0f;
-	create_vector_ext(&sphere->color, 0, 0,0);
-	sphere->emited = false;
-
-    return sphere;
-}
-
-bool sphere_intersection(const Camera* const cam, Sphere* const sph)
-{
-	Vector oc;
-	sub_ext(&cam->position, &sph->position, &oc);
-
-	const float A = dot(&cam->direction,&cam->direction);
-	const float B = 2.0f * (dot(&cam->direction,&oc));
-	const float C = dot(&oc,&oc) - sph->radius*sph->radius;
-
-	Quadratic_info* quad = quadratic_resolution(A, B, C);
-
-	if(quad == NULL)return false;
-
-	Vector lightPos;
-	Vector lightColor;
-	Vector color_in;
-	Vector color_ambient;
-	Vector color_diffuse;
-
-	create_vector_ext(&lightPos, 50, 200, -100);
-	create_vector_ext(&lightColor, 255, 255, 255);
-	create_vector_ext(&color_in, 255, 0, 0);
-
-	float dif = 1.0f;
-	switch (quad->state)
-	{
-	case ONE_SOLUTION:
-		
-		free(quad);
-		return true;
-		break;
-	case TWO_SOLUTION: {
-		Vector hit_point;
-
-		const float t = quad->x0;
-
-		linear_ext(&cam->position, &cam->direction, t, &hit_point);
-		Vector normal;
-		sub_ext(&hit_point, &sph->position, &normal);
-		Vector nnormal;
-		
-		//phong_light(0.1, &nnormal,&lightColor, &hit_point,&lightPos,&color_in,&sph->color);
-
-		free(quad);
-		return true;
-		break;
-	}
-	default:
-		break;
-	}
-	return false;
-}
-
 
 bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)
 {

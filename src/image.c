@@ -204,33 +204,6 @@ void clear_frame_sky_color_24bit(Image_24bit *const img)
     }
 }
 
-void clear_frame_sky_color_24bit_ptr(Image_24bit_ptr *const img)
-{
-    for(size_t i = 0; i < img->height; ++i)
-    {
-        for(size_t j = 0; j < img->width; ++j)
-        {
-            // Génere un effet de ciel bleu selon la hauteur de l'image 
-            const uint8_t k = i * 255 / img->height;
-            const size_t index = i * img->width + j;
-            set_color_24bit_ptr(&img->buffer, index, k % 255, k % 255, 255);
-        }
-    }
-}
-
-void clear_frame_sky_color_32bit(Image_32bit *const img)
-{
-    for(size_t i = 0; i < img->height; ++i)
-    {
-        for(size_t j = 0; j < img->width; ++j)
-        {
-            // Génere un effet de ciel bleu selon la hauteur de l'image 
-            const uint8_t k = i * 255 / img->height;
-            img->buffer[i * img->width + j] = get_color_32bit( k % 255, k % 255, 255, 0);
-        }
-    }   
-}
-
 void write_image_file_24bit(Image_24bit *const img)
 {
     fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->width, img->height, 255);
@@ -280,19 +253,6 @@ void free_image_24bit(Image_24bit* img)
     {
         fprintf(stderr, "Image already freed.\n");
     }
-}
-
-uint24_t convert_to_color(const Vector * vec){
-	uint24_t res;
-	for(int i = 0; i<3; ++i){
-		if(vec->Data[i]<0 || vec->Data[i]>255){
-			printf("Error color range:%f\n",vec->Data[i]);
-			exit(1);
-			
-		}
-		else res.byte[i] = (uint8_t)vec->Data[i];
-	}
-	return res;
 }
 
 void free_image_24bit_ptr(Image_24bit_ptr* img)

@@ -7,7 +7,7 @@
 
 #include "light.h"
 
-Ray random_Ray_demi_sphere(Vector * origin, Vector * normal){
+static inline Ray random_Ray_demi_sphere(Vector * origin, Vector * normal){
 	Ray ray = random_Ray(origin);
 	if (dot(normal, &ray.direction)<0){
 		for (int i = 0; i<3; ++i) {
@@ -65,13 +65,6 @@ static inline Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, 
 }
 
 
-Vector convert_to_vect(const uint24_t * rgb){
-	Vector result;
-	float weight = 1.0 / 255.0;
-	create_vector_ext(&result, (float)rgb->byte[0]*weight, (float)rgb->byte[1]*weight, (float)rgb->byte[2]*weight);
-	return result;
-}
-
 Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax){
 	Vector L_incident;                         //ceci va représenter la réflectance du rayon incident avec RGB comme composante
 	create_vector_default_ext(&L_incident);
@@ -105,9 +98,9 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	}
 	Sphere obj = *S->objects[object];
 	
-	if (obj.emited) {
+	if (obj.emitted) {
 		Vector res;
-		float intensity = 10.0f;
+		float intensity = 5.0f;
 		mul_ext(&obj.color, intensity, &res);
 		return res;
 	}
@@ -138,44 +131,7 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	return L_incident;
 }
 
-
-/*
-float BRDF_lambertian(Ray const * ray, Vector const * normal, Sphere const * s, float const albedo){
-	float res = s->color * albedo / M_PI;
-	return res;
-}
-*/
-
-void phong_light(const float ambient_str, Vector* normal, const Vector* color_light, Vector* hitPoint, Vector* lightPos, const Vector* color_in, Vector* color_out)
-{
-	//Ambient
-	const float amb_x = ambient_str * color_light->Data[0] ;
-	const float amb_y = ambient_str * color_light->Data[1] ;
-	const float amb_z = ambient_str * color_light->Data[2] ;
-
-	//Diffuse
-	norm_ext(normal, normal);
-
-	Vector lightDir0;
-	Vector lightDir1;
-
-	sub_ext(lightPos, hitPoint, &lightDir0);
-	norm_ext(&lightDir0, &lightDir1);
-	
-	const float dt = dot(normal, &lightDir1);
-	const float dif = dt < 0.0f ? 0.0f : dt;
-
-	const float specular_str = 0.5f;
-
-	const float x = (0 + dif)*color_in->Data[0];
-	const float y = (0 + dif)*color_in->Data[1];
-	const float z = (0 + dif)*color_in->Data[2];
-
-	create_vector_ext(color_out, x, y, z);
-}
-
-
-Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, Scene const * S)
+Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, Scene const * S, size_t N)
 {
 	const float aspect_ratio = (float)cam->width * cam->inv_height;
 	const float fov = tanf(cam->fov * (M_PI / 180.0f) * 0.5f);
@@ -189,7 +145,7 @@ Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, 
 	
 	
 	for(size_t i = 0; i<N; ++i){
-		Vector radiance = ray_sampling(&ray, S, cam, 0, 10);
+		Vector radiance = ray_sampling(&ray, S, cam, 0, 8);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}
