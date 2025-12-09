@@ -76,16 +76,21 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	Vector L_incident;                         //ceci va représenter la réflectance du rayon incident avec RGB comme composante
 	create_vector_default_ext(&L_incident);
 	Vector hit;
+	Vector black;
+   create_vector_ext(&black, 0, 0, 0);
 	bool check = false;
 	int object = -1;
 	if (d == dmax) {
-		Vector black;
-		create_vector_ext(&black, 0, 0, 0);
 		return black;// par défaut met en noir si le rayon à fait un certain nombre de rebond
 	}			// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
 	if (intersect_in_scene(r, S, &object, &hit) == false) {
-			Vector res = convert_to_vect(&S->background_color);// par défaut met la couleur de fond si le rayon est hors-limite
-			return res;
+		if (d==0) {
+			return *S->background_color;// par défaut met la couleur de fond si le rayon est hors-limite;
+		}
+		else{
+			return black;// permet d'éviter au ciel d'avoir une influance sur la couleur des objets
+		}
+			
 	}
 	
 	Vector n = get_normal_vector(&hit, S->objects[object]);
@@ -102,8 +107,8 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	
 	if (obj.emited) {
 		Vector res;
-		float weight = 1 / 255.0 * 0.9f;
-		mul_ext(&obj.color, weight, &res);
+		float intensity = 10.0f;
+		mul_ext(&obj.color, intensity, &res);
 		return res;
 	}
 
@@ -116,7 +121,7 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	
 	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
 	
-	const float albedo = 0.9f;
+	const float albedo = 0.8f;
 	Vector L_reflected_i = ray_sampling(&r_new, S, cam, d+1, dmax);
 	const float cos_theta = dot(&n,&r_new.direction);
 	Vector weight;
@@ -184,14 +189,20 @@ Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, 
 	
 	
 	for(size_t i = 0; i<N; ++i){
-		Vector radiance = ray_sampling(&ray, S, cam, 0, 5);
+		Vector radiance = ray_sampling(&ray, S, cam, 0, 10);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}
 	}
-	float inv_N = (float)1/N * 255;
+	float inv_N = (float)1/(N+1) * 255;
 	for (int i = 0; i<3; ++i) {
+		
 		color.Data[i] = color.Data[i]*inv_N;
+		/*
+		if (color.Data[i]>255) {
+			perror("Error: color > 255\n");
+			exit(1);
+		}*/
 	}
 	return color;
 }

@@ -4,6 +4,9 @@
 #include "scene.h"
 #include "vector.h"
 
+static inline float maxf(float a, float b) { return (a < b) ? b : a;}
+static inline float minf(float a, float b) { return (a < b) ? a : b;}
+
 int main(int argc, char** argv)
 {
 
@@ -33,9 +36,10 @@ int main(int argc, char** argv)
 		Camera cam;
 		Sphere sphere;
 		AABB box;
-
+		Vector WHITE;
+		create_vector_ext(&WHITE, 0, 0, 0);
 		create_camera(&cam, width, height, fov, x0, y0, z0);
-		create_sphere(&sphere, 0,0,2,1);
+		create_sphere(&sphere, 0,0,2,1, &WHITE, true);
 		create_ray_box(&box, BLU,RED,GRN,RED | BLU,RED | GRN, BLU | GRN);
 		
 
@@ -81,11 +85,11 @@ int main(int argc, char** argv)
 	}
 	else if(strcmp(argv[1], "path") == 0)
 	{
-		Image_24bit* image = create_image_24bit(width, height);
+		Image_32bit * image = create_image_32bit(width, height);
 		fprintf(stdout,"Using path tracing image %ldx%ld.\n",image->width,image->height);
 
 		//clear_frame_sky_color_32bit(image);
-		clear_frame_color_24bit(image, 0, 0, 0);
+		clear_frame_color_32bit(image, 0, 0, 0, 0);
 		
 		const float x0 = 0;
 		const float y0 = 0;
@@ -100,24 +104,25 @@ int main(int argc, char** argv)
 
 		create_camera(&cam, width, height, fov, x0, y0, z0);
 		
-		create_sphere(sphere1, 0,0,-0.3,0.05);
 		Vector sphere_color1;
-		create_vector_ext(&sphere_color1, 255, 0, 0);
-		sphere1->color = sphere_color1;
-		sphere1->emited = false;
+		create_vector_ext(&sphere_color1, 255, 100, 30);
+		create_sphere(sphere1, 0.05,0.05,-0.3,0.05, &sphere_color1, false);
 		
-		create_sphere(sphere2, 0,100,-0.3,50);
 		Vector sphere_color2;
 		create_vector_ext(&sphere_color2, 255, 255, 255);
-		sphere2->color = sphere_color2;
-		sphere2->emited = true;
+		create_sphere(sphere2, 0,100,0,50, &sphere_color2, true);
+		
+		Vector sphere_color3;
+		create_vector_ext(&sphere_color3, 120, 255, 20);
+		create_sphere(sphere3, -0.05,0,-0.3,0.05, &sphere_color3, false);
 		
 		
-		uint24_t bg;
-		set_color_24bit(&bg, 0, 120, 255);
-		Scene * scene = create_scene_ptr(2, 0, bg);
+		Vector bg;
+		create_vector_ext(&bg, 0, 120, 255);
+		Scene * scene = create_scene_ptr(3, 0, &bg);
 		scene->objects[0] = sphere1;
 		scene->objects[1] = sphere2;
+		scene->objects[2] = sphere3;
 		Vector color;
 		
 
@@ -126,12 +131,19 @@ int main(int argc, char** argv)
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
 				color = path_trace(&cam, x1, y1, scene);
-				put_color_at_24bit(image, x1, y1, (uint8_t)color.Data[0], (uint8_t)color.Data[1], (uint8_t)color.Data[2]);
+				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
+				r = maxf(0, color.Data[0]);
+				r = minf(255, color.Data[0]);
+				g = maxf(0, color.Data[1]);
+				g = minf(255, color.Data[1]);
+				b = maxf(0, color.Data[2]);
+				b = minf(255, color.Data[2]);
+				put_color_at_32bit(image, x1, y1, (uint8_t)r, (uint8_t)g, (uint8_t)b, 0);
 			}
 		}
-		write_image_file_24bit(image);
+		write_image_file_32bit(image);
 		free_scene(scene);
-		free_image_24bit(image);
+		free_image_32bit(image);
 
 	}
 	else
@@ -141,3 +153,4 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+

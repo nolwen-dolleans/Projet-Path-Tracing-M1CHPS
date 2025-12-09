@@ -18,14 +18,16 @@ void free_scene(Scene * S){
 }
 
 
-Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint24_t backgroundColor){
+Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, const Vector * backgroundColor){
+	float inv255 = 1.0f / 255.0f; // normalisation de la couleur
 	Scene * s = malloc(sizeof(Scene));
 	s->objects = malloc(sizeof(Sphere*)*n_objects);
 	for(int i = 0; i<n_objects; ++i){
 		s->objects[i] = malloc(sizeof(Sphere));
 	}
 	s->lightsources = malloc(sizeof(Vector)*n_lightsources);
-	s->background_color = backgroundColor;
+	s->background_color = malloc(sizeof(Vector));
+	mul_ext(backgroundColor, inv255, s->background_color);
 	s->size_objects = n_objects;
 	s->size_lightsources = n_lightsources;
 	return s;

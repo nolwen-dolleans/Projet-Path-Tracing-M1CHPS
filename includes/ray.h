@@ -158,8 +158,10 @@ void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, c
  * @param y position at y-axis
  * @param z position at z-axis
  * @param rad Radius
+ * @param color vector rgb with r,g,b in [0,255]
+ * @param is_emitted bool if the sphere emitt or not
  */
-void create_sphere(Sphere* const sph ,const float x, const float y, const float z, const float rad);
+void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted);
 
 /**
  * @brief Create a 3D sphere

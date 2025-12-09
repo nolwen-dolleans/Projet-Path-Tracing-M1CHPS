@@ -18,7 +18,7 @@
 #include "time.h"
 #include "ray.h"
 
-#define N 1000
+#define N 2000
 
 
 /**

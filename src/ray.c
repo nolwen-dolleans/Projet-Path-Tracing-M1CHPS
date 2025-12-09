@@ -97,10 +97,13 @@ Ray random_Ray(Vector const * Origin){
 }
 
 
-void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad)
+void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted)
 {
+	float inv255 = 1.0f/255.0f;
 	create_vector_ext(&sph->position,x, y, z);
 	sph->radius = rad;
+	mul_ext(color, inv255, &sph->color);
+	sph->emited = is_emitted;
 }
 
 Sphere* create_sphere_default(void)
@@ -108,6 +111,8 @@ Sphere* create_sphere_default(void)
     Sphere* sphere = (Sphere*)malloc_check(sizeof(Sphere));
     create_vector_ext(&sphere->position,0.0f, 0.0f, 0.0f);
     sphere->radius = 0.0f;
+	create_vector_ext(&sphere->color, 0, 0,0);
+	sphere->emited = false;
 
     return sphere;
 }
