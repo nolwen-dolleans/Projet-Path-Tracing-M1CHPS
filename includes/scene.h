@@ -22,7 +22,7 @@
 
 typedef struct Scene{
 	Sphere ** objects;
-	uint24_t background_color;
+	Vector * background_color;
 	Vector * lightsources;
 	size_t size_objects;
 	size_t size_lightsources;
@@ -37,7 +37,7 @@ typedef struct Scene{
  * @return index of the object
  * @return intersection:  The poter to the intersection point
  */
-Vector intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object);
+bool intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object, Vector *hit);
 
 
 /**
@@ -53,6 +53,6 @@ void free_scene(Scene * S);
  * @param backgroundColor a uint32_t represent the background color
  * @return Scene
  */
-Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint24_t backgroundColor);
+Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, const Vector * backgroundColor);
 
 #endif /* scene_h */

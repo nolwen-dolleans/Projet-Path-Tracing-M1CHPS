@@ -22,7 +22,7 @@ add_executable(ppm src/ppm.c)
 target_link_libraries(ppm PRIVATE LibPathTracing)
 
 
-target_compile_options(ppm PRIVATE -O3 -Wall -march=native)
+target_compile_options(ppm PRIVATE -O0 -Wall -march=native -g)
 
 add_executable(test_runner 
                             test/test_runner.c 

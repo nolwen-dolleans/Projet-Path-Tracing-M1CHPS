@@ -18,45 +18,44 @@ void free_scene(Scene * S){
 }
 
 
-Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, uint24_t backgroundColor){
+Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, const Vector * backgroundColor){
+	float inv255 = 1.0f / 255.0f; // normalisation de la couleur
 	Scene * s = malloc(sizeof(Scene));
 	s->objects = malloc(sizeof(Sphere*)*n_objects);
 	for(int i = 0; i<n_objects; ++i){
 		s->objects[i] = malloc(sizeof(Sphere));
 	}
 	s->lightsources = malloc(sizeof(Vector)*n_lightsources);
-	s->background_color = backgroundColor;
+	s->background_color = malloc(sizeof(Vector));
+	mul_ext(backgroundColor, inv255, s->background_color);
 	s->size_objects = n_objects;
 	s->size_lightsources = n_lightsources;
 	return s;
 }
 
-Vector intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object){
+bool intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object, Vector *hit){
 	int object_index = -1;
-	double t = 10000; 				//distance minimale entre l'origine du rayon et de l'objet
-	const Vector * origins = &r->position;
-	Vector intersection;
+	const Vector * origin = &r->position;
+	double closest_t = 1e30; //distance minimale entre l'origine du rayon et de l'objet
 	
 	for (int i = 0; i<S->size_objects; ++i) {
 		Sphere sp = *S->objects[i];
-		intersection = intersect_sphere(r, &sp);
-		if (!(is_null(&intersection))){
-			Vector * w = sub(&intersection,origins);
-			double t_new = sqrt(dot(w,w));
-			if (t_new < t){
-				t = t_new;
+		if (!intersect_sphere(r, &sp, hit)){
+			continue;
+		}
+		else{
+			Vector diff;
+			sub_ext(hit, origin, &diff);
+			double t = sqrt(dot(&diff, &diff));
+			
+			if  (t<closest_t){
+				closest_t = t;
 				object_index = i;
 			}
 		}
+		
 	}
-	if(object_index == -1){
-		create_vector_ext(&intersection, 0, 0, 0);
-	}
-	else {
-		intersection = intersect_sphere(r, S->objects[object_index]);
-	}
+	if(object_index == -1) return false;
 	*object = object_index;
-	return intersection;
-	
-	
+	return true;
 }

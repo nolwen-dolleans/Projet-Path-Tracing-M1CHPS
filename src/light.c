@@ -5,7 +5,6 @@
 //  Created by Nolwen Dolléans on 12/11/2025.
 //
 
-
 #include "light.h"
 
 Ray random_Ray_demi_sphere(Vector * origin, Vector * normal){
@@ -32,11 +31,17 @@ static inline Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, 
 	//coordonnées dans la base orthonormée (up,right,forward) https://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-13-normal-mapping/
 	Vector up;
 	Vector norm = *normal;
-	create_vector_ext(&up, 0, 1, 0);
+	
 	
 	Vector tangent;
+	if (fabs(norm.Data[1])<0.9f){
+		create_vector_ext(&up, 1, 0, 0);
+	}
+	else{
+		create_vector_ext(&up, 0, 1, 0);
+	}
 	cross_ext(&norm, &up, &tangent);
-	norm_ext(&tangent, &tangent);
+    norm_ext(&tangent, &tangent);
 	
 	Vector bitangent;
 	cross_ext(&norm, &tangent, &bitangent);
@@ -55,11 +60,6 @@ static inline Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, 
 	ray.position = *origin;
 	ray.direction = direction;
 	norm_ext(&ray.direction, &ray.direction);
-	if (dot(&ray.direction, &ray.direction)<0){
-		for (short int i = 0; i<3; i++) {
-			ray.direction.Data[i] *= -1;
-		}
-	}
 	
 	return ray;
 }
@@ -67,43 +67,74 @@ static inline Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, 
 
 Vector convert_to_vect(const uint24_t * rgb){
 	Vector result;
-	create_vector_ext(&result, (float)rgb->byte[0], (float)rgb->byte[1], (float)rgb->byte[2]);
+	float weight = 1.0 / 255.0;
+	create_vector_ext(&result, (float)rgb->byte[0]*weight, (float)rgb->byte[1]*weight, (float)rgb->byte[2]*weight);
 	return result;
 }
 
-Vector ray_sampling(Ray * r, const Scene * S, int d, int dmax){
+Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax){
 	Vector L_incident;                         //ceci va représenter la réflectance du rayon incident avec RGB comme composante
 	create_vector_default_ext(&L_incident);
+	Vector hit;
+	Vector black;
+   create_vector_ext(&black, 0, 0, 0);
+	bool check = false;
 	int object = -1;
 	if (d == dmax) {
-		Vector black;
-		create_vector_ext(&black, 0, 0, 0);
 		return black;// par défaut met en noir si le rayon à fait un certain nombre de rebond
+	}			// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
+	if (intersect_in_scene(r, S, &object, &hit) == false) {
+		if (d==0) {
+			return *S->background_color;// par défaut met la couleur de fond si le rayon est hors-limite;
+		}
+		else{
+			return black;// permet d'éviter au ciel d'avoir une influance sur la couleur des objets
+		}
+			
 	}
-	Vector intersection = intersect_in_scene(r,S,&object);				// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
 	
-	if (object < 0) {
-		return convert_to_vect(&S->background_color);// par défaut met la couleur de fond si le rayon est hors-limite
-	}
-	Vector n = get_normal_vector(&intersection, S->objects[object]);
+	Vector n = get_normal_vector(&hit, S->objects[object]);
 
-	accumulate_diffuse_point_light(&intersection, &n, 0.9f, &S->objects[object]->color, S, &L_incident);
-	
-	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&intersection,&n); 		// créé un rebond sur la zone d'intersection
-	
-	Vector L_emitted_i = ray_sampling(&r_new,S,d+1,dmax);
-	
-	float albedo = 0.3f;
-	float cos_teta = dot(&n,&r_new.direction);
-	//float pdf = 1 / 2*M_PI;
-	//float BRDF = S->objects[object]->color * albedo / M_PI;
-	Vector BRDF_pdf;
-	mul_ext(&S->objects[object]->color, albedo,&BRDF_pdf);
-	
-	for(int i = 0; i<3; ++i){
-		L_emitted_i.Data[i] *= BRDF_pdf.Data[i];
-		L_incident.Data[i]+= L_emitted_i.Data[i];
+	// Assurer une normale unitaire et orientée à l’opposé du rayon incident
+	norm_ext(&n, &n);
+	if (dot(&n, &r->direction) > 0.0f) {
+		// la normale pointe du mauvais côté pour l’hémisphère sortant
+		n.Data[0] = -n.Data[0];
+		n.Data[1] = -n.Data[1];
+		n.Data[2] = -n.Data[2];
 	}
+	Sphere obj = *S->objects[object];
+	
+	if (obj.emited) {
+		Vector res;
+		float intensity = 10.0f;
+		mul_ext(&obj.color, intensity, &res);
+		return res;
+	}
+
+	// Offset the new ray origin to avoid self-intersections
+	Vector offset_origin;
+	Vector n_eps;
+	// n_eps = n * 1e-3
+	mul_ext(&n, 1e-3f, &n_eps);
+	add_ext(&hit, &n_eps, &offset_origin);
+	
+	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
+	
+	const float albedo = 0.8f;
+	Vector L_reflected_i = ray_sampling(&r_new, S, cam, d+1, dmax);
+	const float cos_theta = dot(&n,&r_new.direction);
+	Vector weight;
+	mul_ext(&obj.color, albedo, &weight);
+
+	for (int i = 0; i < 3; ++i) {
+		if (check) {
+			printf("%f ",L_incident.Data[i]);
+		}
+		L_incident.Data[i] += L_reflected_i.Data[i] * weight.Data[i];
+	}if (check) {
+		printf("\n");
+	   }
 	return L_incident;
 }
 
@@ -150,20 +181,29 @@ Vector path_trace(Camera * const cam, const float pixel_x, const float pixel_y, 
 	const float fov = tanf(cam->fov * (M_PI / 180.0f) * 0.5f);
 	const float pixel_nc_x = (2.0f*(pixel_x + 0.5f) * cam->inv_width - 1.0f) * aspect_ratio * fov;
 	const float pixel_nc_y = (1.0f - 2.0f*(pixel_y + 0.5f) * cam->inv_height) * fov;
-	
+	int col = 0;
 	Ray ray;
-	create_ray_ext(&ray, 0, 0, 0, pixel_nc_x, pixel_nc_y, 1);
+	create_ray_ext(&ray, 0, 0, 0, pixel_nc_x, pixel_nc_y, -1);
 	Vector color;
-	create_vector_ext(&color,0, 0, 0);
+	create_vector_ext(&color,col, col, col);
+	
 	
 	for(size_t i = 0; i<N; ++i){
-		Vector radiance = ray_sampling(&ray, S, 0, 10);
+		Vector radiance = ray_sampling(&ray, S, cam, 0, 10);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}
 	}
+	float inv_N = (float)1/(N+1) * 255;
 	for (int i = 0; i<3; ++i) {
-		color.Data[i] = color.Data[i]/(float)(N);
+		
+		color.Data[i] = color.Data[i]*inv_N;
+		/*
+		if (color.Data[i]>255) {
+			perror("Error: color > 255\n");
+			exit(1);
+		}*/
 	}
 	return color;
 }
+

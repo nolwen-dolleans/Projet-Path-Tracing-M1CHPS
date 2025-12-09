@@ -97,10 +97,13 @@ Ray random_Ray(Vector const * Origin){
 }
 
 
-void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad)
+void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted)
 {
+	float inv255 = 1.0f/255.0f;
 	create_vector_ext(&sph->position,x, y, z);
 	sph->radius = rad;
+	mul_ext(color, inv255, &sph->color);
+	sph->emited = is_emitted;
 }
 
 Sphere* create_sphere_default(void)
@@ -108,6 +111,8 @@ Sphere* create_sphere_default(void)
     Sphere* sphere = (Sphere*)malloc_check(sizeof(Sphere));
     create_vector_ext(&sphere->position,0.0f, 0.0f, 0.0f);
     sphere->radius = 0.0f;
+	create_vector_ext(&sphere->color, 0, 0,0);
+	sphere->emited = false;
 
     return sphere;
 }
@@ -143,7 +148,7 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 		free(quad);
 		return true;
 		break;
-	case TWO_SOLUTION:
+	case TWO_SOLUTION: {
 		Vector hit_point;
 
 		const float t = quad->x0;
@@ -158,6 +163,7 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 		free(quad);
 		return true;
 		break;
+	}
 	default:
 		break;
 	}
@@ -165,79 +171,59 @@ bool sphere_intersection(const Camera* const cam, Sphere* const sph)
 }
 
 
-Vector intersect_sphere(const Ray* const r, const Sphere* const s)
+bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)
 {
-/*     const float bx2 = r->direction.Data[0]*r->direction.Data[0];
-    const float by2 = r->direction.Data[1]*r->direction.Data[1];
-    const float bz2 = r->direction.Data[2]*r->direction.Data[2];
-
-    const float ax2 = r->position.Data[0]*r->position.Data[0];
-    const float ay2 = r->position.Data[1]*r->position.Data[1];
-    const float az2 = r->position.Data[2]*r->position.Data[2];
- 
-    const float xc2 = s->position.Data[0]*s->position.Data[0];
-    const float yc2 = s->position.Data[1]*s->position.Data[1];
-    const float zc2 = s->position.Data[2]*s->position.Data[2];
-
-    const float r2 = s->radius*s->radius;
-
-    const float ax_bx = 2.0f*r->position.Data[0]*r->direction.Data[0];
-    const float ay_by = 2.0f*r->position.Data[1]*r->direction.Data[1];
-    const float az_bz = 2.0f*r->position.Data[2]*r->direction.Data[2];
-
-    const float bx_xc = 2.0f*r->direction.Data[0]*s->position.Data[0];
-    const float by_yc = 2.0f*r->direction.Data[1]*s->position.Data[1];
-    const float bz_zc = 2.0f*r->direction.Data[2]*s->position.Data[2];
-
-    const float A = bx2 + by2 + bz2;
-    const float B = ax_bx + ay_by + az_bz - bx_xc - by_yc - bz_zc;
-    const float C = ax2 + ay2 + az2 - xc2 - yc2 - zc2 - r2; */
 	
-	Vector const O = r->position;
+	Vector const oc = r->position;
 	Vector const u = r->direction;
+	
 	Vector w;
-	sub_ext(&O,&s->position,&w);
-    const float A = dot(&u,&u);
-    const float B = 2.0f * dot(&u,&w);
-    const float C = dot(&w,&w) - s->radius*s->radius;
+	sub_ext(&oc,&s->position,&w);
+	const float A = dot(&u,&u);
+	const float B = 2.0f * dot(&u,&w);
+	const float C = dot(&w,&w) - s->radius*s->radius;
 
-    Quadratic_info* quad = quadratic_resolution(A, B, C);
-	Vector solutions;
-	create_vector_ext(&solutions, 0, 0, 0);
-    Vector u0;
-    Vector u1;
-	if(quad == NULL)return solutions;
-    switch (quad->state)
-    {
-    case ONE_SOLUTION:
-        mul_ext(&u, quad->x0,&u0);
-        add_ext(&O, &u0, &solutions);
-        break;
-    case TWO_SOLUTION:
-        Vector s1;
-        Vector s2;
-        mul_ext(&u, quad->x0,&u0);
-        add_ext(&O, &u0, &s1);
-
-        mul_ext(&u, quad->x1,&u1);
-        add_ext(&O, &u1, &s2);
-		Vector d1;
-		Vector d2;
-		sub_ext(&s1, &O, &d1);
-		sub_ext(&s2, &O, &d2);
-		if(length(&d1) < length(&d2)){
-			solutions = s1;
-		}
-		else{
-			solutions = s2;
-		}
+	Quadratic_info* quad = quadratic_resolution(A, B, C);
+	Vector u0;
+	Vector u1;
+	
+	if(quad == NULL)return false;
+	
+	const float EPS = 1e-4f;
+	float t = -1;
+	switch (quad->state)
+	{
+	case ONE_SOLUTION: {
+		float t0 = quad->x0;
+		if (t0 > EPS) {t = t0;}
 		break;
-        
-    default:
-        break;
-    }
+	}
+	case TWO_SOLUTION: {
+		float t0 = quad->x0;
+		float t1 = quad->x1;
+
+		if (t0 > t1) {
+			float tmp = t0; t0 = t1; t1 = tmp;
+		}
+		if (t0 > EPS) {t = t0;}
+		else if (t1 > EPS) {t = t1;}
+		break;
+	}
+	default:
+		break;
+	}
+
+	if (t <= 0.0f) {
+		free(quad);
+		return false;
+	}
+
+	// Sinon on calcule le point d’impact
+	Vector tu;
+	mul_ext(&r->direction, t, &tu);
+	add_ext(&r->position, &tu, hit);
 	free(quad);
-    return solutions;
+	return true;
 
 }
 
@@ -306,9 +292,7 @@ bool box_intersection(const Camera* const cam, AABB* const box)
 }
 Vector get_normal_vector(const Vector * point, const Sphere * s){
 	Vector n;
-	for (int i = 0; i<3; ++i) {
-		n.Data[i] = point->Data[i]-s->position.Data[i];
-	}
+	sub_ext(point, &s->position, &n);
 	norm_ext(&n,&n);
 	return n;
 }
@@ -324,3 +308,4 @@ void free_sphere(Sphere* s)
     if(s) free(s);
     else fprintf(stdout, "No need to free memory.\n");
 }
+

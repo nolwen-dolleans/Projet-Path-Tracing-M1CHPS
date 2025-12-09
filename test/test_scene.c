@@ -7,24 +7,24 @@
 
 void test_intersect_scene(void){
 	
-	uint24_t BLACK;
-	set_color_24bit(&BLACK, 0, 0, 0);
-	Scene * s = create_scene_ptr(1, 1, BLACK);
+	Vector BLACK;
+	create_vector_ext(&BLACK, 0, 0, 0);
+	Scene * s = create_scene_ptr(1, 1, &BLACK);
 	printf("%p\n", s->objects[0]);
 	
-	create_sphere(s->objects[0], 0, 0, 2, 1);
-	Vector intersect;
+	create_sphere(s->objects[0], 0, 0, 2, 1, NULL, false);
+	Vector hit;
 	int object = -1;
 	Ray * ray = create_ray(0, 0, 0, 0, 0, 0.5);
 	
-	intersect = intersect_in_scene(ray, s, &object);
+	intersect_in_scene(ray, s, &object, &hit);
 	
 	
 	TEST_ASSERT_EQUAL_INT(object, 0);
 	
-	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,0,intersect.Data[0]);
-	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,0,intersect.Data[1]);
-	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,1,intersect.Data[2]);
+	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,0,hit.Data[0]);
+	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,0,hit.Data[1]);
+	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,1,hit.Data[2]);
 	
 	free_scene(s);
 	free_ray(ray);
@@ -34,16 +34,16 @@ void test_intersect_scene(void){
 void test_create_scene(void){
 	srand((unsigned int)time(NULL));
 	int nbobjects = rand()%101;
-	uint24_t BLACK;
-	set_color_24bit(&BLACK, 0, 0, 0);
+	Vector BLACK;
+	create_vector_ext(&BLACK, 0, 0, 0);
 	
-	Scene * S = create_scene_ptr(nbobjects, rand(), BLACK);
+	Scene * S = create_scene_ptr(nbobjects, rand(), &BLACK);
 	for (int i = 0; i<S->size_objects; ++i) {
 		float x = rand();
 		float y = rand();
 		float z = rand();
 		Sphere * s = malloc_check(sizeof(Sphere));
-		create_sphere(s,x, y, z, 1);
+		create_sphere(s,x, y, z, 1, NULL, false);
 		S->objects[i] = s;
 		TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,S->objects[i]->radius,1);
 		
