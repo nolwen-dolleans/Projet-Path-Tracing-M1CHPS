@@ -1,0 +1,117 @@
+\section{Équation de rendu}
+
+L'équation de rendu représente l'impact de la radiance de la lumière sur une surface. En effet, elle va nous permettre de déterminer la manière dont la lumière se reflète sur un objet.
+
+
+L'équation de rendu se définie comme suit:
+
+$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}ht) \, d\omega_i}$$
+
+avec: 
+\begin{itemize}
+\item[$\_$] $L_o$ : La radiance réfléchis sur la surface au point $x$ de direction $\omega_o$.
+\item[$\_$] $L_e$ : La radiance émise par la surface au point $x$ de direction $\omega_o$.
+\item[$\_$] $L_i$ : La radiance d'un des rayons incidents sur la surface au point $x$ de direction $\omega_i\subset\Omega$, le hémisphère centré autour de la normale $\textbf{n}$ du point x.
+\item[$\_$] $f$ : le BRDF qui représente la manière dont le matériaux reflète la lumière.
+\end{itemize}
+
+\subsection{Démonstrations}
+
+\subsubsection{Cas Général}
+
+Par définition, la radiance incidente se détermine comme suit:
+
+$$L_{o} = L_{e} + L_{r}$$
+
+$L_r$ représente l'ensemble des rayons incidents sur la surface qui se réfléchi en un rayon de direction $\omega_i$ dont la formule est:
+$$L_r = \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
+
+Ce qui nous donne l'équation de rendu ci-dessus.
+
+\subsubsection{Matériaux Lambertiens}
+
+Cette équation n'est pas résoluble analytiquement. Pour faciliter les calculs et l'implémentation de notre path tracing, nous allons nous prendre le cas des matériaux dit "Lambertiens".
+
+Les matériaux lambertiens ont les propriétés suivantes:
+\begin{itemize}
+\item Ils sont isotropes (leur structures sont identiques peu importe où l'on regarde)
+\item Ils sont diffus (les rayons réfléchis sont dans l'hémisphère $\Omega$ de manière équiprobable)
+\item Ils n'émettent pas de lumière dans le visible.
+\end{itemize}
+
+Les conséquences sont que pour un matériau lambertien, le BRDF est invariant de $x$ et $\omega$.
+
+Les rayons de direction $\omega_i$ sont seulement dans l'hémisphère $\Omega$.
+
+De ces faits, nous pouvons réécrire l'équation de rendu:
+$$L_{o}(x, \omega_o) = f_{const}\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
+
+On définie l'irradiance incidente $E_i=\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$ et l'irradiance réfléchie $E_o=\int_{\Omega}L_{o}(x, \omega_o) \, (\textbf{n}\cdot\omega_i) \, d\omega_i$ la puissance d'un rayonnement électromagnétique frappant sur une unité de surface.
+
+On définit également l'albédo $\rho(x, \omega_i, \omega_o)$ qui représente le rapport entre le radiance émise et la radiance incidente : $\rho(x, \omega_i, \omega_o)=\dfrac{L_o(x, \omega_i, \omega_o)}{L_r(x, \omega_i, \omega_o)} = \dfrac{E_o(x, \omega_i, \omega_o)}{E_r(x, \omega_i, \omega_o)}$
+
+Nous avons donc le système suivant:
+$$
+\begin{cases}
+	L_o = f_{const}\times E_i \\
+	E_o = L_o\int_{\Omega}(\textbf{n}\cdot\omega) \, d\omega
+\end{cases}
+\Leftrightarrow\begin{cases}
+	L_o = f_{const}\times E_i \\
+	E_o = L_o\int_{\Omega}\cos(\theta) \, d\omega
+\end{cases}
+$$
+
+En se plaçant en coordonnées cylindriques pour un hémisphère de rayon 1: $d\omega = \sin(\theta) \, d\theta \, d\varphi$ avec $\theta \in [0,\dfrac{\pi}{2}]$ et $\varphi\in[-\pi,\pi]$.
+
+Donc $\int_{\Omega}\cos(\theta) \, d\omega$ devient:
+$$\int_{\Omega}\cos(\theta) \, d\omega = \int_{-\pi}^{\pi} \int_{0}^{\frac{\pi}{2}} \cos(\theta)\sin(\theta)d\theta d\varphi = 2\pi \, \left[\frac{\sin^2(\theta)}{2}\right]_0^\frac{\pi}{2} = \boxed{\pi}$$
+
+Donc le système devient:
+$$
+\begin{cases}
+L_o = f_{const}\times E_i \\
+L_o = \dfrac{E_o}{\pi}
+\end{cases}
+$$
+
+Donc nous avons la formule du BRDF suivante:
+$$\frac{E_o}{\pi} = f_{const}\times E_i \Leftrightarrow f_{const} = \frac{E_o}{E_i} \, \frac1{\pi}$$
+$$\Leftrightarrow f_{const} = \boxed{\frac\rho\pi} $$
+
+
+Ceci nous permet de conclure avec l'équation sur laquelle nous allons travailler dans cette partie du projet:
+
+$$ 
+\boxed{L_o(x, \omega_i) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i) \, d\omega_i}
+$$
+
+\subsection{Approximation avec la méthode Monte-Carlo}
+
+La méthode de Monte-Carlo est une méthode itérative permettant de passer d'une intégrale à une somme d'échantillons aléatoires pondérée par une loi de probabilité notée $pdf$ (Probability Density Function). Cette somme converge vers la solution vraie en fonction du nombre d'échantillons.
+
+Ainsi, nous avons l'approximation suivante:
+
+Soit g, une fonction telle que: $g:\ \left\{
+\begin{array}{l}
+\mathbb{R} \longmapsto \mathbb{R}\\
+x\longrightarrow g(x)
+\end{array}
+\right.$:
+$$
+I = \int_\Omega g(x) \, dx \approx \frac{1}{N} \sum_k^N \frac{g(x_k)}{pdf(x_k)}
+$$
+
+Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted" dans l'hémisphère orienté sur $\textbf{n}$. Nous avons donc $pdf(\omega_i) = \dfrac{(\textbf{n}\cdot\omega_i)}{\pi}$.
+
+Ainsi, nous pouvons approximer la radiance $L_o$ de la manière suivante:
+
+$$ 
+\boxed{L_o(x, \omega_i) = \frac{\rho}{N} \sum_i^N L_i(x, \omega_i)}
+$$
+
+Ce qui simplifie grandement l'équation de rendu, et nous permettra de l'implémenter avec un appel récursif.
+
+Plus précisément, notre fonction calculera $\rho \, L_i(x, \omega_i)$ puis nous l'appellerons récursivement pour un certain nombre de rebonds. Cette fonction sera ensuite appelée N fois par pixels.
+
+\pagebreak

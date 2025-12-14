@@ -1,13 +1,16 @@
 \section{Demonstration sur les matrices de rotations}
-\noindent
+
 Dans le cadre de ce projet, nous fixons la caméra à la position : $\mathbf{E} = (0, 0, 0)\in \mathbb{R}^3$ et nous posons être dans la base canonique de $\mathbb{R}^3$ : $(\vec{r_0}, \vec{u_0}, \vec{d_0}) =
 \left(
 \left( \begin{smallmatrix} 1 \\ 0 \\ 0 \end{smallmatrix} \right),
 \left( \begin{smallmatrix} 0 \\ 1 \\ 0 \end{smallmatrix} \right),
 \left( \begin{smallmatrix} 0 \\ 0 \\ 1 \end{smallmatrix} \right)
-\right)$. Notons que jusqu'à maintenant la caméra pointe dans la direction de $\vec{d_0}$. En restant à cette position, nous allons implémenter la possibilité pour la caméra de pivoter dans n'importe quelle direction, nous cherchons donc ici à démontrer que l'application utilisée pour implémenter cela fonctionne pour n'importe quel angle choisi. \\
-Pour réaliser cela, nous considérons un angle $\alpha$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{r_0}$ et un second angle $\beta$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{u_0}$. \\
-L'application qui permet la rotation de la caméra est determinée par la composition des deux applications suivantes $\forall \alpha, \beta \in \mathbb{R}$ (nous pouvons restreindre $\alpha$ et $\beta$ à $[0, 2\pi]$ mais rien nous pose cette condition ici) : \\
+\right)$. Notons que jusqu'à maintenant la caméra pointe dans la direction de $\vec{d_0}$. En restant à cette position, nous allons implémenter la possibilité pour la caméra de pivoter dans n'importe quelle direction, nous cherchons donc ici à démontrer que l'application utilisée pour implémenter cela fonctionne pour n'importe quel angle choisi.
+
+Pour réaliser cela, nous considérons un angle $\alpha$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{r_0}$ et un second angle $\beta$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{u_0}$.
+
+L'application qui permet la rotation de la caméra est determinée par la composition des deux applications suivantes $\forall \alpha, \beta \in \mathbb{R}$ (nous pouvons restreindre $\alpha$ et $\beta$ à $[0, 2\pi]$ mais rien nous pose cette condition ici) :
+
 $\begin{array}{ccccc}
 pitch_\alpha & : & \mathbb{R}^3 & \to & \mathbb{R}^3 \\
  & & (x, y, z) & \mapsto & pitch_\alpha (x, y, z) \\
@@ -16,8 +19,10 @@ pitch_\alpha & : & \mathbb{R}^3 & \to & \mathbb{R}^3 \\
 \begin{array}{ccccc}
 yaw_\beta & : & \mathbb{R}^3 & \to & \mathbb{R}^3 \\
  & & (x, y, z) & \mapsto & yaw_\beta (x, y, z) \\
-\end{array}$ \\
-Qui sont toutes deux définies grâce aux matrices de rotations sur leurs axes respectifs : \\
+\end{array}$
+
+Qui sont toutes deux définies grâce aux matrices de rotations sur leurs axes respectifs :
+
 \[ \forall \alpha \in \mathbb{R} : 
 pitch_{\alpha}(x,y,z) = 
 \begin{pmatrix}  0 & 0 & 1  \\ \sin\alpha & \cos\alpha & 0 \\ \cos\alpha & -\sin\alpha & 0 \end{pmatrix}
@@ -33,23 +38,27 @@ yaw_{\beta}(x,y,z) =
 = 
 \begin{pmatrix} -x\sin\beta + z\cos\beta \\ y \\ x\cos\beta + z\sin\beta \end{pmatrix}
 \]
-\noindent
+
 Nous nous intérressons donc à l'application : $pitch_{\alpha} \circ yaw_{\beta}$ appliquée à chacun des vecteurs formant la base canonique. Soient les vecteurs $(\vec{r}, \vec{u}, \vec{d}) \in \mathbb{R}^3$ définis tels que $\forall \alpha, \beta \in \mathbb{R}$ : \\
 $ \begin{cases}
 pitch_{\alpha} \circ yaw_{\beta} \, (\vec{r_0}) = \vec{r} \\
 pitch_{\alpha} \circ yaw_{\beta} \, (\vec{u_0}) = \vec{u} \\
 pitch_{\alpha} \circ yaw_{\beta} \, (\vec{d_0}) = \vec{d} \\
-\end{cases}$ \\
-Nous voulons montrer que la famille de vecteurs $(\vec{r}, \vec{u}, \vec{d})$ forment une base orthonormée de $\mathbb{R}^3$. C'est-à-dire qu'après utiliser cette application sur la position de la caméra, celle-ci pointerait maintenant dans la direction de $\vec{d}$. Soient $\alpha, \beta \in \mathbb{R}$. \\
-Tout d'abord écrivons l'expression de $pitch_{\alpha} \circ yaw_{\beta} \; \forall (x, y, z) \in \mathbb{R}^3$ : \\
-$pitch_{\alpha} \circ yaw_{\beta} \, (x, y, z) =
-\begin{pmatrix} x\cos\beta + z\sin\beta \\ (-x\sin\beta + z\cos\beta)\sin\alpha + y\cos\alpha \\ (-x\sin\beta + z\cos\beta)\cos\alpha - y\sin\alpha \end{pmatrix}$ \\ \\
-Appliquons-la maintenant aux vecteurs de la base canonique : \\
+\end{cases}$
+
+Nous voulons montrer que la famille de vecteurs $(\vec{r}, \vec{u}, \vec{d})$ forment une base orthonormée de $\mathbb{R}^3$. C'est-à-dire qu'après utiliser cette application sur la position de la caméra, celle-ci pointerait maintenant dans la direction de $\vec{d}$. Soient $\alpha, \beta \in \mathbb{R}$.
+
+Tout d'abord écrivons l'expression de $pitch_{\alpha} \circ yaw_{\beta} \; \forall (x, y, z) \in \mathbb{R}^3$ :
+
+$pitch_{\alpha} \circ yaw_{\beta} \, (x, y, z) = \begin{pmatrix} x\cos\beta + z\sin\beta \\ (-x\sin\beta + z\cos\beta)\sin\alpha + y\cos\alpha \\ (-x\sin\beta + z\cos\beta)\cos\alpha - y\sin\alpha \end{pmatrix}$
+
+Appliquons-la maintenant aux vecteurs de la base canonique : 
+
 $\begin{cases}
 \vec{r} = pitch_{\alpha} \circ yaw_{\beta} \, (\vec{r_0}) = \begin{pmatrix} \cos\beta \\ -\sin\alpha\sin\beta \\ -\cos\alpha\sin\beta \end{pmatrix}\\
 \vec{u} = pitch_{\alpha} \circ yaw_{\beta} \, (\vec{u_0}) = \begin{pmatrix} 0 \\ \cos\alpha \\ -\sin\alpha \end{pmatrix} \\
 \vec{d} = pitch_{\alpha} \circ yaw_{\beta} \, (\vec{d_0}) = \begin{pmatrix} \sin\beta \\ \cos\beta\sin\alpha \\ \cos\alpha\cos\beta \end{pmatrix} \\
-\end{cases}$ \\
+\end{cases}$
 
 Montrons premièrement que chacun de ces vecteurs sont de norme $1$ :
 \begin{align*}
@@ -76,5 +85,8 @@ Nous remarquons que le vecteur $\vec{d}$ est normal au plan formé par $\vec{r}$
 \langle \vec{r}, \vec{u} \rangle &= \cos\beta\times0-\sin\alpha\sin\beta\cos\alpha+\cos\alpha\sin\beta\sin\alpha \\
                                  &= 0
 \end{align*}
-Nous avons montré que $\vec{d}$ est normal à $\vec{r}$ et $\vec{u}$; que $\vec{r}$ et $\vec{u}$ sont orthogonaux entre eux et que les trois vecteurs ont pour norme $1$. Cela montre donc que $(\vec{r},\vec{u}, \vec{d})$ est une base orthonormée de $\mathbb{R}^3$, donc que l'application $pitch_{\alpha} \circ yaw_{\beta}$ établi une rotation de la base canonique $(\vec{r_0}, \vec{u_0}, \vec{d_0})$ pour des $\alpha, \beta \in \mathbb{R}$ quelconques. Donc cette application nous permet bien de pivoter la caméra dans n'importe quelle direction, c'est-à-dire en considérant la sphère centrée en $\mathbf{E}$ de rayon $\| \vec{d_0} \| = 1 $ incluse dans $\mathbb{R}^3$ : \\
-$\forall x \in (\mathbf{E}, \| \vec{d_0} \|), \exists \alpha, \beta \in \mathbb{R} \, \, \text{tels que} \, pitch_{\alpha} \circ yaw_{\beta}(\vec{d_0}) = \vec{\mathbf{E}x} $. \\
+Nous avons montré que $\vec{d}$ est normal à $\vec{r}$ et $\vec{u}$; que $\vec{r}$ et $\vec{u}$ sont orthogonaux entre eux et que les trois vecteurs ont pour norme $1$. Cela montre donc que $(\vec{r},\vec{u}, \vec{d})$ est une base orthonormée de $\mathbb{R}^3$, donc que l'application $pitch_{\alpha} \circ yaw_{\beta}$ établi une rotation de la base canonique $(\vec{r_0}, \vec{u_0}, \vec{d_0})$ pour des $\alpha, \beta \in \mathbb{R}$ quelconques. Donc cette application nous permet bien de pivoter la caméra dans n'importe quelle direction, c'est-à-dire en considérant la sphère centrée en $\mathbf{E}$ de rayon $\| \vec{d_0} \| = 1 $ incluse dans $\mathbb{R}^3$ :
+
+$\forall x \in (\mathbf{E}, \| \vec{d_0} \|), \exists \alpha, \beta \in \mathbb{R} \, \, \text{tels que} \, pitch_{\alpha} \circ yaw_{\beta}(\vec{d_0}) = \vec{\mathbf{E}x} $. 
+
+\pagebreak

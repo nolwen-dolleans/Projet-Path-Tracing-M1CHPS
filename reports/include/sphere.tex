@@ -1,0 +1,44 @@
+\section{Définition d'objets dans l'espace}
+
+\subsection{Équation d'un rayon}
+
+Pour tout vecteur $\vec{d} \in \mathbb{R}^3$ d'origine $O \in \mathbb{R}^3$ dans la direction $T \in \mathbb{R}^3$, on a $\vec{d}=\overrightarrow{(O+T)}$ qui donne l'équation de rayon :
+
+$$
+\forall t  \in \mathbb{R}, \, 
+{\vec{p}(t)} = {O + \vec{d}t} = \begin{pmatrix} o_x\\o_y\\o_z\end{pmatrix} + \begin{pmatrix} d_x\\d_y\\d_z\end{pmatrix}t =
+\begin{pmatrix} o_x+d_xt\\o_y+d_yt\\o_z+d_zt\end{pmatrix}.
+$$
+
+\subsection{Équation d'une sphère}
+
+Pour une position $C \in \mathbb{R}^3$ et un rayon $r \in \mathbb{R}_+$ on défini une sphère $s=(C, r)$ d'équation :
+
+$$s = \{(x,y,z) \in \mathbb{R}^3 \, | \, (x - c_x)^2 + (y - c_y)^2 + (z - c_z)^2 = r^2 \}$$
+$$\Leftrightarrow s = \{(x,y,z) \in \mathbb{R}^3 \, | \, (x - c_x)^2 + (y - c_y)^2 + (z - c_z)^2 - r^2 = 0 \}.$$
+
+\subsection{Intersection d'un rayon sur une sphère}
+
+Dans une premier temps, on injecte $\vec{p}(t)$ dans l'équation de $s(x,y,z)$, on obtient :
+
+\begin{align*}
+s(\vec{p}(t)) &= (p_x(t) - c_x)^2 + (p_y(t) - c_y)^2 + (p_z(t) - c_z)^2 - r^2 \\ 
+              &= (o_x+d_x t - c_x)^2 + (o_y + d_y t - c_y)^2 + (o_z + d_z t- c_z)^2 - r^2 \\
+              &= (d_x^2 + d_y^2 + d_z^2)t^2 + 2(o_x d_x + o_y d_y + o_z d_z - c_x d_x - c_y d_y - c_z d_z)t \\
+              &\quad + (o_x^2 + o_y^2 + o_z^2 - c_x^2 - c_y^2 - c_z^2 - r^2) \\
+              &= (\vec{d}\cdot\vec{d})t^2 + 2\vec{d}\cdot(\overrightarrow{o-c})t + (\overrightarrow{o-c})^2 - r^2
+\end{align*}
+
+Soit $s(\vec{p}(t))$ une équation quadratique, avec $a = \vec{d}\cdot\vec{d}$, $b = 2\vec{d}\cdot(\overrightarrow{o-c})$, $c = (\vec{o}-\vec{c})^2 - r^2$
+
+On doit résoudre $at^2 + bt + c = 0$.
+
+Pour un discriminant $\bigtriangleup = b^2 - 4ac$ : 
+
+- Aucune intersection si $\bigtriangleup < 0$ ;
+
+- Une intersection si $\bigtriangleup = 0 \Rightarrow x_1 = \frac{-b}{2a}$ ;
+
+- Deux intersections si $\bigtriangleup > 0 \Rightarrow x_1 = \frac{-b - \sqrt{\bigtriangleup} }{2a}$, $x_2 = \frac{-b + \sqrt{\bigtriangleup} }{2a}$.
+
+\pagebreak
