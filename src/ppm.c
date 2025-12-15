@@ -56,14 +56,30 @@ int main(int argc, char** argv)
 	create_sphere(sphere4, -0.2,-0.2,-0.3,0.1, &sphere_color4, true, 15);
 	
 	
-	
 	Vector bg;
 	create_vector_ext(&bg, 0, 120, 255);
-	Scene * scene = create_scene_ptr(4, 0, &bg);
-	scene->objects[0] = sphere1;
-	scene->objects[1] = sphere2;
-	scene->objects[2] = sphere3;
-	scene->objects[3] = sphere4;
+	Scene_ * scene = create_scene_ptr_(4, 0, &bg);
+
+	scene->objects[0].subStruct = sphere1;
+	scene->objects[0].type = SPHERE;
+	scene->objects[0].emitted = false;
+	scene->objects[0].albedo = 0.8;
+
+	scene->objects[1].subStruct = sphere2;
+	scene->objects[1].type = SPHERE;
+	scene->objects[1].emitted = false;
+	scene->objects[1].albedo = 0.5;
+
+	scene->objects[2].subStruct = sphere3;
+	scene->objects[2].type = SPHERE;
+	scene->objects[2].emitted = true;
+	scene->objects[2].albedo = 10;
+
+	scene->objects[3].subStruct = sphere4;
+	scene->objects[3].type = SPHERE;
+	scene->objects[3].emitted = true;
+	scene->objects[3].albedo = 15;
+
 	Vector color;
 //#############################################################################
 	
@@ -79,7 +95,9 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, scene, smpls);
+				//color = path_trace(&cam, x1, y1, scene, smpls);
+				color = path_trace_(&cam, x1, y1, scene, smpls);
+
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = maxf(0, color.Data[0]);
 				r = minf(255, color.Data[0]);
@@ -91,7 +109,7 @@ int main(int argc, char** argv)
 			}
 		}
 		write_image_file_32bit(image);
-		free_scene(scene);
+		free_scene_(scene);
 		free_image_32bit(image);
 
 	}
@@ -108,7 +126,8 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, scene, smpls);
+				//color = path_trace(&cam, x1, y1, scene, smpls);
+				color = path_trace_(&cam, x1, y1, scene, smpls);
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = maxf(0, color.Data[0]);
 				r = minf(255, color.Data[0]);
@@ -120,7 +139,7 @@ int main(int argc, char** argv)
 			}
 		}
 		write_image_file_24bit(image);
-		free_scene(scene);
+		free_scene_(scene);
 		free_image_24bit(image);
 	}
 	else if(strcmp(argv[1], "24ptr") == 0)
@@ -135,7 +154,8 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, scene, smpls);
+				//color = path_trace(&cam, x1, y1, scene, smpls);
+				color = path_trace_(&cam, x1, y1, scene, smpls);
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = maxf(0, color.Data[0]);
 				r = minf(255, color.Data[0]);

@@ -45,6 +45,26 @@ void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, c
 
 }
 
+void trace_ray(const size_t i, const size_t j, const size_t width, const size_t height, const float angle, Ray* const r)
+{
+    const float inv_height = 1.0f/ height;
+    const float fov = tanf(radian(angle * 0.5));
+
+    float Pixel_x = (2.0f*i + 1.0f - width)   * inv_height * fov;
+    float Pixel_y = (height - 2.0f*j - 1.0f)  * inv_height * fov;
+    float Pixel_z =  -1;
+	    
+    r->position.Data[0] = 0.0f;
+    r->position.Data[1] = 0.0f;
+    r->position.Data[2] = 0.0f;
+
+	r->direction.Data[0] = Pixel_x; 
+	r->direction.Data[1] = Pixel_y; 
+	r->direction.Data[2] = Pixel_z;
+
+	norm_ext(&r->direction, &r->direction);
+}
+
 Ray random_Ray(Vector const * Origin){
 	Ray ray;
 	ray.position = *Origin;
@@ -67,7 +87,7 @@ void create_sphere(Sphere* sph ,const float x, const float y, const float z, con
 	sph->albedo = albedo;
 }
 
-bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)
+bool intersect_sphere(Ray* const r, const Sphere* const s, Vector *hit)
 {
 	
 	Vector const oc = r->position;
@@ -79,44 +99,25 @@ bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit)
 	const float B = 2.0f * dot(&u,&w);
 	const float C = dot(&w,&w) - s->radius*s->radius;
 
-	Quadratic_info* quad = quadratic_resolution(A, B, C);
-	
-	if(quad == NULL)return false;
-	
-	const float EPS = 1e-4f;
-	float t = -1;
-	switch (quad->state)
-	{
-	case ONE_SOLUTION: {
-		float t0 = quad->x0;
-		if (t0 > EPS) {t = t0;}
-		break;
-	}
-	case TWO_SOLUTION: {
-		float t0 = quad->x0;
-		float t1 = quad->x1;
+	const float delta = B*B - 4.0f*A*C;
 
-		if (t0 > t1) {
-			float tmp = t0; t0 = t1; t1 = tmp;
-		}
-		if (t0 > EPS) {t = t0;}
-		else if (t1 > EPS) {t = t1;}
-		break;
-	}
-	default:
-		break;
-	}
+	const float EPS = 1e-6f;
+	
+	if(delta < 0.0f) return false;
+	
+	float t = -1; // t goes from -1 to 1
+	float t0 = 0.0f;
 
-	if (t <= 0.0f) {
-		free(quad);
-		return false;
-	}
+	if(delta < EPS) 
+		t0 = -B/(2.0f*A);
+	else if(delta > EPS) 
+		t0 = (-B - sqrtf(delta))/(2.0f*A);
+
+	t = t0 > EPS ? t0 : t;
 
 	// Sinon on calcule le point d’impact
-	Vector tu;
-	mul_ext(&r->direction, t, &tu);
-	add_ext(&r->position, &tu, hit);
-	free(quad);
+	linear_ext(&r->position, &r->direction, t, hit);
+
 	return true;
 
 }
@@ -140,55 +141,97 @@ void create_ray_box(AABB * const box, const uint32_t color_min, const uint32_t c
 	box->color_hit_b = 155;
 }
 
-bool box_intersection(const Camera* const cam, AABB* const box)
+
+bool intersect_box(Ray* const r, AABB* const box, Vector *hit)
 {
 
-	const float xaBmin = box->min.Data[0] - cam->position.Data[0];
-	const float yaBmin = box->min.Data[1] - cam->position.Data[1];
-	const float zaBmin = box->min.Data[2] - cam->position.Data[2];
-	const float xaBmax = box->max.Data[0] - cam->position.Data[0];
-	const float yaBmax = box->max.Data[1] - cam->position.Data[1];
-	const float zaBmax = box->max.Data[2] - cam->position.Data[2];
+	
+    float tmin = (box->min.Data[0] - r->position.Data[0]) / r->direction.Data[0];
+    float tmax = (box->max.Data[0] - r->position.Data[0]) / r->direction.Data[0];
 
-	const float txBmin = xaBmin * cam->inv_direction.Data[0];
-	const float tyBmin = yaBmin * cam->inv_direction.Data[1];
-	const float tzBmin = zaBmin * cam->inv_direction.Data[2];
+    if (tmin > tmax) swap(&tmin, &tmax);
 
-	const float txBmax = xaBmax * cam->inv_direction.Data[0];
-	const float tyBmax = yaBmax * cam->inv_direction.Data[1];
-	const float tzBmax = zaBmax * cam->inv_direction.Data[2];
+    for (size_t i = 1; i < 3; ++i) {
+        float t1 = (box->min.Data[i] - r->position.Data[i]) / r->direction.Data[i];
+        float t2 = (box->max.Data[i] - r->position.Data[i]) / r->direction.Data[i];
+        if (t1 > t2) swap(&t1, &t2);
 
-	float tmin = txBmin > tyBmin ? txBmin : tyBmin;
-	tmin = tzBmin > tmin ? tzBmin : tmin;
+        tmin = max(&tmin, &t1);
+        tmax = min(&tmax, &t2);
 
-	float tmax = txBmax > tyBmax ? txBmax : tyBmax;
-	tmax = tzBmax > tmax ? tzBmax : tmax;
+        if (tmin > tmax) return false;
+    }
 
-	if(tmin < tmax)
-	{
-		const float x = cam->position.Data[0] + cam->direction.Data[0]*tmin;
-		const float y = cam->position.Data[1] + cam->direction.Data[1]*tmin;
-		const float z = cam->position.Data[2] + cam->direction.Data[2]*tmin;
 
-		if(box->min.Data[0] < x && x < box->max.Data[0] && box->min.Data[1] < y && y < box->max.Data[1] && box->min.Data[2] < z && z < box->max.Data[2])
-		{
+	linear_ext(&r->position, &r->direction, tmax, hit);
 
-			box->color_hit_r = box->color[MIN] >> 0x8;
-			box->color_hit_g = (box->color[MIN] & 0x00F0) >> 0x4;
-			box->color_hit_b = box->color[MIN] & 0xF;
-			
-		}
-  
-		return true;
-	}
+    bool test_left_face  = box->min.Data[0] == hit->Data[0];
+         test_left_face = test_left_face && box->min.Data[1] <= hit->Data[1] && hit->Data[1] <= box->max.Data[1];
+         test_left_face = test_left_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
 
-	return false;
+    bool test_right_face  = box->max.Data[0] == hit->Data[0];
+         test_right_face = test_right_face && box->min.Data[1] <= hit->Data[1] && hit->Data[1] <= box->max.Data[1];
+         test_right_face = test_right_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
+
+    bool test_up_face  = box->min.Data[0] <= hit->Data[0] && hit->Data[1] <= box->max.Data[0];
+         test_up_face = test_up_face && box->max.Data[1] == hit->Data[1];
+         test_up_face = test_up_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
+
+    bool test_bottom_face  = box->min.Data[0] <= hit->Data[0] && hit->Data[1] <= box->max.Data[0];
+         test_bottom_face = test_bottom_face && box->min.Data[1] == hit->Data[1];
+         test_bottom_face = test_bottom_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
+
+    bool test_back_face  = box->min.Data[0] <= hit->Data[0] && hit->Data[1] <= box->max.Data[0];
+         test_back_face = test_back_face && box->min.Data[1] <= hit->Data[1] && hit->Data[1] <= box->max.Data[1];
+         test_back_face = test_back_face && box->min.Data[2] == hit->Data[2];
+
+
+    if(test_left_face)
+		box->color[0] = 0 << 24 | 100 << 16 | 100 << 8 | 100;
+    else if(test_right_face)
+		box->color[1] = 0 << 24 | 100 << 16 | 100 << 8 | 100;
+    else if(test_up_face)
+		box->color[2] = 0 << 24 | 250 << 16 | 0 << 8 | 0;
+    else if(test_bottom_face)
+		box->color[3] = 0 << 24 | 0 << 16 | 255 << 8 | 0;
+    else if(test_back_face)
+		box->color[4] = 0 << 24 | 0 << 16 | 0 << 8 | 255;
+
+    return true;
+
 }
+
+bool intersect(Ray* const r, const Primitive* const p, Vector *hit)
+{
+	switch (p->type)
+	{
+	case SPHERE:
+		return intersect_sphere(r, (Sphere*)p->subStruct, hit);
+	case BOX:
+		return intersect_box(r, (AABB*)p->subStruct, hit);
+	}
+}
+
+
 Vector get_normal_vector(const Vector * point, const Sphere * s){
 	Vector n;
 	sub_ext(point, &s->position, &n);
 	norm_ext(&n,&n);
 	return n;
+}
+
+Vector get_normal_vector_(const Vector * point, const Primitive * p){
+
+
+	switch (p->type)
+	{
+	case SPHERE:
+		return get_normal_vector(point, (Sphere*)p->subStruct);
+	case BOX:
+	default:
+		break;
+	}
+
 }
 
 void free_ray(Ray* r)
