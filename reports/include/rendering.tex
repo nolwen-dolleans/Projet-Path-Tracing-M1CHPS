@@ -103,7 +103,8 @@ I = \int_\Omega g(x) \, dx \approx \frac{1}{N} \sum_k^N \frac{g(x_k)}{pdf(x_k)}
 $$
 \subsubsection{Méthode d'échantillonnage Cosine-Weighted} 
 
-Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted". Il consiste à se placer dans le repère local $(tangente, bitangente, normal)$ au point d'intersection (cf. \textit{Figure 9}), pour ensuite construire le rayon aléatoire.
+Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted". Il consiste à se placer dans le repère local $(tangente, bitangente, normal)$ au point d'intersection (cf. \textit{Figure 9}), pour ensuite construire le rayon aléatoire.\\
+
 \begin{figure}[H]
 	\centering
 \begin{minipage}{.4\textwidth}
@@ -112,7 +113,7 @@ Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosin
 \end{minipage}
 \captionof{figure}{Représentation de la base locale au point d'intersection du rayon sur la sphère
 avec la normale (en bleu), la bitangente (en vert) et la tangente (en rouge).}
-\end{figure}\\
+\end{figure}
 
  Ce mode d'échantillonnage se fait de la manière suivante:
 
@@ -134,6 +135,7 @@ z = \sqrt{1-r^2}
 
 \end{itemize} 
 Ainsi, on construit la direction du rayon incident $\omega_i$ de da manière suivante dans la base $\left( right, up, forward\right)$: $\omega_i = \left( x\cdot tangente, y\cdot bitangente, z\cdot normal \right)$.\\
+
 L'avantage de cette méthode d'échantillonnage est que la $pdf$ sera: $pdf = \frac{\cos\theta}{\pi}$.
 
 \subsubsection{Application de la Méthode de Monte-Carlo pour l'équation de rendu}
@@ -155,7 +157,7 @@ Ainsi, nous avons pu bien simplifier l'équation de rendu en choisissant le bon 
 Le choix que nous avons fait pour notre première version naïve est la suivante: la somme $\rho\sum_{i=1}^N {L_i(x, \omega_i)}$ est représentée dans notre code comme étant une fonction récursive. En effet, pour chaque rebond, nous allons sommer $\rho\ L_i(x, \omega_i)$ et retourner le résultat pour chaque échantillon de pixel. La fonction sera de la manière suivante:
 
 \begin{algorithm}[H]
-\caption{Échantillonnage récursif d’un rayon (Path Tracing)}
+\caption{Échantillonnage récursif d’un rayon (RaySampling)}
 \begin{algorithmic}[1]
 \Require Rayon $r$, scène $S$, caméra $cam$, profondeur $d$, profondeur max $d_{\max}$
 \Ensure Couleur incidente $L$
