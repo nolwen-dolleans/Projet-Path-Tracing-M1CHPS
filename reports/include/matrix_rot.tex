@@ -1,11 +1,27 @@
-\section{Demonstration sur les matrices de rotations}
+\subsection{Résultat du Path Tracing}
+\label{subsec:img_pt}
 
-Dans le cadre de ce projet, nous fixons la caméra à la position : $\mathbf{E} = (0, 0, 0)\in \mathbb{R}^3$ et nous posons être dans la base canonique de $\mathbb{R}^3$ : $(\vec{r_0}, \vec{u_0}, \vec{d_0}) =
+Suite au développement de notre Path Tracer, nous avons été capable d'observer en exemple la scène suivante :
+
+\begin{figure}[H]
+\centering
+  \centering
+  \includegraphics{include/Path_Tracing_v1.png}
+
+  \captionof{figure}{Image 32 bits résultante du path tracer}
+  \label{fig:result}
+
+\end{figure}
+
+\subsection{Démonstration sur les matrices de rotations}
+\label{subsec:mat_rot}
+
+Dans le cadre de ce projet, nous fixons la caméra à une position $\mathbf{E} \in \mathbb{R}^3$ quelconque et nous posons être dans la base canonique de $\mathbb{R}^3$ : $(\vec{r_0}, \vec{u_0}, \vec{d_0}) =
 \left(
 \left( \begin{smallmatrix} 1 \\ 0 \\ 0 \end{smallmatrix} \right),
 \left( \begin{smallmatrix} 0 \\ 1 \\ 0 \end{smallmatrix} \right),
 \left( \begin{smallmatrix} 0 \\ 0 \\ 1 \end{smallmatrix} \right)
-\right)$. Notons que jusqu'à maintenant la caméra pointe dans la direction de $\vec{d_0}$. En restant à cette position, nous allons implémenter la possibilité pour la caméra de pivoter dans n'importe quelle direction, nous cherchons donc ici à démontrer que l'application utilisée pour implémenter cela fonctionne pour n'importe quel angle choisi.
+\right)$ à ce point $\mathbf{E}$. Notons que jusqu'à maintenant la caméra pointe dans la direction de $\vec{d_0}$. En restant à cette position, nous allons implémenter la possibilité pour la caméra de pivoter dans n'importe quelle direction, nous cherchons donc ici à démontrer que l'application utilisée pour implémenter cela fonctionne pour n'importe quel angle choisi.
 
 Pour réaliser cela, nous considérons un angle $\alpha$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{r_0}$ et un second angle $\beta$ présentant une rotation par rapport à l'axe formé par le vecteur $\vec{u_0}$.
 
@@ -62,13 +78,13 @@ $\begin{cases}
 
 Montrons premièrement que chacun de ces vecteurs sont de norme $1$ :
 \begin{align*}
-\| \vec{r} \|^2 &= \cos^2\beta+\sin^2\alpha\sin^2\beta+\cos^2\alpha\sin^2\beta \\
+\lVert \vec{r} \rVert^2 &= \cos^2\beta+\sin^2\alpha\sin^2\beta+\cos^2\alpha\sin^2\beta \\
                 &= \cos^2\beta+sin^2\beta(\sin^2\alpha+\cos^2\alpha) \\
                 &= \cos^2\beta+sin^2\beta \\
                 &= 1 \\[2mm]
-\| \vec{u} \|^2 &= \cos^2\alpha+\sin^2\alpha \\
+\lVert \vec{u} \rVert^2 &= \cos^2\alpha+\sin^2\alpha \\
                 &= 1 \\[2mm]
-\| \vec{d} \|^2 &= \sin^2\beta+\cos^2\beta\sin^2\alpha+\cos^2\alpha\cos^2\beta \\
+\lVert \vec{d} \rVert^2 &= \sin^2\beta+\cos^2\beta\sin^2\alpha+\cos^2\alpha\cos^2\beta \\
                 &= \sin^2\beta+\cos^2\beta(\sin^2\alpha+\cos^2\alpha) \\
                 &= \sin^2\beta+\cos^2\beta \\
                 &= 1 \\[2mm]
@@ -82,11 +98,11 @@ Calculons maintenant le produit vectoriel de $\vec{r}$ avec $\vec{u}$ :
 \end{align*}
 Nous remarquons que le vecteur $\vec{d}$ est normal au plan formé par $\vec{r}$ et $\vec{u}$. Il nous reste donc à montrer que $\vec{r}$ et $\vec{u}$ sont orthogonaux :
 \begin{align*}
-\langle \vec{r}, \vec{u} \rangle &= \cos\beta\times0-\sin\alpha\sin\beta\cos\alpha+\cos\alpha\sin\beta\sin\alpha \\
-                                 &= 0
+\vec{r} \cdot \vec{u} &= \cos\beta\times0-\sin\alpha\sin\beta\cos\alpha+\cos\alpha\sin\beta\sin\alpha \\
+                      &= 0
 \end{align*}
-Nous avons montré que $\vec{d}$ est normal à $\vec{r}$ et $\vec{u}$; que $\vec{r}$ et $\vec{u}$ sont orthogonaux entre eux et que les trois vecteurs ont pour norme $1$. Cela montre donc que $(\vec{r},\vec{u}, \vec{d})$ est une base orthonormée de $\mathbb{R}^3$, donc que l'application $pitch_{\alpha} \circ yaw_{\beta}$ établi une rotation de la base canonique $(\vec{r_0}, \vec{u_0}, \vec{d_0})$ pour des $\alpha, \beta \in \mathbb{R}$ quelconques. Donc cette application nous permet bien de pivoter la caméra dans n'importe quelle direction, c'est-à-dire en considérant la sphère centrée en $\mathbf{E}$ de rayon $\| \vec{d_0} \| = 1 $ incluse dans $\mathbb{R}^3$ :
+Nous avons montré que $\vec{d}$ est normal à $\vec{r}$ et $\vec{u}$; que $\vec{r}$ et $\vec{u}$ sont orthogonaux entre eux et que les trois vecteurs ont pour norme $1$. Cela montre donc que $(\vec{r},\vec{u}, \vec{d})$ est une base orthonormée de $\mathbb{R}^3$, donc que l'application $pitch_{\alpha} \circ yaw_{\beta}$ établi une rotation de la base canonique $(\vec{r_0}, \vec{u_0}, \vec{d_0})$ pour des $\alpha, \beta \in \mathbb{R}$ quelconques. Donc cette application nous permet bien de pivoter la caméra dans n'importe quelle direction, c'est-à-dire en considérant la sphère centrée en $\mathbf{E}$ de rayon $\lVert \vec{d_0} \rVert = 1 $ incluse dans $\mathbb{R}^3$ :
 
-$\forall x \in (\mathbf{E}, \| \vec{d_0} \|), \exists \alpha, \beta \in \mathbb{R} \, \, \text{tels que} \, pitch_{\alpha} \circ yaw_{\beta}(\vec{d_0}) = \vec{\mathbf{E}x} $. 
+$\forall x \in (\mathbf{E}, \lVert \vec{d_0} \rVert), \exists \alpha, \beta \in \mathbb{R} \, \, \text{tels que} \, pitch_{\alpha} \circ yaw_{\beta}(\vec{d_0}) = \vec{\mathbf{E}x} $.
 
 \pagebreak
