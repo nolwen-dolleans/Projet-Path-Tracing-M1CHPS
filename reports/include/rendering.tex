@@ -48,7 +48,7 @@ $$L_{o}(x, \omega_o) = f_{const}\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\c
 
 On définie l'irradiance incidente $E_i=\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$ et l'irradiance réfléchie $E_o=\int_{\Omega}L_{o}(x, \omega_o) \, (\textbf{n}\cdot\omega_i) \, d\omega_i$ la puissance d'un rayonnement électromagnétique frappant sur une unité de surface.
 
-On définit également l'albédo $\rho(x, \omega_i, \omega_o)$ qui représente le rapport entre le radiance émise et la radiance incidente : $\rho(x, \omega_i, \omega_o)=\dfrac{L_o(x, \omega_i, \omega_o)}{L_r(x, \omega_i, \omega_o)} = \dfrac{E_o(x, \omega_i, \omega_o)}{E_r(x, \omega_i, \omega_o)}$
+On définit également l'albédo $\rho(x, \omega_i, \omega_o)$ qui représente le rapport entre le radiance réfléchis et la radiance incidente : $\rho(x, \omega_i, \omega_o)=\dfrac{L_o(x, \omega_i, \omega_o)}{L_r(x, \omega_i, \omega_o)} = \dfrac{E_o(x, \omega_i, \omega_o)}{E_r(x, \omega_i, \omega_o)}$
 
 Nous avons donc le système suivant:
 $$
@@ -62,7 +62,7 @@ $$
 \end{cases}
 $$
 
-En se plaçant en coordonnées cylindriques pour un hémisphère de rayon 1: $d\omega = \sin(\theta) \, d\theta \, d\varphi$ avec $\theta \in [0,\dfrac{\pi}{2}]$ et $\varphi\in[-\pi,\pi]$.
+En se plaçant en coordonnées sphériques pour un hémisphère de rayon 1: $d\omega = \sin(\theta) \, d\theta \, d\varphi$ avec $\theta \in [0,\dfrac{\pi}{2}]$ et $\varphi\in[-\pi,\pi]$.
 
 Donc $\int_{\Omega}\cos(\theta) \, d\omega$ devient:
 $$\int_{\Omega}\cos(\theta) \, d\omega = \int_{-\pi}^{\pi} \int_{0}^{\frac{\pi}{2}} \cos(\theta)\sin(\theta)d\theta d\varphi = 2\pi \, \left[\frac{\sin^2(\theta)}{2}\right]_0^\frac{\pi}{2} = \boxed{\pi}$$
@@ -83,7 +83,7 @@ $$\Leftrightarrow f_{const} = \boxed{\frac\rho\pi} $$
 Ceci nous permet de conclure avec l'équation sur laquelle nous allons travailler dans cette partie du projet:
 
 $$ 
-\boxed{L_o(x, \omega_i) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i) \, d\omega_i}
+\boxed{L_o(x, \omega) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i) \, d\omega_i}
 $$
 
 \subsection{Approximation avec la méthode Monte-Carlo}
@@ -101,17 +101,85 @@ x\longrightarrow g(x)
 $$
 I = \int_\Omega g(x) \, dx \approx \frac{1}{N} \sum_k^N \frac{g(x_k)}{pdf(x_k)}
 $$
+\subsubsection{Méthode d'échantillonnage Cosine-Weighted} 
 
-Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted" dans l'hémisphère orienté sur $\textbf{n}$. Nous avons donc $pdf(\omega_i) = \dfrac{(\textbf{n}\cdot\omega_i)}{\pi}$.
+Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted". Il consiste à se placer dans le repère local $(tangente, bitangente, normal)$ au point d'intersection (cf. \textit{Figure 9}), pour ensuite construire le rayon aléatoire.
+\begin{figure}[H]
+	\centering
+\begin{minipage}{.4\textwidth}
+	
+	\includegraphics[scale=0.5]{include/NTBFromUVs.png}
+\end{minipage}
+\captionof{figure}{Représentation de la base locale au point d'intersection du rayon sur la sphère
+avec la normale (en bleu), la bitangente (en vert) et la tangente (en rouge).}
+\end{figure}\\
 
-Ainsi, nous pouvons approximer la radiance $L_o$ de la manière suivante:
+ Ce mode d'échantillonnage se fait de la manière suivante:
 
+\begin{itemize}
+\item[$\_$] Génération de 2 nombres aléatoires $\xi_1$ et $\xi_2$
+\item[$\_$] On les passe en coordonnées polaires: $\left\{
+\begin{array}{l}
+r = \sqrt{\xi_1}\\
+\theta = 2\pi\xi_2
+\end{array}
+\right.$
+\item[$\_$] On passe les coordonnées polaires dans la base locale:$\left\{
+\begin{array}{l}
+x = r\cos\theta\\
+y = r\sin\theta\\
+z = \sqrt{1-r^2}
+\end{array}
+\right.$\\
+
+\end{itemize} 
+Ainsi, on construit la direction du rayon incident $\omega_i$ de da manière suivante dans la base $\left( right, up, forward\right)$: $\omega_i = \left( x\cdot tangente, y\cdot bitangente, z\cdot normal \right)$.\\
+L'avantage de cette méthode d'échantillonnage est que la $pdf$ sera: $pdf = \frac{\cos\theta}{\pi}$.
+
+\subsubsection{Application de la Méthode de Monte-Carlo pour l'équation de rendu}
+
+L'équation de rendu avec la méthode de Monte-Carlo s'écrit de la façon suivante:
+\\
 $$ 
-\boxed{L_o(x, \omega_i) = \frac{\rho}{N} \sum_i^N L_i(x, \omega_i)}
+L_o(x, \omega_o) = \frac\rho\pi \sum_{i=1}^N \frac{L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i)}{pdf(\omega_i)}
 $$
 
-Ce qui simplifie grandement l'équation de rendu, et nous permettra de l'implémenter avec un appel récursif.
+$$ 
+L_o(x, \omega_o) = \rho\sum_{i=1}^N {L_i(x, \omega_i)}
+$$
+\\
 
-Plus précisément, notre fonction calculera $\rho \, L_i(x, \omega_i)$ puis nous l'appellerons récursivement pour un certain nombre de rebonds. Cette fonction sera ensuite appelée N fois par pixels.
+Ainsi, nous avons pu bien simplifier l'équation de rendu en choisissant le bon échantillonnage et en travaillant sur les bons matériaux.
+
+\subsection{Implémentation}
+Le choix que nous avons fait pour notre première version naïve est la suivante: la somme $\rho\sum_{i=1}^N {L_i(x, \omega_i)}$ est représentée dans notre code comme étant une fonction récursive. En effet, pour chaque rebond, nous allons sommer $\rho\ L_i(x, \omega_i)$ et retourner le résultat pour chaque échantillon de pixel. La fonction sera de la manière suivante:
+
+\begin{algorithm}[H]
+\caption{Échantillonnage récursif d’un rayon (Path Tracing)}
+\begin{algorithmic}[1]
+\Require Rayon $r$, scène $S$, caméra $cam$, profondeur $d$, profondeur max $d_{\max}$
+\Ensure Couleur incidente $L$
+\State Initialiser $L \gets (0,0,0)$
+\State $black \gets (0,0,0)$
+\If{$d = d_{\max}$}
+    \State \Return $black$
+\EndIf
+\If{pas d’intersection de $r$ avec la scène}
+  \State \Return couleur de fond de la scène
+\EndIf
+\If{l’objet est émissif}
+    \State $L \gets albedo \times couleur\_objet$
+    \State \Return $L$
+\EndIf
+\State Générer un rayon réfléchi $r_{new}$ dans l’hémisphère selon une loi Cosine-Weighted
+
+\State $L_{ref} \gets$ \Call{RaySampling}{$r_{new}, S, cam, d+1, d_{\max}$}
+\State$L \gets L+albedo \times L_{ref}$
+\State \Return $L$
+
+\end{algorithmic}
+\end{algorithm}
+
+
 
 \pagebreak

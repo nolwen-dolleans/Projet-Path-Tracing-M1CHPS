@@ -71,8 +71,8 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	Vector hit;
 	Vector black;
    create_vector_ext(&black, 0, 0, 0);
-	bool check = false;
 	int object = -1;
+	
 	if (d == dmax) {
 		return black;// par défaut met en noir si le rayon à fait un certain nombre de rebond
 	}			// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
@@ -105,11 +105,9 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 		return res;
 	}
 
-	// Offset the new ray origin to avoid self-intersections
 	Vector offset_origin;
 	Vector n_eps;
-	// n_eps = n * 1e-3
-	mul_ext(&n, 1e-3f, &n_eps);
+	mul_ext(&n, 1e-3f, &n_eps); // n_eps = n * 1e-3
 	add_ext(&hit, &n_eps, &offset_origin);
 	
 	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
@@ -121,13 +119,9 @@ Vector ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dma
 	mul_ext(&obj.color, albedo, &weight);
 
 	for (int i = 0; i < 3; ++i) {
-		if (check) {
-			printf("%f ",L_incident.Data[i]);
-		}
 		L_incident.Data[i] += L_reflected_i.Data[i] * weight.Data[i];
-	}if (check) {
-		printf("\n");
-	   }
+	}
+	
 	return L_incident;
 }
 
