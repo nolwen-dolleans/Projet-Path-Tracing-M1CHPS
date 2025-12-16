@@ -1,0 +1,17 @@
+\section{Analyse de performances}
+Dans cette dernière partie, nous allons discuter de l'implémentations actuelle et la manière dont nous allons analyser les performances.
+
+\subsection{Protocole de mesure}
+
+Pour analyser les performances, nous allons commencer par quantifier le temps d'execution du programme en fonction du nombre d'échantillons par pixels. Ainsi, nous pourrons comparer le runtime en fonction de nos modifications.\\
+
+Pour comparer les versions de notre Path Tracer, nous allons prendre un nombre d'échantillons fixé à 2000, puis nous comparerons les temps d'exécutions de chaque version.
+
+\subsection{Discussion de l'implémentation actuelle}
+
+La version naïve de notre Path Tracer converge vers la solution vraie. Cependant, elle possède plusieurs imprécisions. En effet, nous calculons la couleur d'un pixel pour N rayons, même si le rayon ne rencontre aucun obstacle sur son chemin, ce qui est une perte de temps, d'autant plus si la surface visible des objets par la caméra est inférieure à celle du ciel.\\
+
+Une autre imprécision est due à l'appel récursif de la fonction "Ray_Sampling", qui peut facilement être remplacée par une boucle, permettant de mieux contrôler le comportement des rayons dans des cas spécifiques, comme celui énoncé plus tôt. De plus, contrairement à l'appel récursif, une boucle est facilement parallélisable, augmentant donc les performances de notre programme.
+
+
+\pagebreak
