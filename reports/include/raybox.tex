@@ -22,7 +22,7 @@ Nous avons 6 équations linéaire à résoudre :
     \item $zB_{\max} = o_{z} + d_{z}tzB_{\max} \Longrightarrow tzB_{\max} =  (zB_{\max} - o_{z})/d_{z}$
 \end{itemize}
 
-Ensuite, pour déterminer si l'intersection existe, nous devons comparer la valeur maximale des solutions $tB_{i_\text{min}}$ à la valeur minimale des solutions $tB_{i_\text{max}}$:
+Ensuite, pour déterminer s'il y a intersection, on doit comparer la valeur maximale des solutions $tB_{i_\text{min}}$ à la valeur minimale des solutions $tB_{i_\text{max}}$:
 \begin{itemize}
     \item $t_{\min} = max(txB_{\min}, tyB_{\min}, tzB_{\min})$
     \item $t_{\max} = min(txB_{\max}, tyB_{\max}, tzB_{\max})$
@@ -33,6 +33,41 @@ Dans le cas où il n'y a pas d'intersection :
 
 \nointersection
 
-Comme nous pouvons observer, $tyBmax < txBmin$ et $txBmax < tyBmin$, il ne peut pas y avoir d'intersection.
+Comme on peut le voir, $tyBmax < txBmin$ et $txBmax < tyBmin$, il ne peut pas y avoir une intersection.
+
+\begin{algorithm}
+\caption{intersection AABB}
+\begin{algorithmic}
+
+\Require AABB, Ray and $hit \in \mathbb{R}^{3}$
+\State $tmin = \dfrac{bmin(0) - Ray.position(0)}{Ray.direction(0)}$
+\State $tmax = \dfrac{bmax(0) - Ray.position(0)}{Ray.direction(0)}$
+
+\If {$tmin > tmax$}
+    \State swap($tmin$, $tmax$)
+\EndIf
+
+\For {i = 1 : 3}
+    \State $t1 = \dfrac{bmin(i) - Ray.position(i)}{Ray.direction(i)}$
+    \State $t2 = \dfrac{bmax(i) - Ray.position(i)}{Ray.direction(i)}$
+    \If {$t1 > t2$}
+        \State swap($tmin$, $tmax$)
+    \EndIf
+    \State $tmin = max(tmin, t1)$
+    \State $tmax = min(tmax, t2)$
+
+    \If {$tmin > tmax$}
+        \State return $false$
+    \EndIf
+\EndFor
+
+\State hit = Ray.position + Ray.direction * tmax
+
+\State return $true$
+
+\end{algorithmic}
+Complexité spatial : O(1)\\
+Complexité temporel : O(1)
+\end{algorithm}
 
 \pagebreak
