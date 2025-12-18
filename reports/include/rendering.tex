@@ -119,12 +119,12 @@ Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosin
 \end{minipage}
 \captionof{figure}{Représentation de la base locale au point d'intersection du rayon sur la sphère
 avec la normale (en bleu), la bitangente (en vert) et la tangente (en rouge).}
+\small{Source: https://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-13-normal-mapping/}
 \end{figure}
 
  Ce mode d'échantillonnage se fait de la manière suivante:
-
 \begin{itemize}
-\item[$\_$] Génération de 2 nombres aléatoires $\xi_1$ et $\xi_2$
+\item[$\_$] Génération de 2 nombres aléatoires $\xi_1\in\mathbb{N}$ et $\xi_2\in\mathbb{N}$\\
 \item[$\_$] On les passe en coordonnées polaires: $\left\{
 \begin{array}{l}
 r = \sqrt{\xi_1}\\
@@ -140,7 +140,7 @@ z = \sqrt{1-r^2}
 \right.$\\
 
 \end{itemize} 
-Ainsi, on construit la direction du rayon incident $\omega_i$ de da manière suivante dans la base $\left( right, up, forward\right)$: $\omega_i = \left( x\cdot tangente, y\cdot bitangente, z\cdot normal \right)$.\\
+Ainsi, on construit la direction du rayon incident $\omega_i$ de la manière suivante dans la base $\left( right, up, forward\right)$: $\omega_i = \left( x\cdot tangente, y\cdot bitangente, z\cdot normal \right)$.\\
 
 L'avantage de cette méthode d'échantillonnage est que la $pdf$ sera: $pdf = \frac{\cos\theta}{\pi}$.
 
