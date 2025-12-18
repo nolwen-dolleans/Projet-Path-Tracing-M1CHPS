@@ -64,14 +64,6 @@ int main(int argc, char** argv)
 	
 	Vector bg;
 	create_vector_ext(&bg, 0, 120, 255);
-<<<<<<< HEAD
-	Scene * scene = create_scene_ptr(5, 0, &bg);
-	scene->objects[0] = sphere1;
-	scene->objects[1] = sphere2;
-	scene->objects[2] = sphere3;
-	scene->objects[3] = sphere4;
-	scene->objects[4] = sphere5;
-=======
 	Scene_ * scene = create_scene_ptr_(4, 0, &bg);
 
 	scene->objects[0].subStruct = sphere1;
@@ -94,7 +86,6 @@ int main(int argc, char** argv)
 	scene->objects[3].emitted = true;
 	scene->objects[3].albedo = 15;
 
->>>>>>> 37431cd9ffe61002d752d91034146be4367f505c
 	Vector color;
 //#############################################################################
 	
