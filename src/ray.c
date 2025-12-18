@@ -108,10 +108,14 @@ bool intersect_sphere(Ray* const r, const Sphere* const s, Vector *hit)
 	float t = -1; // t goes from -1 to 1
 	float t0 = 0.0f;
 
-	if(delta < EPS) 
+	if(delta < EPS)
 		t0 = -B/(2.0f*A);
-	else if(delta > EPS) 
+		
+		
+	else if(delta > EPS){
 		t0 = (-B - sqrtf(delta))/(2.0f*A);
+		t0 = t0 > 0 ? t0 : (-B + sqrtf(delta))/(2.0f*A);
+	}
 
 	t = t0 > EPS ? t0 : t;
 

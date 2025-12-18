@@ -160,7 +160,7 @@ Vector ray_sampling_(Ray * r, const Scene_ * S, const Camera * cam, int d, int d
 	create_vector_default_ext(&L_incident);
 	Vector hit;
 	Vector black;
-   create_vector_ext(&black, 0, 0, 0);
+    create_vector_ext(&black, 0, 0, 0);
 	bool check = false;
 	int object = -1;
 	if (d == dmax) {
@@ -177,15 +177,7 @@ Vector ray_sampling_(Ray * r, const Scene_ * S, const Camera * cam, int d, int d
 	}
 	
 	Vector n = get_normal_vector_(&hit, &S->objects[object]);
-
-	// Assurer une normale unitaire et orientée à l’opposé du rayon incident
-	norm_ext(&n, &n);
-	if (dot(&n, &r->direction) > 0.0f) {
-		// la normale pointe du mauvais côté pour l’hémisphère sortant
-		n.Data[0] = -n.Data[0];
-		n.Data[1] = -n.Data[1];
-		n.Data[2] = -n.Data[2];
-	}
+	
 	Primitive obj = S->objects[object];
 
 	if (obj.emitted) {
@@ -229,13 +221,8 @@ Vector ray_sampling_(Ray * r, const Scene_ * S, const Camera * cam, int d, int d
 	}
 
 	for (int i = 0; i < 3; ++i) {
-		if (check) {
-			printf("%f ",L_incident.Data[i]);
-		}
 		L_incident.Data[i] += L_reflected_i.Data[i] * weight.Data[i];
-	}if (check) {
-		printf("\n");
-	   }
+	}
 	return L_incident;
 }
 
@@ -258,13 +245,7 @@ Vector path_trace_(Camera * const cam, const size_t pixel_x, const size_t pixel_
 	}
 	float inv_N = (float)1/(N+1) * 255;
 	for (int i = 0; i<3; ++i) {
-		
 		color.Data[i] = color.Data[i]*inv_N;
-		/*
-		if (color.Data[i]>255) {
-			perror("Error: color > 255\n");
-			exit(1);
-		}*/
 	}
 	return color;
 }

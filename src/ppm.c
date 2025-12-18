@@ -37,29 +37,23 @@ int main(int argc, char** argv)
 	Sphere * sphere2 = malloc(sizeof(Sphere));
 	Sphere * sphere3 = malloc(sizeof(Sphere));
 	Sphere * sphere4 = malloc(sizeof(Sphere));
-	Sphere * sphere5 = malloc(sizeof(Sphere));
 	AABB box;
 
 	Vector sphere_color1;
-	create_vector_ext(&sphere_color1, 255, 255, 255);
+	create_vector_ext(&sphere_color1, 255, 120, 20);
 	create_sphere(sphere1, 0.05,0.05,-0.3,0.05, &sphere_color1, false, 0.8);
 	
 	Vector sphere_color2;
 	create_vector_ext(&sphere_color2, 120, 255, 20);
 	create_sphere(sphere2, -0.05,0,-0.3,0.05, &sphere_color2, false, 0.5);
 	
-	Vector sphere_color5;
-	create_vector_ext(&sphere_color5, 128, 0, 32);
-	create_sphere(sphere5, 0,0.02,-0.2,0.01
-				  , &sphere_color5, false, 0.5);
-	
 	Vector sphere_color3;
 	create_vector_ext(&sphere_color3, 255, 255, 255);
-	create_sphere(sphere3, 0,0.2,-0.3,0.1, &sphere_color3, true, 10);
+	create_sphere(sphere3, 0,0.2,-0.3,0.1, &sphere_color3, true, 1);
 	
 	Vector sphere_color4;
 	create_vector_ext(&sphere_color4, 255, 255, 255);
-	create_sphere(sphere4, -0.2,-0.2,-0.3,0.1, &sphere_color4, true, 10);
+	create_sphere(sphere4, 0,-0.2,-0.3,0.1, &sphere_color4, true, 1);
 	
 	
 	Vector bg;
@@ -74,17 +68,17 @@ int main(int argc, char** argv)
 	scene->objects[1].subStruct = sphere2;
 	scene->objects[1].type = SPHERE;
 	scene->objects[1].emitted = false;
-	scene->objects[1].albedo = 0.5;
+	scene->objects[1].albedo = 0.8;
 
 	scene->objects[2].subStruct = sphere3;
 	scene->objects[2].type = SPHERE;
 	scene->objects[2].emitted = true;
-	scene->objects[2].albedo = 10;
+	scene->objects[2].albedo = 5;
 
 	scene->objects[3].subStruct = sphere4;
 	scene->objects[3].type = SPHERE;
 	scene->objects[3].emitted = true;
-	scene->objects[3].albedo = 15;
+	scene->objects[3].albedo = 5;
 
 	Vector color;
 //#############################################################################
