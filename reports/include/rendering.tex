@@ -5,7 +5,7 @@ L'équation de rendu représente l'impact de la radiance de la lumière sur une 
 
 L'équation de rendu se définie comme suit:
 
-$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}ht) \, d\omega_i}$$
+$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i}$$
 
 avec: 
 \begin{itemize}
@@ -14,6 +14,8 @@ avec:
 \item[$\_$] $L_i$ : La radiance d'un des rayons incidents sur la surface au point $x$ de direction $\omega_i\subset\Omega$, le hémisphère centré autour de la normale $\textbf{n}$ du point x.
 \item[$\_$] $f$ : le BRDF qui représente la manière dont le matériaux reflète la lumière.
 \end{itemize}
+
+
 
 \subsection{Démonstrations}
 
@@ -170,13 +172,13 @@ Le choix que nous avons fait pour notre première version naïve est la suivante
   \State \Return couleur de fond de la scène
 \EndIf
 \If{l’objet est émissif}
-    \State $L \gets albedo \times couleur\_objet$
+    \State $L \gets intensite \cdot couleur\_objet$
     \State \Return $L$
 \EndIf
 \State Générer un rayon réfléchi $r_{new}$ dans l’hémisphère selon une loi Cosine-Weighted
 
 \State $L_{ref} \gets$ \Call{RaySampling}{$r_{new}, S, cam, d+1, d_{\max}$}
-\State$L \gets L+albedo \times L_{ref}$
+\State$L \gets L+albedo \cdot L_{ref}$
 \State \Return $L$
 
 \end{algorithmic}
