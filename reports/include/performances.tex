@@ -1,13 +1,49 @@
-\section{Analyse de performances}
-Dans cette dernière partie, nous allons discuter de l'implémentations actuelle et la manière dont nous allons analyser les performances.
+\section{Résultats}
 
-\subsection{Protocole de mesure}
+
+\subsection{Convergence}
+La méthode de Monte-Carlo est réputée comme ayant une convergence rapide dans un premier temps, puis une convergence lente pour un très grand nombre d'échantillons (cf. Figure 10).\\
+
+On constate cette convergence dans les résultats obtenus avec notre Path Tracer.
+\begin{figure}[H]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.2]{include/image_32bit10.png}
+
+  \small 10 échantillons
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.2]{include/image_32bit50.png}
+
+  \small 50 échantillons
+\end{minipage}
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.2]{include/image_32bit500.png}
+
+  \small 500 échantillons
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.2]{include/image_32bit3000.png}
+
+  \small 3000 échantillons
+\end{minipage}
+\captionof{figure}{Différentes résolution d'une même image}
+\end{figure}
+
+
+\subsection{Analyse de performances}
+Dans cette dernière partie, nous allons discuter de l'implémentations actuelle et la manière dont nous allons analyser les performances.
+\subsubsection{Protocole de mesure}
 
 Pour analyser les performances, nous allons commencer par quantifier le temps d'execution du programme en fonction du nombre d'échantillons par pixels. Ainsi, nous pourrons comparer le runtime en fonction de nos modifications.\\
 
 Pour comparer les versions de notre Path Tracer, nous allons prendre un nombre d'échantillons fixé à 2000, puis nous comparerons les temps d'exécutions de chaque version.
 
-\subsection{Discussion de l'implémentation actuelle}
+\subsubsection{Discussion de l'implémentation actuelle}
 
 La version naïve de notre Path Tracer converge vers la solution vraie. Cependant, elle possède plusieurs imprécisions. En effet, nous calculons la couleur d'un pixel pour N rayons, même si le rayon ne rencontre aucun obstacle sur son chemin, ce qui est une perte de temps, d'autant plus si la surface visible des objets par la caméra est inférieure à celle du ciel.\\
 
