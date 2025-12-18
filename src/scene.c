@@ -17,6 +17,13 @@ void free_scene(Scene * S){
 	
 }
 
+void free_scene_(Scene_ * S){
+
+	free(S->objects);
+	if(S->lightsources != NULL) free_vector(S->lightsources);
+	if(S != NULL) free(S);
+	
+}
 
 Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, const Vector * backgroundColor){
 	float inv255 = 1.0f / 255.0f; // normalisation de la couleur
@@ -33,6 +40,20 @@ Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, const Vector *
 	return s;
 }
 
+Scene_ * create_scene_ptr_(size_t n_objects, size_t n_lightsources, const Vector * backgroundColor){
+	float inv255 = 1.0f / 255.0f; // normalisation de la couleur
+
+	Scene_ * s = (Scene_*)malloc(sizeof(Scene_));
+	s->objects = (Primitive*)malloc(sizeof(Primitive)*n_objects);
+	s->lightsources = (Vector*)malloc(sizeof(Vector)*n_lightsources);
+	s->background_color = malloc(sizeof(Vector));
+
+	mul_ext(backgroundColor, inv255, s->background_color);
+	s->size_objects = n_objects;
+	s->size_lightsources = n_lightsources;
+	return s;
+}
+
 bool intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object, Vector *hit){
 	int object_index = -1;
 	const Vector * origin = &r->position;
@@ -41,6 +62,32 @@ bool intersect_in_scene(const struct Ray* const r, const Scene* const S, int * o
 	for (int i = 0; i<S->size_objects; ++i) {
 		Sphere sp = *S->objects[i];
 		if (!intersect_sphere(r, &sp, hit)){
+			continue;
+		}
+		else{
+			Vector diff;
+			sub_ext(hit, origin, &diff);
+			double t = sqrt(dot(&diff, &diff));
+			
+			if  (t<closest_t){
+				closest_t = t;
+				object_index = i;
+			}
+		}
+		
+	}
+	if(object_index == -1) return false;
+	*object = object_index;
+	return true;
+}
+
+bool intersect_in_scene_(Ray* const r, const Scene_* const S, int * object, Vector *hit){
+	int object_index = -1;
+	const Vector * origin = &r->position;
+	double closest_t = 1e30; //distance minimale entre l'origine du rayon et de l'objet
+	
+	for (int i = 0; i<S->size_objects; ++i) {
+		if (!intersect(r, &S->objects[i], hit)){
 			continue;
 		}
 		else{

@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt,fleqn]{article}
+
 \usepackage[a4paper,margin=2cm]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -13,6 +13,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \usepackage{tikz, pgfplots}
 \usepackage{tikz-3dplot}
@@ -31,11 +33,13 @@
 \input{include/pagedegarde.tex}
 \tableofcontents
 \pagebreak
+\input{include/introduction.tex}
 \input{include/tracing.tex}
 \input{include/sphere.tex}
 \input{include/raybox.tex}
-\input{include/matrix_rot.tex}
+\section{Annexes}
 \input{include/rendering.tex}
+\input{include/matrix_rot.tex}
 \input{include/performances.tex}
 
 \end{document}

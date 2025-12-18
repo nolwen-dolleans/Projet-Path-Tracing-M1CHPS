@@ -61,3 +61,33 @@ Linear_info* linear_resolution(const float a, const float b)
 	
 	return lin;
 }
+
+
+void swap(float* const restrict a, float* const restrict b)
+{
+    float c = *a;
+    *a = *b;
+    *b = c;
+}
+
+float max(const float* const a, const float* const b)
+{
+    return *a < *b ? *b : *a;
+}
+
+float min(const float* const a, const float* const b)
+{
+    return *a > *b ? *b : *a;
+}
+
+float radian(const float degree)
+{
+    // pi/180 * degree
+    return 0.01745329251f * degree;
+}
+
+float degree(const float radian)
+{
+    // 180/pi * radian
+    return 57.2957795131f * radian;
+}

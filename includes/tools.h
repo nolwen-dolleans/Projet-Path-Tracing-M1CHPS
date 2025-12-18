@@ -74,4 +74,15 @@ Quadratic_info* quadratic_resolution(const float a, const float b, const float c
 Linear_info* linear_resolution(const float a, const float b);
 
 
+void swap(float* const restrict a, float* const restrict b);
+
+float max(const float* const a, const float* const b);
+
+float min(const float* const a, const float* const b);
+
+float radian(const float degree);
+
+float degree(const float radian);
+
+
 #endif

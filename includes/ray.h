@@ -31,6 +31,7 @@ typedef struct Ray
 {
     Vector position;
     Vector direction;
+	float t;
 }Ray;
 
 /**
@@ -87,6 +88,21 @@ typedef struct Sphere
 	bool emitted;
 	float albedo;
 }Sphere;
+
+typedef enum PRIM_TYPE
+{
+	SPHERE,
+	BOX
+}PRIM_TYPE;
+
+typedef struct Primitive
+{
+	Vector origin;
+	PRIM_TYPE type;
+	bool emitted;
+	float albedo;
+	void* subStruct;
+}Primitive;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -174,7 +190,17 @@ bool box_intersection(const Camera* const cam, AABB* const box);
  * @param s Sphere
  * @return Set of points
  */
-bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit);
+bool intersect_sphere(Ray* const r, const Sphere* const s, Vector *hit);
+
+
+/**
+ * @brief Compute the intersection of a ray and a primitive
+ * @param r Ray
+ * @param s Sphere
+ * @return Set of points
+ */
+bool intersect(Ray* const r, const Primitive* const p, Vector *hit);
+
 
 /**
  * @brief Compute the sphere normal vector at a point
@@ -183,6 +209,9 @@ bool intersect_sphere(const Ray* const r, const Sphere* const s, Vector *hit);
  * @return pointer to the normal vector
  */
 Vector get_normal_vector(const Vector * point, const Sphere * s);
+
+Vector get_normal_vector_(const Vector * point, const Primitive * p);
+
 
 /**
  * @brief Free ray
@@ -195,6 +224,8 @@ void free_ray(Ray* r);
  * @param s Sphere
  */
 void free_sphere(Sphere* s);
+
+void trace_ray(const size_t i, const size_t j, const size_t width, const size_t height, const float angle, Ray* const r);
 
 
 #endif

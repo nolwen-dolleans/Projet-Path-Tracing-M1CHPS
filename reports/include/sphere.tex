@@ -41,4 +41,34 @@ Pour un discriminant $\bigtriangleup = b^2 - 4ac$ :
 
 - Deux intersections si $\bigtriangleup > 0 \Rightarrow x_1 = \frac{-b - \sqrt{\bigtriangleup} }{2a}$, $x_2 = \frac{-b + \sqrt{\bigtriangleup} }{2a}$.
 
+\begin{algorithm}
+\caption{intersection Sphere}
+\begin{algorithmic}
+\Require Sphere, Ray and $hit \in \mathbb{R}^{3}$
+\State $a = Ray.direction * Ray.direction$
+\State $b = 2 * Ray.direction * (Ray.position - Ray.direction)$
+\State $c = (Ray.position - Ray.direction)^2 - radius^2$
+
+$\Delta = B^2 - 4AC$  
+
+\If {$\Delta$ < 0}
+   \State return $false$
+\ElsIf {$\Delta == 0$}
+    \State return $false$
+\ElsIf {$\Delta > 0$}
+    \State $t = \dfrac{-b}{2a}$
+\ElsIf {$\Delta > 0$}
+    \State $t = \dfrac{-b - \sqrt{\Delta}}{2a}$
+\EndIf
+
+\State $hit = Ray.position + Ray.direction * t$
+
+\State return $true$
+
+\end{algorithmic}
+Complexité spatial : O(1)
+
+Complexité temporel : O(1)
+\end{algorithm}
+
 \pagebreak
