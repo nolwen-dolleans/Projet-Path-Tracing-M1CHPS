@@ -85,50 +85,12 @@ Nous pouvons maintenant chercher la distance séparant deux centres de pixels ad
 
 \distanceq
 
-Nous savons que $\mathbf{C}=\mathbf{E}+\vec{d}=(0,0,1)$ et cherchons à déterminer les coordonnées de $P_{0,0}$ :
+Nous savons que $\mathbf{C}=\mathbf{E}+\vec{d}$ et cherchons à déterminer les coordonnées de $P_{0,0}$ :
 
-Avant cela, nous devons nous assurer de la position de $\mathbf{C}$ par rapport au centre des pixels sur l'écran. Celle-ci dépend de la paritée de $(w,h)$ donnant quatre cas de figure :
-
-\begin{center}
-\begin{tikzpicture}
-\paritee
-\end{tikzpicture}
-\captionof{figure}{Position de $\mathbf{C}$ selon la paritée de $(w,h)$}
-\small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
-\end{center}
-
-Dans chacun de ces cas, nous pouvons tout de même obtenir les coordonnées de $P_{0,0}$ grâce aux vecteurs $\vec{d_{r}}, \vec{d_{u}} \in \mathbb{R}^3$ :
+Nous prenons compte des vecteurs $\vec{d_r}, \, \vec{d_u} \in \mathbb{R}^3$ représentant la distance entre $\mathbf{C}$ et les centres des pixels aux extrémitées de l'écran (cf \hyperref[subsec:paritee]{Annexe~\ref*{subsec:paritee}}). Ainsi : 
 
 $$ \vec{d_{r}} = -2\, (\dfrac{w-1}{h-1})\, \tan(\dfrac{\theta}{2}) \, \dfrac{w-1}{2(w-1)}\, \vec{r} = -(\dfrac{w-1}{h-1})\tan(\dfrac{\theta}{2})\, \vec{r} $$
 $$ \vec{d_{u}} = 2\, \tan(\dfrac{\theta}{2}) \, \dfrac{h-1}{2(h-1)}\, \vec{u} = \tan(\dfrac{\theta}{2})\, \vec{u} $$
-
-Qui, partant de $\mathbf{C}$ pour chacun des cas, sont visuellement représentées tels que :
-
-\begin{center}
-\begin{tikzpicture}
-    \paritee
-
-    \draw[->, very thick, red] (2,-1) -- (0.5,-1) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
-    \draw[->, very thick, red] (2,-1) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
-
-    \begin{scope}[shift={(5.5,0)}]
-      \draw[->, very thick, red] (2,-1.5) -- (0.5,-1.5) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
-      \draw[->, very thick, red] (2,-1.5) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
-    \end{scope}
-
-    \begin{scope}[shift={(0,-4.5)}]
-      \draw[->, very thick, red] (1.5,-2) -- (0.5,-2) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
-      \draw[->, very thick, red] (1.5,-2) -- (1.5,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
-    \end{scope}
-
-    \begin{scope}[shift={(5.5,-4.5)}]
-      \draw[->, very thick, red] (2,-2) -- (0.5,-2) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
-      \draw[->, very thick, red] (2,-2) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
-    \end{scope}
-\end{tikzpicture}
-\captionof{figure}{Définition des vecteurs $\vec{d_{r}}$ et $\vec{d_{u}}$ indépendants de la paritée de $(w,h)$}
-\small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
-\end{center}
 
 Nous en déduisons que les coordonnées de $P_{0,0}$ sont donc :
 

@@ -163,4 +163,52 @@ Nous avons montré que $\vec{d}$ est normal à $\vec{r}$ et $\vec{u}$; que $\vec
 
 $\forall x \in (\mathbf{E}, \lVert \vec{d_0} \rVert), \exists \alpha, \beta \in \mathbb{R} \, \, \text{tels que} \, pitch_{\alpha} \circ yaw_{\beta}(\vec{d_0}) = \vec{\mathbf{E}x} $.
 
+\subsection{Paritée du nombres de pixels dans la formation d'un écran}
+\label{subsec:paritee}
+
+Afin d'obtenir des expressions de $\vec{d_u}$ et $\vec{d_r}$ correctes en général, nous devons nous assurer de la position de $\mathbf{C}$ par rapport au centre des pixels sur l'écran. Celle-ci dépend de la paritée de $(w,h)$ donnant quatre cas de figure :
+
+\begin{center}
+\begin{tikzpicture}
+\paritee
+\end{tikzpicture}
+\captionof{figure}{Position de $\mathbf{C}$ selon la paritée de $(w,h)$}
+\small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
+\end{center}
+
+En choisissant : 
+
+$$ \vec{d_{r}} = -2\, (\dfrac{w-1}{h-1})\, \tan(\dfrac{\theta}{2}) \, \dfrac{w-1}{2(w-1)}\, \vec{r} = -(\dfrac{w-1}{h-1})\tan(\dfrac{\theta}{2})\, \vec{r} $$
+$$ \vec{d_{u}} = 2\, \tan(\dfrac{\theta}{2}) \, \dfrac{h-1}{2(h-1)}\, \vec{u} = \tan(\dfrac{\theta}{2})\, \vec{u} $$
+
+Nous pouvons les représenter pour chacun de ces cas en partant de $\mathbf{C}$, ils sont visuellement représentés tels que :
+
+\begin{center}
+\begin{tikzpicture}
+    \paritee
+
+    \draw[->, very thick, red] (2,-1) -- (0.5,-1) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+    \draw[->, very thick, red] (2,-1) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+
+    \begin{scope}[shift={(5.5,0)}]
+      \draw[->, very thick, red] (2,-1.5) -- (0.5,-1.5) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+      \draw[->, very thick, red] (2,-1.5) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+    \end{scope}
+
+    \begin{scope}[shift={(0,-4.5)}]
+      \draw[->, very thick, red] (1.5,-2) -- (0.5,-2) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+      \draw[->, very thick, red] (1.5,-2) -- (1.5,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+    \end{scope}
+
+    \begin{scope}[shift={(5.5,-4.5)}]
+      \draw[->, very thick, red] (2,-2) -- (0.5,-2) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+      \draw[->, very thick, red] (2,-2) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+    \end{scope}
+\end{tikzpicture}
+\captionof{figure}{Définition des vecteurs $\vec{d_{r}}$ et $\vec{d_{u}}$ indépendants de la paritée de $(w,h)$}
+\small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
+\end{center}
+
+Cela généralise donc les distances nécessaires afin de déterminer par la suite les coordonnées de chaque centre des pixels de notre écran.
+
 \pagebreak
