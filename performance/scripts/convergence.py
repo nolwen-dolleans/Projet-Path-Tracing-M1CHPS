@@ -28,7 +28,7 @@ def compare_images(image_path, reference_path):
 
 	
 arr_error = []
-reference_path = "images/image_32bit8192.ppm"
+reference_path = "images/image_32bit16384.ppm"
 
 for samples in range(0, N):
     img_index = str(2 ** samples)

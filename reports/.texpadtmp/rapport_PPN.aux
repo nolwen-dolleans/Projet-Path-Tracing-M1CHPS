@@ -1,0 +1,74 @@
+\relax 
+\providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
+\@nameuse{bbl@beforestart}
+\catcode `:\active 
+\catcode `;\active 
+\catcode `!\active 
+\catcode `?\active 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\babel@aux{french}{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{3}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Qu'est-ce que le Path Tracing?}{3}{subsection.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.1.1}Le Ray Casting}{3}{subsubsection.1.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Comparaison avec des technique existantes}{3}{subsection.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Limites du Path Tracing}{4}{subsection.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Données utilisées}{4}{subsection.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Définition de l'écran}{5}{section.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces Écran dans $\mathbb  {R}^3$ par rapport à la caméra}}{5}{figure.2.1}\protected@file@percent }
+\newlabel{fig:screenrepresentation}{{2.1}{5}{Écran dans $\mathbb {R}^3$ par rapport à la caméra}{figure.2.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Aspect Ratio}{5}{subsection.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces Écran avant de résoudre le problème lié à l'aspect ratio}}{5}{figure.2.2}\protected@file@percent }
+\newlabel{fig:stretched}{{2.2}{5}{Écran avant de résoudre le problème lié à l'aspect ratio}{figure.2.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces Différentes résolution d'une même image}}{6}{figure.caption.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces Écran avant de résoudre le problème lié à l'aspect ratio}}{6}{figure.2.4}\protected@file@percent }
+\newlabel{fig:unstretched}{{2.4}{6}{Écran avant de résoudre le problème lié à l'aspect ratio}{figure.2.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Obtention des vecteurs des rayons}{7}{subsection.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Définition de la notation des pixels sur l'écran}}{7}{figure.2.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces La hauteur de l'écran déterminée par la FOV est $2\,tan(\dfrac  {\theta }{2})$}}{7}{figure.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Définition d'objets dans l'espace}{9}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Équation d'un rayon}{9}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Équation d'une sphère}{9}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Intersection d'un rayon sur une sphère}{9}{subsection.3.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces intersection Sphere}}{10}{algorithm.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}AABB}{10}{section.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces AABB en fonction de $B_{min}$ et $B_{max}$}}{10}{figure.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Points d'intersection entre un rayon $o+dt$ et l'AABB}}{11}{figure.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Représentation des points n'intersectant pas l'AABB}}{11}{figure.4.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces intersection AABB}}{12}{algorithm.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Équation de rendu}{13}{section.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Schéma de la réflection total des rayons de directions $\omega _i$ résultant en un rayon de direction $\omega _o$ sur le point $x$ d'une surface.}}{13}{figure.caption.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Les matériaux Lambertiens}{13}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Approximation avec la méthode Monte-Carlo}{14}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Méthode d'échantillonnage Cosine-Weighted}{14}{subsubsection.5.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5.2}{\ignorespaces Représentation de la base locale au point d'intersection du rayon sur la sphère avec la normale (en bleu), la bitangente (en vert) et la tangente (en rouge).}}{14}{figure.caption.4}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:img_intersection}{{5.2}{14}{Représentation de la base locale au point d'intersection du rayon sur la sphère avec la normale (en bleu), la bitangente (en vert) et la tangente (en rouge)}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Application de la Méthode de Monte-Carlo pour l'équation de rendu}{14}{subsubsection.5.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Implémentation}{15}{subsection.5.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Échantillonnage récursif d'un rayon (RaySampling)}}{15}{algorithm.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Résultats}{16}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Convergence}{16}{subsection.6.1}\protected@file@percent }
+\newlabel{subsec:path_trac_1}{{6.1}{16}{Convergence}{subsection.6.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.1}{\ignorespaces Résultat d'une même scène pour différents nombres d'échantillons}}{16}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:res_path_tracer}{{6.1}{16}{Résultat d'une même scène pour différents nombres d'échantillons}{figure.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Convergence de la Global Mean Error avec l'image de référence en fonction du nombre d'échantillons par rayon en échelle logarithmique. L'image de référence a comme nombre d'échantillons N=16384.}}{16}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:convergence}{{6.2}{16}{Convergence de la Global Mean Error avec l'image de référence en fonction du nombre d'échantillons par rayon en échelle logarithmique. L'image de référence a comme nombre d'échantillons N=16384}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Analyse de performances}{17}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.1}Protocole de mesure}{17}{subsubsection.6.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.2}Discussion de l'implémentation actuelle}{17}{subsubsection.6.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.3}Possibles améliorations}{17}{subsubsection.6.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Annexes}{18}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Démonstration de l'équation de rendu}{18}{subsection.7.1}\protected@file@percent }
+\newlabel{subsec:demo_rendering}{{7.1}{18}{Démonstration de l'équation de rendu}{subsection.7.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.1}Cas Général}{18}{subsubsection.7.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.2}Matériaux Lambertiens}{18}{subsubsection.7.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Démonstration sur les matrices de rotations}{19}{subsection.7.2}\protected@file@percent }
+\newlabel{subsec:mat_rot}{{7.2}{19}{Démonstration sur les matrices de rotations}{subsection.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Paritée du nombres de pixels dans la formation d'un écran}{21}{subsection.7.3}\protected@file@percent }
+\newlabel{subsec:paritee}{{7.3}{21}{Paritée du nombres de pixels dans la formation d'un écran}{subsection.7.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Position de $\mathbf  {C}$ selon la paritée de $(w,h)$}}{21}{figure.7.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Définition des vecteurs $\vec  {d_{r}}$ et $\vec  {d_{u}}$ indépendants de la paritée de $(w,h)$}}{22}{figure.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Bibliographie}{23}{section.8}\protected@file@percent }
+\gdef \@abspage@last{23}
