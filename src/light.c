@@ -17,7 +17,6 @@ static inline Ray random_Ray_demi_sphere(Vector * origin, Vector * normal){
 	return ray;
 }
 
-//https://www.mathematik.uni-marburg.de/~thormae/lectures/graphics1/code/ImportanceSampling/index.html?utm_source=chatgpt.com
 static inline Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal){
 	const float u1 = (float)rand() / (float)RAND_MAX;
 	const float u2 = (float)rand() / (float)RAND_MAX;

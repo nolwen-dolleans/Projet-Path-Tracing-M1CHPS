@@ -53,7 +53,7 @@ I = \int_\Omega g(x) \, d_x \approx \frac{1}{N} \sum_k^N \frac{g(x_k)}{pdf(x_k)}
 $$
 \subsubsection{Méthode d'échantillonnage Cosine-Weighted} 
 
-Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted". Il consiste à se placer dans le repère local $(tangente, bitangente, normal)$ au point d'intersection (cf. \textit{Figure 9}), pour ensuite construire le rayon aléatoire.\\
+Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted". Il consiste à se placer dans le repère local orthonormée $(tangente, bitangente, normal)$ au point d'intersection (cf. \textit{Figure 9}), pour ensuite construire le rayon aléatoire.\\
 
 \begin{figure}[H]
 	\centering
@@ -69,13 +69,13 @@ avec la normale (en bleu), la bitangente (en vert) et la tangente (en rouge).}
  Ce mode d'échantillonnage se fait de la manière suivante:
 \begin{itemize}
 \item[$\_$] Génération de 2 nombres aléatoires $\xi_1\in\mathbb{N}$ et $\xi_2\in\mathbb{N}$\\
-\item[$\_$] On les passe en coordonnées polaires: $\left\{
+\item[$\_$] Nous les passons en coordonnées polaires: $\left\{
 \begin{array}{l}
 r = \sqrt{\xi_1}\\
 \theta = 2\pi\xi_2
 \end{array}
 \right.$
-\item[$\_$] On passe les coordonnées polaires dans la base locale:$\left\{
+\item[$\_$] Nous passons les coordonnées polaires dans la base locale:$\left\{
 \begin{array}{l}
 x = r\cos\theta\\
 y = r\sin\theta\\
