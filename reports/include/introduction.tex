@@ -31,7 +31,7 @@ On ne gère pas les rebonds.
 
 \end{itemize}
 
-De nos jours, la technique de rendu la plus populaire est la rasterization. Bien que plus coûteuse en calcul, la rasterization demeure dominante dans les moteurs temps réel.
+De nos jours, la technique de rendu la plus populaire est la rasterization. Bien que moins précise visuellement, la rasterization demeure dominante dans les moteurs temps réel.
 
 \subsection{Limites du Path Tracing}
 
@@ -39,7 +39,7 @@ Le Path-Tracing étant un modèle, il nous faut de poser des fonctionnements qui
 
 Pour les limites liées à l'utilisation du Path-Tracing, il y a premièrement le problème de son implémentation pour un rendu en temps réel, le matériel nécessaire pour son implémentation est coûteux et donc le rendu devient dépendant de la capacité à traiter les images.
 
-Deuxièmement, une implémentation avec une grande quantité d'objets dans la scène, de rayons lumineux et de rebonds considérés demande également de fortes ressources matérielles. Le Path-Tracing comprend de plus un test pour d'éventuelles intersections de chemins lumineux, ce qui demande des performances, particulièrement pour des modèles 3D complexes.
+Le Path-Tracing comprend de plus un test pour d'éventuelles intersections de chemins lumineux, ce qui demande des performances, particulièrement pour des modèles 3D complexes.
 
 \subsection{Données utilisées}
 
