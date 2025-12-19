@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 	
 	if(strcmp(argv[1], "32") == 0)
 	{
-		Image_32bit * image = create_image_32bit(width, height);
+		Image_32bit * image = create_image_32bit(width, height, smpls);
 		fprintf(stdout,"Using path tracing image %ldx%ld.\n",image->width,image->height);
 
 		//clear_frame_sky_color_32bit(image);

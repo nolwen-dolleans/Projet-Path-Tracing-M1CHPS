@@ -73,7 +73,7 @@ Image_24bit_ptr* create_image_24bit_ptr(const size_t width, const size_t height)
 
 };
 
-Image_32bit* create_image_32bit(const size_t width, const size_t height)
+Image_32bit* create_image_32bit(const size_t width, const size_t height, const size_t samples)
 {
     Image_32bit* img = (Image_32bit*)malloc(width * height * sizeof(Image_32bit));
     if(img == NULL)
@@ -84,8 +84,9 @@ Image_32bit* create_image_32bit(const size_t width, const size_t height)
     
     img->width = width;
     img->height = height;
-
-    img->img_file = fopen("image/image_32bit.ppm", "w");
+	char path[100];
+	sprintf(path, "image/image_32bit%ld.ppm", samples);
+    img->img_file = fopen(path, "w");
 
     if(img->img_file == NULL)
     {

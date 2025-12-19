@@ -98,7 +98,7 @@ Image_24bit_ptr* create_image_24bit_ptr(const size_t width, const size_t height)
  * @param width Longueur
  * @param height Hauteur
  */
-Image_32bit* create_image_32bit(const size_t width, const size_t height);
+Image_32bit* create_image_32bit(const size_t width, const size_t height, const size_t samples);
 
 /**
  * @brief

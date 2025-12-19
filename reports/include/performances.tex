@@ -2,9 +2,7 @@
 
 \subsection{Convergence}
 \label{subsec:path_trac_1}
-La méthode de Monte-Carlo est réputée comme ayant une convergence rapide dans un premier temps, puis une convergence lente pour un très grand nombre d'échantillons (cf. \hyperref[fig:res_path_tracer]{Figure~\ref*{fig:res_path_tracer}}).
 
-On constate cette convergence dans les résultats obtenus avec notre Path Tracer.
 \begin{figure}[H]
 \centering
 \begin{minipage}{.5\textwidth}
@@ -32,13 +30,28 @@ On constate cette convergence dans les résultats obtenus avec notre Path Tracer
   \small 3000 échantillons
 \end{minipage}
 \captionof{figure}{Résultat d'une même scène pour différents nombres d'échantillons}
-\small $(w,h) = (1000,1000)$
+\small $(w,h) = (1000,1000)$, 8 rebonds
 \label{fig:res_path_tracer}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{include/convergence_monte_carlo.png}
+\captionof{figure}{Convergence de la Global Mean Error en fonction du nombre d'échantillons par rayon en échelle logarithmique avec comme image de référence à N=8192.}
+\small $(w,h) = (1000,1000)$, 8 rebonds
+\label{fig:convergence}
+\end{figure}
+
+
+La méthode de Monte-Carlo est réputée comme ayant une convergence rapide dans un premier temps, puis une convergence lente pour un très grand nombre d'échantillons (cf. \hyperref[fig:res_path_tracer]{Figure~\ref*{fig:res_path_tracer}}).\\
+
+
+Nous constatons cette convergence dans les résultats obtenus avec notre Path Tracer.
+En effet, la méthode de Monte-Carlo possède une convergence lente, en $O\left(\frac{1}{\sqrt N}\right)$ (cf \hyperref[fig:res_path_tracer]{Figure~\ref*{fig:convergence}}). Nous remarquons également une chute de l'erreur vers les dernières images puisque plus N augmente, plus l'image se rapproche de notre image de référence.\\
 
 \subsection{Analyse de performances}
 Dans cette dernière partie, nous allons discuter de l'implémentation actuelle et la manière dont nous allons analyser les performances.
+
 \subsubsection{Protocole de mesure}
 
 Pour analyser les performances, nous allons commencer par quantifier le temps d'exécution du programme en fonction du nombre d'échantillons par pixels. Ainsi, nous pourrons comparer le runtime en fonction de nos modifications.

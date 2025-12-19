@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 
 sns.set_theme(style="whitegrid", context="talk")
-N = 7
+N = 9
 
 def load_image(path):
 	img = Image.open(path).convert("RGB")
@@ -28,7 +28,7 @@ def compare_images(image_path, reference_path):
 
 	
 arr_error = []
-reference_path = "images/image_32bit4096.ppm"
+reference_path = "images/image_32bit8192.ppm"
 
 for samples in range(0, N):
     img_index = str(2 ** samples)
