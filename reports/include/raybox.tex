@@ -1,6 +1,6 @@
 \section{AABB}
 
-Un AABB (Axis-Aligned Bounding Box) est un cube qui nous sert d'espace de rebond pour nos rayon.
+Un AABB (Axis-Aligned Bounding Box) est un pavé droit qui nous sert d'espace de rebond pour nos rayon.
 
 Nous pouvons le définir par deux points $B_{min} \in \mathbb{R}^3, \, B_{max} \in \mathbb{R}^3$ représentant deux sommets aux extremitées du cube, chacunes des arêtes sont ensuite colinéaires à un des vecteurs de la base canonique.
 
@@ -13,14 +13,16 @@ Dans le cas où il y a intersection :
 \intersection
 
 Nous avons 6 équations linéaire à résoudre :
-\begin{itemize}
-    \item $xB_{\min} = o_{x} + d_{x}txB_{\min} \Longrightarrow txB_{\min} =  (xB_{\min} - o_{x})/d_{x}$
-    \item $yB_{\min} = o_{y} + d_{y}tyB_{\min} \Longrightarrow tyB_{\min} =  (yB_{\min} - o_{y})/d_{y}$
-    \item $zB_{\min} = o_{z} + d_{z}tzB_{\min} \Longrightarrow tzB_{\min} =  (zB_{\min} - o_{z})/d_{z}$
-    \item $xB_{\max} = o_{x} + d_{x}txB_{\max} \Longrightarrow txB_{\max} =  (xB_{\max} - o_{x})/d_{x}$
-    \item $yB_{\max} = o_{y} + d_{y}tyB_{\max} \Longrightarrow tyB_{\max} =  (yB_{\max} - o_{y})/d_{y}$
-    \item $zB_{\max} = o_{z} + d_{z}tzB_{\max} \Longrightarrow tzB_{\max} =  (zB_{\max} - o_{z})/d_{z}$
-\end{itemize}
+$$
+\begin{cases}
+    xB_{\min} = o_{x} + d_{x}txB_{\min} \Longrightarrow txB_{\min} =  (xB_{\min} - o_{x})/d_{x} \\
+    yB_{\min} = o_{y} + d_{y}tyB_{\min} \Longrightarrow tyB_{\min} =  (yB_{\min} - o_{y})/d_{y} \\
+    zB_{\min} = o_{z} + d_{z}tzB_{\min} \Longrightarrow tzB_{\min} =  (zB_{\min} - o_{z})/d_{z} \\
+    xB_{\max} = o_{x} + d_{x}txB_{\max} \Longrightarrow txB_{\max} =  (xB_{\max} - o_{x})/d_{x} \\
+    yB_{\max} = o_{y} + d_{y}tyB_{\max} \Longrightarrow tyB_{\max} =  (yB_{\max} - o_{y})/d_{y} \\
+    zB_{\max} = o_{z} + d_{z}tzB_{\max} \Longrightarrow tzB_{\max} =  (zB_{\max} - o_{z})/d_{z}
+\end{cases}
+$$
 
 Ensuite, pour déterminer s'il y a intersection, on doit comparer la valeur maximale des solutions $tB_{i_\text{min}}$ à la valeur minimale des solutions $tB_{i_\text{max}}$:
 \begin{itemize}

@@ -2,7 +2,7 @@
 
 \subsection{Convergence}
 \label{subsec:path_trac_1}
-La méthode de Monte-Carlo est réputée comme ayant une convergence rapide dans un premier temps, puis une convergence lente pour un très grand nombre d'échantillons (cf. Figure 10).
+La méthode de Monte-Carlo est réputée comme ayant une convergence rapide dans un premier temps, puis une convergence lente pour un très grand nombre d'échantillons (cf. \hyperref[fig:res_path_tracer]{Figure~\ref*{fig:res_path_tracer}}).
 
 On constate cette convergence dans les résultats obtenus avec notre Path Tracer.
 \begin{figure}[H]
@@ -33,14 +33,15 @@ On constate cette convergence dans les résultats obtenus avec notre Path Tracer
 \end{minipage}
 \captionof{figure}{Résultat d'une même scène pour différents nombres d'échantillons}
 \small $(w,h) = (1000,1000)$
+\label{fig:res_path_tracer}
 \end{figure}
 
 
 \subsection{Analyse de performances}
-Dans cette dernière partie, nous allons discuter de l'implémentations actuelle et la manière dont nous allons analyser les performances.
+Dans cette dernière partie, nous allons discuter de l'implémentation actuelle et la manière dont nous allons analyser les performances.
 \subsubsection{Protocole de mesure}
 
-Pour analyser les performances, nous allons commencer par quantifier le temps d'execution du programme en fonction du nombre d'échantillons par pixels. Ainsi, nous pourrons comparer le runtime en fonction de nos modifications.
+Pour analyser les performances, nous allons commencer par quantifier le temps d'exécution du programme en fonction du nombre d'échantillons par pixels. Ainsi, nous pourrons comparer le runtime en fonction de nos modifications.
 
 Pour comparer les versions de notre Path Tracer, nous allons prendre un nombre d'échantillons fixé à 2000, puis nous comparerons les temps d'exécutions de chaque version.
 
@@ -49,6 +50,5 @@ Pour comparer les versions de notre Path Tracer, nous allons prendre un nombre d
 La version naïve de notre Path Tracer converge vers la solution vraie. Cependant, elle possède plusieurs imprécisions. En effet, nous calculons la couleur d'un pixel pour N rayons, même si le rayon ne rencontre aucun obstacle sur son chemin, ce qui est une perte de temps, d'autant plus si la surface visible des objets par la caméra est inférieure à celle du ciel.
 
 Une autre imprécision est due à l'appel récursif de la fonction RaySampling. Elle pourra facilement être remplacée par une boucle, permettant de mieux contrôler le comportement des rayons dans des cas spécifiques, comme celui énoncé plus tôt. De plus, contrairement à l'appel récursif, une boucle est facilement parallélisable, augmentant donc les performances de notre programme.
-
 
 \pagebreak

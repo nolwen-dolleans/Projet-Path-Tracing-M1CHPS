@@ -26,10 +26,10 @@ s(\vec{p}(t)) &= (p_x(t) - c_x)^2 + (p_y(t) - c_y)^2 + (p_z(t) - c_z)^2 - r^2 \\
               &= (o_x+d_x t - c_x)^2 + (o_y + d_y t - c_y)^2 + (o_z + d_z t- c_z)^2 - r^2 \\
               &= (d_x^2 + d_y^2 + d_z^2)t^2 + 2(o_x d_x + o_y d_y + o_z d_z - c_x d_x - c_y d_y - c_z d_z)t \\
               &\quad + (o_x^2 + o_y^2 + o_z^2 - c_x^2 - c_y^2 - c_z^2 - r^2) \\
-              &= (\vec{d}\cdot\vec{d})t^2 + 2\vec{d}\cdot(\overrightarrow{o-c})t + (\overrightarrow{o-c})^2 - r^2
+              &= \lVert \vec{d} \rVert^2t^2 + 2\vec{d}\cdot(\overrightarrow{O-C})t + \lVert (\overrightarrow{O-C}) \rVert^2 - r^2
 \end{align*}
 
-Soit $s(\vec{p}(t))$ une équation quadratique, avec $a = \vec{d}\cdot\vec{d}$, $b = 2\vec{d}\cdot(\overrightarrow{o-c})$, $c = (\vec{o}-\vec{c})^2 - r^2$
+Soit $s(\vec{p}(t))$ une équation quadratique, avec $a = \lVert \vec{d} \rVert^2$, $b = 2\vec{d}\cdot(\overrightarrow{O-C})$, $c = \lVert (\overrightarrow{O-C}) \rVert^2 - r^2$
 
 On doit résoudre $at^2 + bt + c = 0$.
 
@@ -37,9 +37,9 @@ Pour un discriminant $\bigtriangleup = b^2 - 4ac$ :
 
 - Aucune intersection si $\bigtriangleup < 0$ ;
 
-- Une intersection si $\bigtriangleup = 0 \Rightarrow x_1 = \frac{-b}{2a}$ ;
+- Une intersection si $\bigtriangleup = 0 \Rightarrow x_1 = \dfrac{-b}{2a}$ ;
 
-- Deux intersections si $\bigtriangleup > 0 \Rightarrow x_1 = \frac{-b - \sqrt{\bigtriangleup} }{2a}$, $x_2 = \frac{-b + \sqrt{\bigtriangleup} }{2a}$.
+- Deux intersections si $\bigtriangleup > 0 \Rightarrow x_1 = \dfrac{-b - \sqrt{\bigtriangleup} }{2a}$, $x_2 = \dfrac{-b + \sqrt{\bigtriangleup} }{2a}$.
 
 \begin{algorithm}
 \caption{intersection Sphere}
