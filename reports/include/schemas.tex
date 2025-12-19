@@ -122,7 +122,7 @@
     \end{tikzpicture}
     \captionof{figure}{Écran avant de résoudre le problème lié à l'aspect ratio}
     \small $(w,h)=(4,2)$
-    \label{fig:stretched}
+    \label{fig:unstretched}
     \end{center}
 }
 
@@ -177,7 +177,6 @@
     \draw[fill] (1,0,0) circle [radius=0.4pt];
 
     \end{tikzpicture}
-    \renewcommand{\thefigure}{1.2}
     \captionof{figure}{La hauteur de l'écran déterminée par la FOV est $2\,tan(\dfrac{\theta}{2})$}
     \small Vrai $\forall (w,h) \in \mathbb{R} \; \text{et} \; \forall \theta \in [0,\pi]$
     \end{center}
@@ -263,6 +262,7 @@
     \node[above] at (B1) {$Bmin$};
 
 \end{tikzpicture}
+\captionof{figure}{AABB en fonction de $B_{min}$ et $B_{max}$}
 \end{center}
 }
 
@@ -325,6 +325,7 @@
     \fill (xtbmin) circle (1pt) node[above,right] {$txB_{\min}$};
 
     \end{tikzpicture}
+    \captionof{figure}{Points d'intersection entre un rayon $o+dt$ et l'AABB}
     \end{center}
 }
 
@@ -391,6 +392,7 @@
     \fill (xtbmin) circle (1pt) node[above,right] {$tyB_{\min}$};
     
     \end{tikzpicture}
+    \captionof{figure}{Représentation des points n'intersectant pas l'AABB}
     \end{center}
 }
 

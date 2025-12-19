@@ -22,19 +22,19 @@ Les pixels ne sont pas eux-même carrés et lorsque nous représentont des objet
   \centering
   \includegraphics[scale=0.2]{include/exemple480x480.png}
 
-  \small $480\times480$ pixels
+  \small Figure 2.3.A - $480\times480$ pixels
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
   \includegraphics[scale=0.2]{include/exemple720x480.jpeg}
 
-  \small $720\times480$ pixels
+  \small Figure 2.3.B - $720\times480$ pixels
 \end{minipage}
 \begin{minipage}{.5\textwidth}
   \centering
   \includegraphics[scale=0.2]{include/exemple480x720.jpeg}
 
-  \small $480\times720$ pixels
+  \small Figure 2.3.C - $480\times720$ pixels
 \end{minipage}
 \captionof{figure}{Différentes résolution d'une même image}
 \end{figure}
@@ -71,7 +71,6 @@ Nous posons $\forall (i,j) \in \mathbb{N} \text{ tels que } 0\leq i\leq w-1, 0\l
     \node[below, fill=white, fill opacity=0.5, text opacity=1, inner sep=0pt, rounded corners] at (0.5,0.45) {$P_{0,h-1}$};
     \node[below, fill=white, fill opacity=0.5, text opacity=1, inner sep=0pt, rounded corners] at (4.5,0.45) {$P_{w-1,h-1}$};
 \end{tikzpicture}
-\renewcommand{\thefigure}{1.1}
 \captionof{figure}{Définition de la notation des pixels sur l'écran}
 \small $(w,h)=(5,7)$
 \end{center}
@@ -94,7 +93,6 @@ Avant cela, nous devons nous assurer de la position de $\mathbf{C}$ par rapport 
 \begin{tikzpicture}
 \paritee
 \end{tikzpicture}
-\renewcommand{\thefigure}{4}
 \captionof{figure}{Position de $\mathbf{C}$ selon la paritée de $(w,h)$}
 \small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
 \end{center}
@@ -128,7 +126,6 @@ Qui, partant de $\mathbf{C}$ pour chacun des cas, sont visuellement représenté
       \draw[->, very thick, red] (2,-2) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
     \end{scope}
 \end{tikzpicture}
-\renewcommand{\thefigure}{4.1}
 \captionof{figure}{Définition des vecteurs $\vec{d_{r}}$ et $\vec{d_{u}}$ indépendants de la paritée de $(w,h)$}
 \small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
 \end{center}

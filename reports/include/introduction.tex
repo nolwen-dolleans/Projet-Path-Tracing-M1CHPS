@@ -6,7 +6,7 @@ Pour ce projet, nous allons nous concentrer sur la technique du Path Tracing, co
 
 \subsection{Qu'est-ce que le Path Tracing?}
 
-Le \textbf{Path Tracing} est une technique de rendu 3D se basant sur la méthode de Monte-Carlo pour approximer l'équation de transport de la lumière. Le principe est d'échantilloner aléatoirement un grand nombre de chemins lumineux entre la caméra et les différentes sources de lumière présentes dans la scène. Un exemple est présent dans l'\hyperref[subsec:img_pt]{Annexe~\ref*{subsec:img_pt}}.
+Le \textbf{Path Tracing} est une technique de rendu 3D se basant sur la méthode de Monte-Carlo pour approximer l'équation de transport de la lumière. Le principe est d'échantilloner aléatoirement un grand nombre de chemins lumineux entre la caméra et les différentes sources de lumière présentes dans la scène. Un exemple est présent dans le \hyperref[subsec:path_trac_1]{résultat~\ref*{subsec:path_trac_1}}.
 
 \subsubsection{Le Ray Casting}
 
@@ -51,18 +51,18 @@ Nous définissons ensuite toute norme utilisée comme la norme 2 euclidienne not
 
 $\begin{array}{ccccc}
 \lVert \cdot \rVert & : & \mathbb{R}^3 & \to & \mathbb{R} \\
- & & \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix} & \mapsto & \sqrt{a_1^2+a_2^2+a_3^2} \end{array}$
+ & & \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix} & \mapsto & \sqrt{a_1^2+a_2^2+a_3^2} \end{array}$ \\ \\
 
 De même, le produit scalaire sera :
 
 $\begin{array}{ccccc}
 \cdot & : & \mathbb{R}^3, \mathbb{R}^3 & \to & \mathbb{R} \\
-& & \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix} \cdot \begin{pmatrix} b_1 \\ b_2 \\ b_3 \end{pmatrix} & \mapsto & a_1 \, b_1 + a_2 \, b_2 + a_3 \, b_3 \end{array}$
+& & \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix} \cdot \begin{pmatrix} b_1 \\ b_2 \\ b_3 \end{pmatrix} & \mapsto & a_1 \, b_1 + a_2 \, b_2 + a_3 \, b_3 \end{array}$ \\ \\
 
 Finalement, le produit vectoriel est :
 
 $\begin{array}{ccccc}
-\cdot \wedge \cdot & : & \mathbb{R}^3, \mathbb{R}^3 & \to & \hspace{-10em} \mathbb{R} \\
-& & \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix} \wedge \begin{pmatrix} b_1 \\ b_2 \\ b_3 \end{pmatrix} & \mapsto & a_2 \, b_3 - a_3 \, b_2 + a_1 \, b_3 - a_3 \, b_1 + a_1 \, b_2 - a_2 \, b_1 \end{array}$
+\cdot \wedge \cdot & : & \mathbb{R}^3, \mathbb{R}^3 & \to & \mathbb{R}^3 \\
+& & \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix} \wedge \begin{pmatrix} b_1 \\ b_2 \\ b_3 \end{pmatrix} & \mapsto & \begin{pmatrix} a_2 \, b_3 - a_3 \, b_2 \\ a_1 \, b_3 - a_3 \, b_1 \\ a_1 \, b_2 - a_2 \, b_1 \end{pmatrix} \end{array}$
 
 \pagebreak
