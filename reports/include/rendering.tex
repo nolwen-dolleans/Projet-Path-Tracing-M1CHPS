@@ -8,7 +8,7 @@ L'équation de rendu représente l'impact de la radiance de la lumière sur une 
 	\captionof{figure}{Schéma de la réflection total des rayons de directions $\omega_i$ résultant en un rayon de direction $\omega_o$ sur le point $x$ d'une surface.}
 \end{figure}
 
-L'équation de rendu se définie comme suit (cf démonstration en Annexe 1):
+L'équation de rendu se définie comme suit (cf démonstration en \hyperref[subsec:demo_rendering]{Annexe~\ref*{subsec:demo_rendering}}):
 
 $$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, \cos\left(\theta_i\right) \, d_{\omega_i}}$$
 
@@ -27,9 +27,9 @@ avec:
 
 \subsection{Les matériaux Lambertiens}
 
-Cette équation n'est pas résoluble analytiquement. Pour faciliter les calculs et l'implémentation de notre path tracing, nous allons nous prendre le cas des matériaux dit "Lambertiens".\\
+Cette équation n'est pas résoluble analytiquement. Pour faciliter les calculs et l'implémentation de notre path tracing, nous allons nous prendre le cas des matériaux dit "Lambertiens".
 
-Ce type de matériaux inclus tous les matériaux de surface rugueuse qui n'émettent pas dans la lumière visible. Nous pouvons donc simplifier l'équation de rendu avec (cf démonstration Annexe 1):
+Ce type de matériaux inclus tous les matériaux de surface rugueuse qui n'émettent pas dans la lumière visible. Nous pouvons donc simplifier l'équation de rendu avec (cf démonstration \hyperref[subsec:demo_rendering]{Annexe~\ref*{subsec:demo_rendering}}):
 
 
 $$ 
@@ -53,7 +53,7 @@ I = \int_\Omega g(x) \, d_x \approx \frac{1}{N} \sum_k^N \frac{g(x_k)}{pdf(x_k)}
 $$
 \subsubsection{Méthode d'échantillonnage Cosine-Weighted} 
 
-Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted". Il consiste à se placer dans le repère local orthonormée $(tangente, bitangente, normal)$ au point d'intersection (cf. \textit{Figure 9}), pour ensuite construire le rayon aléatoire.\\
+Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosine-weighted". Il consiste à se placer dans le repère local orthonormée $(tangente, bitangente, normal)$ au point d'intersection (cf. \hyperref[fig:img_intersection]{figure~\ref*{fig:img_intersection}}), pour ensuite construire le rayon aléatoire.
 
 \begin{figure}[H]
 	\centering
@@ -63,7 +63,8 @@ Pour des matériaux lambertiens, nous choisissons un échantillonnage dit "Cosin
 \end{minipage}
 \captionof{figure}{Représentation de la base locale au point d'intersection du rayon sur la sphère
 avec la normale (en bleu), la bitangente (en vert) et la tangente (en rouge).}
-\small{Source: https://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-13-normal-mapping/}
+\small{Source: \href{https://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-13-normal-mapping/}{https://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-13-normal-mapping/}
+\label{fig:img_intersection}}
 \end{figure}
 
  Ce mode d'échantillonnage se fait de la manière suivante:
@@ -84,9 +85,9 @@ z = \sqrt{1-r^2}
 \right.$\\
 
 \end{itemize} 
-Ainsi, on construit la direction du rayon incident $\omega_i$ de la manière suivante dans la base $\left( right, up, forward\right)$: $\omega_i = x\cdot tangente + y\cdot bitangente+ z\cdot normal $.\\
+Ainsi, on construit la direction du rayon incident $\omega_i$ de la manière suivante dans la base $\left( \vec{r_0}, \vec{u_0}, \vec{d_0}\right)$: $\omega_i = x\cdot tangente + y\cdot bitangente+ z\cdot normal $.
 
-L'avantage de cette méthode d'échantillonnage est que la $pdf$ sera: $pdf = \frac{\cos\theta_i}{\pi}$.
+L'avantage de cette méthode d'échantillonnage est que la $pdf$ sera: $pdf = \dfrac{\cos\theta_i}{\pi}$.
 
 \subsubsection{Application de la Méthode de Monte-Carlo pour l'équation de rendu}
 
@@ -104,10 +105,12 @@ $$
 Ainsi, nous avons pu bien simplifier l'équation de rendu en choisissant le bon échantillonnage et en travaillant sur les bons matériaux.
 
 \subsection{Implémentation}
+Pour implémenter l'équation de rendu, nous allons utiliser la parité de la radiance (c'est-à-dire $\, L(x,\omega) = L(x,-\omega)$) afin de propager les rayons de la caméra vers la source de lumière plutôt que l'inverse, qui serait le phénomène physique naturel.
+
 Le choix que nous avons fait pour notre première version naïve est la suivante: la somme $\rho\sum_{i=1}^N {L_i(x, \omega_i)}$ est représentée dans notre code comme étant une fonction récursive. En effet, pour chaque rebond, nous allons sommer $\rho\ L_i(x, \omega_i)$ et retourner le résultat pour chaque échantillon de pixel. La fonction sera de la manière suivante:
 
 \begin{algorithm}[H]
-\caption{Échantillonnage récursif d’un rayon (RaySampling)}
+\caption{Échantillonnage récursif d'un rayon (RaySampling)}
 \begin{algorithmic}[1]
 \Require Rayon $r$, scène $S$, caméra $cam$, profondeur $d$, profondeur max $d_{\max}$
 \Ensure Couleur incidente $L$
@@ -116,14 +119,14 @@ Le choix que nous avons fait pour notre première version naïve est la suivante
 \If{$d = d_{\max}$}
     \State \Return $black$
 \EndIf
-\If{pas d’intersection de $r$ avec la scène}
+\If{pas d'intersection de $r$ avec la scène}
   \State \Return couleur de fond de la scène
 \EndIf
-\If{l’objet est émissif}
+\If{l'objet est émissif}
     \State $L \gets intensite \cdot couleur\_objet$
     \State \Return $L$
 \EndIf
-\State Générer un rayon réfléchi $r_{new}$ dans l’hémisphère selon une loi Cosine-Weighted
+\State Générer un rayon réfléchi $r_{new}$ dans l'hémisphère selon une loi Cosine-Weighted
 
 \State $L_{ref} \gets$ \Call{RaySampling}{$r_{new}, S, cam, d+1, d_{\max}$}
 \State$L \gets L+albedo \cdot L_{ref}$

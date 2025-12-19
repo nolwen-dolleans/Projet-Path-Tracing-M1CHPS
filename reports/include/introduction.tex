@@ -22,7 +22,7 @@ C'est pourquoi nous implémentons des propriétés supplémentaires au Ray Casti
 
 
 \begin{itemize}
-\item[$\bullet$]\textbf{Rasterization}: technique de rendu 3D utilisée pour convertir des objets 3D en une image 2D affichable à l’écran. Elle fonctionne triangle par triangle plutôt que pixel par pixel. Très rapide, optimisée pour des scènes avec des millions de triangles et avec des exigences en temps-réel. Mais les ombres/éclairages indirects, réflexions complexes et phénomènes optiques réalistes restent approximatifs. 
+\item[$\bullet$]\textbf{Rasterization}: technique de rendu 3D utilisée pour convertir des objets 3D en une image 2D affichable à l'écran. Elle fonctionne triangle par triangle plutôt que pixel par pixel. Très rapide, optimisée pour des scènes avec des millions de triangles et avec des exigences en temps-réel. Mais les ombres/éclairages indirects, réflexions complexes et phénomènes optiques réalistes restent approximatifs. 
 
 \item[$\bullet$] \textbf{Ray tracing }: lance des rayons partants de la caméra pour simuler les ombres, réflexions et occultations ne traitant alors pas toute la scène, mais uniquement les trajectoires des photons qui seront interceptés. Cela donne un rendu plus fidèle que le rasterizaton mais souvent limité à quelques rebonds ou approximations car plus coûteuse en temps et en énergie.
 

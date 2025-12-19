@@ -1,4 +1,5 @@
 \subsection{Démonstration de l'équation de rendu}
+\label{subsec:demo_rendering}
 \subsubsection{Cas Général}
 
 Par définition, la radiance incidente se détermine comme suit:
@@ -6,11 +7,11 @@ Par définition, la radiance incidente se détermine comme suit:
 $$L_{o} = L_{e} + L_{r}$$
 
 $L_r$ représente l'ensemble des rayons incidents sur la surface qui se réfléchi en un rayon de direction $\omega_i$ dont la formule est:
-$$L_r = \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
+$$L_r = \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, \cos(\theta_i) \, d\omega_i$$
 
 Ce qui nous donne l'équation de rendu ci-dessous:
 
-$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i}$$
+$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, \cos(\theta_i) \, d\omega_i}$$
 
 
 \subsubsection{Matériaux Lambertiens}
@@ -27,9 +28,9 @@ Les conséquences sont que pour un matériau lambertien, le BRDF est invariant d
 Les rayons de direction $\omega_i$ sont seulement dans l'hémisphère $\Omega$.
 
 De ces faits, nous pouvons réécrire l'équation de rendu:
-$$L_{o}(x, \omega_o) = f_{const}\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
+$$L_{o}(x, \omega_o) = f_{const}\int_{\Omega}L_{i}(x, \omega_i) \, \cos(\theta_i) \, d\omega_i$$
 
-On définie l'irradiance incidente $E_i=\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$ et l'irradiance réfléchie $E_o=\int_{\Omega}L_{o}(x, \omega_o) \, (\textbf{n}\cdot\omega_i) \, d\omega_i$ la puissance d'un rayonnement électromagnétique frappant sur une unité de surface.
+On définie l'irradiance incidente $E_i=\int_{\Omega}L_{i}(x, \omega_i) \, \cos(\theta_i) \, d\omega_i$ et l'irradiance réfléchie $E_o=\int_{\Omega}L_{o}(x, \omega_o) \, \cos(\theta_i) \, d\omega_i$ la puissance d'un rayonnement électromagnétique frappant sur une unité de surface.
 
 On définit également l'albédo $\rho(x, \omega_i, \omega_o)$ qui représente le rapport entre le radiance réfléchis et la radiance incidente : $\rho(x, \omega_i, \omega_o)=\dfrac{L_o(x, \omega_i, \omega_o)}{L_r(x, \omega_i, \omega_o)} = \dfrac{E_o(x, \omega_i, \omega_o)}{E_r(x, \omega_i, \omega_o)}$
 
@@ -37,7 +38,7 @@ Nous avons donc le système suivant:
 $$
 \begin{cases}
 	L_o = f_{const}\times E_i \\
-	E_o = L_o\int_{\Omega}(\textbf{n}\cdot\omega) \, d\omega
+	E_o = L_o\int_{\Omega}\cos(\theta) \, d\omega
 \end{cases}
 \Leftrightarrow\begin{cases}
 	L_o = f_{const}\times E_i \\
@@ -66,7 +67,7 @@ $$\Leftrightarrow f_{const} = \boxed{\frac\rho\pi} $$
 Ceci nous permet de conclure avec l'équation sur laquelle nous allons travailler dans cette partie du projet:
 
 $$ 
-\boxed{L_o(x, \omega) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i) \, d\omega_i}
+\boxed{L_o(x, \omega) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, \cos(\theta_i) \, d\omega_i}
 $$
 
 
@@ -161,5 +162,53 @@ Nous remarquons que le vecteur $\vec{d}$ est normal au plan formé par $\vec{r}$
 Nous avons montré que $\vec{d}$ est normal à $\vec{r}$ et $\vec{u}$; que $\vec{r}$ et $\vec{u}$ sont orthogonaux entre eux et que les trois vecteurs ont pour norme $1$. Cela montre donc que $(\vec{r},\vec{u}, \vec{d})$ est une base orthonormée de $\mathbb{R}^3$, donc que l'application $pitch_{\alpha} \circ yaw_{\beta}$ établi une rotation de la base canonique $(\vec{r_0}, \vec{u_0}, \vec{d_0})$ pour des $\alpha, \beta \in \mathbb{R}$ quelconques. Donc cette application nous permet bien de pivoter la caméra dans n'importe quelle direction, c'est-à-dire en considérant la sphère centrée en $\mathbf{E}$ de rayon $\lVert \vec{d_0} \rVert = 1 $ incluse dans $\mathbb{R}^3$ :
 
 $\forall x \in (\mathbf{E}, \lVert \vec{d_0} \rVert), \exists \alpha, \beta \in \mathbb{R} \, \, \text{tels que} \, pitch_{\alpha} \circ yaw_{\beta}(\vec{d_0}) = \vec{\mathbf{E}x} $.
+
+\subsection{Paritée du nombres de pixels dans la formation d'un écran}
+\label{subsec:paritee}
+
+Afin d'obtenir des expressions de $\vec{d_u}$ et $\vec{d_r}$ correctes en général, nous devons nous assurer de la position de $\mathbf{C}$ par rapport au centre des pixels sur l'écran. Celle-ci dépend de la paritée de $(w,h)$ donnant quatre cas de figure :
+
+\begin{center}
+\begin{tikzpicture}
+\paritee
+\end{tikzpicture}
+\captionof{figure}{Position de $\mathbf{C}$ selon la paritée de $(w,h)$}
+\small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
+\end{center}
+
+En choisissant : 
+
+$$ \vec{d_{r}} = -2\, (\dfrac{w-1}{h-1})\, \tan(\dfrac{\theta}{2}) \, \dfrac{w-1}{2(w-1)}\, \vec{r} = -(\dfrac{w-1}{h-1})\tan(\dfrac{\theta}{2})\, \vec{r} $$
+$$ \vec{d_{u}} = 2\, \tan(\dfrac{\theta}{2}) \, \dfrac{h-1}{2(h-1)}\, \vec{u} = \tan(\dfrac{\theta}{2})\, \vec{u} $$
+
+Nous pouvons les représenter pour chacun de ces cas en partant de $\mathbf{C}$, ils sont visuellement représentés tels que :
+
+\begin{center}
+\begin{tikzpicture}
+    \paritee
+
+    \draw[->, very thick, red] (2,-1) -- (0.5,-1) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+    \draw[->, very thick, red] (2,-1) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+
+    \begin{scope}[shift={(5.5,0)}]
+      \draw[->, very thick, red] (2,-1.5) -- (0.5,-1.5) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+      \draw[->, very thick, red] (2,-1.5) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+    \end{scope}
+
+    \begin{scope}[shift={(0,-4.5)}]
+      \draw[->, very thick, red] (1.5,-2) -- (0.5,-2) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+      \draw[->, very thick, red] (1.5,-2) -- (1.5,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+    \end{scope}
+
+    \begin{scope}[shift={(5.5,-4.5)}]
+      \draw[->, very thick, red] (2,-2) -- (0.5,-2) node[below, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{r}}$};
+      \draw[->, very thick, red] (2,-2) -- (2,-0.5) node[right, midway, fill=white, fill opacity=0.5, text opacity=1, rounded corners] {$\vec{d_{u}}$};
+    \end{scope}
+\end{tikzpicture}
+\captionof{figure}{Définition des vecteurs $\vec{d_{r}}$ et $\vec{d_{u}}$ indépendants de la paritée de $(w,h)$}
+\small $(w,h)=\{(4,2);(4,3);(3,4);(4,4)\}$
+\end{center}
+
+Cela généralise donc les distances nécessaires afin de déterminer par la suite les coordonnées de chaque centre des pixels de notre écran.
 
 \pagebreak
