@@ -51,4 +51,12 @@ La version naïve de notre Path Tracer converge vers la solution vraie. Cependan
 
 Une autre imprécision est due à l'appel récursif de la fonction RaySampling. Elle pourra facilement être remplacée par une boucle, permettant de mieux contrôler le comportement des rayons dans des cas spécifiques, comme celui énoncé plus tôt. De plus, contrairement à l'appel récursif, une boucle est facilement parallélisable, augmentant donc les performances de notre programme.
 
+\subsubsection{Possibles améliorations}
+A l'heure actuelle, toutes nos implémentations sont des versions naïves. On pourrait améliorer certaines zones critiques de notre code en évitant de faire beaucoup de division. Par exemple, si on a des divisions avec les mêmes valeurs, on pourrait les faire qu'une fois.
+Il y a aussi la possibilité de limiter l'allocation de la mémoire dans la heap, et de maximiser l'utilisation de la mémoire statique (stack).
+Les pistes d'améliorations cité ci-dessus reste des améliorations mineures, mais on pourrait aller beaucoup plus loin.
+Par exemple, paralléliser la fonction ray sampling, en divisant le travail en plusieurs groupes (block).
+On pourrait décider de la taille d'un groupe de travail de manière statique ou de manière dynamique.
+Pour cela, on pourrait utiliser openMP qui permet de gérer plusieurs types de parallélisations.
+Il y a aussi la vectorisation, mais de ce qu'on sait, cela aura peu d'impacte sur les performances vu que le compilateur le fait de manière automatique.
 \pagebreak
