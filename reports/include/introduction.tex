@@ -10,13 +10,16 @@ Le \textbf{Path Tracing} est une technique de rendu 3D se basant sur la méthode
 
 \subsubsection{Le Ray Casting}
 
-Le Path Tracing se base sur le \textbf{Ray Casting}. Le ray casting est une technique de rendu visuel qui a pour principe d'afficher des images avec une illusion de profondeur / 3D. Cette technique a été popularisée par le studio ID Software, qui l'a entre autre utilisé pour Wolfenstein 3D, DOOM et Quake. Elle fut souvent utilisée pour du temps réel, car elle était très peu coûteuse en termes de calcul pour les machines de l'époque.
+Le Path Tracing se base sur le \textbf{Ray Casting}. 
+Le ray casting est une technique de rendu visuel qui a pour principe d'afficher des images avec une illusion de profondeur / 3D. Cette technique a été popularisée par le studio ID Software, qui l'a entre autre utilisé pour Wolfenstein 3D, DOOM et Quake. 
+Elle fut souvent utilisée pour du temps réel, car elle était très peu coûteuse en termes de calcul pour les machines de l'époque.
 
-L'environnement est représenté de la manière suivante: une caméra, qui sert de point de vue à la manière d'un \oe il et une grille représentant notre environnement. À partir de la caméra, plusieurs rayons sont projetés aléatoirement. À chaque contact entre un rayon et une surface, nous effectuons une interpolation entre la position de la caméra et la position du pixel touché par l'un de nos rayons. Dès qu'un rayon atteint une surface, on calcule la distance du rayon et de la couleur du pixel atteint en fonction des propriétés de celle-ci. Plus la distance du rayon est grande, plus la surface est éloignée. Pour créer un effet de profondeur, nous calculons l'angle entre le rayon projeté et une surface. Plus l'angle est grand, plus l'effet de profondeur sera grand.
+L'environnement est représenté de la manière suivante: une caméra à partir duquel on balance un rayon par pixel. Pour chaque pixel tracer, on calcule l'intersection de chaque objet toucher par le rayon. Ensuite, on affiche le pixel avec la distance la plus petite.
 
-Cette technique apporte quelques inconvénients, d'où le fait qu'elle soit utilisée en complément d'autres techniques de rendu. Elle ne permet pas d'effectuer du rendu sur des objets 3D complexes. Pour du temps réel, nous sommes limité sur une rotation par rapport à l'axe de Y. Nous ne pouvons pas faire du rendu volumétrique, i.e rendu d'un effet de flamme ou liquide.
-
-C'est pourquoi nous implémentons des propriétés supplémentaires au Ray Casting, tel que le principe de rendu avec la méthode de Monte Carlo, traité dans ce rapport.
+Cette technique apporte quelques inconvénients, d'où le fait qu'elle soit utilisée en complément d'autres techniques de rendu. 
+Elle ne permet pas d'effectuer du rendu sur des objets 3D complexes. Pour du temps réel, nous sommes limité sur une rotation par rapport à l'axe de Y. 
+Nous ne pouvons pas faire du rendu volumétrique, i.e rendu d'un effet de flamme ou liquide. Pour du temps réel, nous sommes limité sur une rotation par rapport à l'axe de Y. 
+On ne gère pas les rebonds.
 
 \subsection{Comparaison avec des technique existantes}
 
