@@ -2,94 +2,38 @@
 
 L'équation de rendu représente l'impact de la radiance de la lumière sur une surface. En effet, elle va nous permettre de déterminer la manière dont la lumière se reflète sur un objet.
 
+\begin{figure}[H]
+	\bounce
+	\centering 
+	\captionof{figure}{Schéma de la réflection total des rayons de directions $\omega_i$ résultant en un rayon de direction $\omega_o$ sur le point $x$ d'une surface.}
+\end{figure}
 
-L'équation de rendu se définie comme suit:
+L'équation de rendu se définie comme suit (cf démonstration en Annexe 1):
 
-$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i}$$
+$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, \cos\left(\theta_i\right) \, d_{\omega_i}}$$
 
 avec: 
 \begin{itemize}
-\item[$\_$] $\textbf{n}$ : La normale de la surface au point $x$.
-\item[$\_$] $\Omega$ : L'hémisphère centrée autour de la normale $\textbf{n}$.
-\item[$\_$] $x$ : Un point de $\mathbb{R}^3$ sur la surface de l'objet considéré.
-\item[$\_$] $\omega_o$ : Un rayon incident dans $\Omega$ sur la surface au point $x$.
-\item[$\_$] $L_o$ : La radiance réfléchis sur la surface au point $x$ de direction $\omega_o$.
-\item[$\_$] $L_e$ : La radiance émise par la surface au point $x$ de direction $\omega_o$.
-\item[$\_$] $L_i$ : La radiance d'un des rayons incidents sur la surface au point $x$ de direction $\omega_i\subset\Omega$.
-\item[$\_$] $f$ : le BRDF qui représente la manière dont le matériaux reflète la lumière.
+\item[$\_$] $\overrightarrow{n}$ : La normale de la surface au point $x$.
+\item[$\_$] $\Omega$ : L'hémisphère centré autour de la normale $\textbf{n}$.
+\item[$\_$] $x$ : Le point de $\mathbb{R}^3$ d'intersection entre les rayons incidents et la surface de l'objet considéré.
+\item[$\_$] $\overrightarrow{\omega_o}$ : Direction du rayon réfléchis dans $\Omega$ sur la surface au point $x$.
+\item[$\_$] $\overrightarrow{\omega_i}$ : Directions des rayons incidents dans $\Omega$ sur la surface au point $x$.
+\item[$\_$] $L_o$ : La radiance réfléchis sur la surface au point $x$ de direction $\overrightarrow{\omega_o}$.
+\item[$\_$] $L_e$ : La radiance émise par la surface au point $x$ de direction $\overrightarrow{\omega_o}$.
+\item[$\_$] $L_i$ : Les radiances des rayons incidents sur la surface au point $x$ de direction $\overrightarrow{\omega_i}$.
+\item[$\_$] $f$ : Le BRDF qui représente la manière dont le matériaux reflète la lumière.
 \end{itemize}
 
+\subsection{Les matériaux Lambertiens}
 
+Cette équation n'est pas résoluble analytiquement. Pour faciliter les calculs et l'implémentation de notre path tracing, nous allons nous prendre le cas des matériaux dit "Lambertiens".\\
 
-\subsection{Démonstrations}
+Ce type de matériaux inclus tous les matériaux de surface rugueuse qui n'émettent pas dans la lumière visible. Nous pouvons donc simplifier l'équation de rendu avec (cf démonstration Annexe 1):
 
-\subsubsection{Cas Général}
-
-Par définition, la radiance incidente se détermine comme suit:
-
-$$L_{o} = L_{e} + L_{r}$$
-
-$L_r$ représente l'ensemble des rayons incidents sur la surface qui se réfléchi en un rayon de direction $\omega_i$ dont la formule est:
-$$L_r = \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
-
-Ce qui nous donne l'équation de rendu ci-dessus.
-
-\subsubsection{Matériaux Lambertiens}
-
-Cette équation n'est pas résoluble analytiquement. Pour faciliter les calculs et l'implémentation de notre path tracing, nous allons nous prendre le cas des matériaux dit "Lambertiens".
-
-Les matériaux lambertiens ont les propriétés suivantes:
-\begin{itemize}
-\item Ils sont isotropes (leur structures sont identiques peu importe où l'on regarde)
-\item Ils sont diffus (les rayons réfléchis sont dans l'hémisphère $\Omega$ de manière équiprobable)
-\item Ils n'émettent pas de lumière dans le visible.
-\end{itemize}
-
-Les conséquences sont que pour un matériau lambertien, le BRDF est invariant de $x$ et $\omega$.
-
-Les rayons de direction $\omega_i$ sont seulement dans l'hémisphère $\Omega$.
-
-De ces faits, nous pouvons réécrire l'équation de rendu:
-$$L_{o}(x, \omega_o) = f_{const}\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
-
-On définie l'irradiance incidente $E_i=\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$ et l'irradiance réfléchie $E_o=\int_{\Omega}L_{o}(x, \omega_o) \, (\textbf{n}\cdot\omega_i) \, d\omega_i$ la puissance d'un rayonnement électromagnétique frappant sur une unité de surface.
-
-On définit également l'albédo $\rho(x, \omega_i, \omega_o)$ qui représente le rapport entre le radiance réfléchis et la radiance incidente : $\rho(x, \omega_i, \omega_o)=\dfrac{L_o(x, \omega_i, \omega_o)}{L_r(x, \omega_i, \omega_o)} = \dfrac{E_o(x, \omega_i, \omega_o)}{E_r(x, \omega_i, \omega_o)}$
-
-Nous avons donc le système suivant:
-$$
-\begin{cases}
-	L_o = f_{const}\times E_i \\
-	E_o = L_o\int_{\Omega}(\textbf{n}\cdot\omega) \, d\omega
-\end{cases}
-\Leftrightarrow\begin{cases}
-	L_o = f_{const}\times E_i \\
-	E_o = L_o\int_{\Omega}\cos(\theta) \, d\omega
-\end{cases}
-$$
-
-En se plaçant en coordonnées sphériques pour un hémisphère de rayon 1: $d\omega = \sin(\theta) \, d\theta \, d\varphi$ avec $\theta \in [0,\dfrac{\pi}{2}]$ et $\varphi\in[-\pi,\pi]$.
-
-Donc $\int_{\Omega}\cos(\theta) \, d\omega$ devient:
-$$\int_{\Omega}\cos(\theta) \, d\omega = \int_{-\pi}^{\pi} \int_{0}^{\frac{\pi}{2}} \cos(\theta)\sin(\theta)d\theta d\varphi = 2\pi \, \left[\frac{\sin^2(\theta)}{2}\right]_0^\frac{\pi}{2} = \boxed{\pi}$$
-
-Donc le système devient:
-$$
-\begin{cases}
-L_o = f_{const}\times E_i \\
-L_o = \dfrac{E_o}{\pi}
-\end{cases}
-$$
-
-Donc nous avons la formule du BRDF suivante:
-$$\frac{E_o}{\pi} = f_{const}\times E_i \Leftrightarrow f_{const} = \frac{E_o}{E_i} \, \frac1{\pi}$$
-$$\Leftrightarrow f_{const} = \boxed{\frac\rho\pi} $$
-
-
-Ceci nous permet de conclure avec l'équation sur laquelle nous allons travailler dans cette partie du projet:
 
 $$ 
-\boxed{L_o(x, \omega) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i) \, d\omega_i}
+\boxed{L_o(x, \omega) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, \cos\left(\theta_i\right) \, d_{\omega_i}}
 $$
 
 \subsection{Approximation avec la méthode Monte-Carlo}
@@ -105,7 +49,7 @@ x\longrightarrow g(x)
 \end{array}
 \right.$:
 $$
-I = \int_\Omega g(x) \, dx \approx \frac{1}{N} \sum_k^N \frac{g(x_k)}{pdf(x_k)}
+I = \int_\Omega g(x) \, d_x \approx \frac{1}{N} \sum_k^N \frac{g(x_k)}{pdf(x_k)}
 $$
 \subsubsection{Méthode d'échantillonnage Cosine-Weighted} 
 
@@ -140,16 +84,16 @@ z = \sqrt{1-r^2}
 \right.$\\
 
 \end{itemize} 
-Ainsi, on construit la direction du rayon incident $\omega_i$ de la manière suivante dans la base $\left( right, up, forward\right)$: $\omega_i = \left( x\cdot tangente, y\cdot bitangente, z\cdot normal \right)$.\\
+Ainsi, on construit la direction du rayon incident $\omega_i$ de la manière suivante dans la base $\left( right, up, forward\right)$: $\omega_i = x\cdot tangente + y\cdot bitangente+ z\cdot normal $.\\
 
-L'avantage de cette méthode d'échantillonnage est que la $pdf$ sera: $pdf = \frac{\cos\theta}{\pi}$.
+L'avantage de cette méthode d'échantillonnage est que la $pdf$ sera: $pdf = \frac{\cos\theta_i}{\pi}$.
 
 \subsubsection{Application de la Méthode de Monte-Carlo pour l'équation de rendu}
 
 L'équation de rendu avec la méthode de Monte-Carlo s'écrit de la façon suivante:
 \\
 $$ 
-L_o(x, \omega_o) = \frac\rho\pi \sum_{i=1}^N \frac{L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i)}{pdf(\omega_i)}
+L_o(x, \omega_o) = \frac\rho\pi \sum_{i=1}^N \frac{L_i(x, \omega_i) \, \cos\left(\theta_i\right)}{pdf(\omega_i)}
 $$
 
 $$ 

@@ -1,17 +1,74 @@
-\subsection{Résultat du Path Tracing}
-\label{subsec:img_pt}
+\subsection{Démonstration de l'équation de rendu}
+\subsubsection{Cas Général}
 
-Suite au développement de notre Path Tracer, nous avons été capable d'observer en exemple la scène suivante :
+Par définition, la radiance incidente se détermine comme suit:
 
-\begin{figure}[H]
-\centering
-  \centering
-  \includegraphics{include/Path_Tracing_v1.png}
+$$L_{o} = L_{e} + L_{r}$$
 
-  \captionof{figure}{Image 32 bits résultante du path tracer}
-  \label{fig:result}
+$L_r$ représente l'ensemble des rayons incidents sur la surface qui se réfléchi en un rayon de direction $\omega_i$ dont la formule est:
+$$L_r = \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
 
-\end{figure}
+Ce qui nous donne l'équation de rendu ci-dessous:
+
+$$\boxed{L_{o}(x, \omega_o) = L_{e}(x, \omega_o) + \int_{\Omega}f(x, \omega_o, \omega_i) \, L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i}$$
+
+
+\subsubsection{Matériaux Lambertiens}
+
+Les matériaux lambertiens ont les propriétés suivantes:
+\begin{itemize}
+\item Ils sont isotropes (leur structures sont identiques peu importe où l'on regarde)
+\item Ils sont diffus (les rayons réfléchis sont dans l'hémisphère $\Omega$ de manière équiprobable)
+\item Ils n'émettent pas de lumière dans le visible.
+\end{itemize}
+
+Les conséquences sont que pour un matériau lambertien, le BRDF est invariant de $x$ et $\omega$.
+
+Les rayons de direction $\omega_i$ sont seulement dans l'hémisphère $\Omega$.
+
+De ces faits, nous pouvons réécrire l'équation de rendu:
+$$L_{o}(x, \omega_o) = f_{const}\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$$
+
+On définie l'irradiance incidente $E_i=\int_{\Omega}L_{i}(x, \omega_i) \, (\textbf{n}\cdot\omega_{i}) \, d\omega_i$ et l'irradiance réfléchie $E_o=\int_{\Omega}L_{o}(x, \omega_o) \, (\textbf{n}\cdot\omega_i) \, d\omega_i$ la puissance d'un rayonnement électromagnétique frappant sur une unité de surface.
+
+On définit également l'albédo $\rho(x, \omega_i, \omega_o)$ qui représente le rapport entre le radiance réfléchis et la radiance incidente : $\rho(x, \omega_i, \omega_o)=\dfrac{L_o(x, \omega_i, \omega_o)}{L_r(x, \omega_i, \omega_o)} = \dfrac{E_o(x, \omega_i, \omega_o)}{E_r(x, \omega_i, \omega_o)}$
+
+Nous avons donc le système suivant:
+$$
+\begin{cases}
+	L_o = f_{const}\times E_i \\
+	E_o = L_o\int_{\Omega}(\textbf{n}\cdot\omega) \, d\omega
+\end{cases}
+\Leftrightarrow\begin{cases}
+	L_o = f_{const}\times E_i \\
+	E_o = L_o\int_{\Omega}\cos(\theta) \, d\omega
+\end{cases}
+$$
+
+En se plaçant en coordonnées sphériques pour un hémisphère de rayon 1: $d\omega = \sin(\theta) \, d\theta \, d\varphi$ avec $\theta \in [0,\dfrac{\pi}{2}]$ et $\varphi\in[-\pi,\pi]$.
+
+Donc $\int_{\Omega}\cos(\theta) \, d\omega$ devient:
+$$\int_{\Omega}\cos(\theta) \, d\omega = \int_{-\pi}^{\pi} \int_{0}^{\frac{\pi}{2}} \cos(\theta)\sin(\theta)d\theta d\varphi = 2\pi \, \left[\frac{\sin^2(\theta)}{2}\right]_0^\frac{\pi}{2} = \boxed{\pi}$$
+
+Donc le système devient:
+$$
+\begin{cases}
+L_o = f_{const}\times E_i \\
+L_o = \dfrac{E_o}{\pi}
+\end{cases}
+$$
+
+Donc nous avons la formule du BRDF suivante:
+$$\frac{E_o}{\pi} = f_{const}\times E_i \Leftrightarrow f_{const} = \frac{E_o}{E_i} \, \frac1{\pi}$$
+$$\Leftrightarrow f_{const} = \boxed{\frac\rho\pi} $$
+
+
+Ceci nous permet de conclure avec l'équation sur laquelle nous allons travailler dans cette partie du projet:
+
+$$ 
+\boxed{L_o(x, \omega) = \frac\rho\pi \int_\Omega L_i(x, \omega_i) \, (\textbf{n}\cdot\omega_i) \, d\omega_i}
+$$
+
 
 \subsection{Démonstration sur les matrices de rotations}
 \label{subsec:mat_rot}
