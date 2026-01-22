@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 
 sns.set_theme(style="whitegrid", context="talk")
-N = 9
+N = 10
 
 def load_image(path):
 	img = Image.open(path).convert("RGB")
@@ -30,7 +30,7 @@ def compare_images(image_path, reference_path):
 arr_error = []
 reference_path = "images/image_32bit16384.ppm"
 
-for samples in range(0, N):
+for samples in range(2, N):
     img_index = str(2 ** samples)
     path = f"images/image_32bit{img_index}.ppm"
 
@@ -38,7 +38,7 @@ for samples in range(0, N):
     arr_error.append(error)
 
 arr_error = np.array(arr_error)
-sampling = 2 ** np.arange(N)
+sampling = 2 ** np.arange(2, N)
 
 data = pd.DataFrame(columns=["N", "Global Mean Error"])
 data["Global Mean Error"] = arr_error

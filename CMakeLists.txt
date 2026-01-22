@@ -18,7 +18,13 @@ target_include_directories(LibPathTracing PUBLIC ${PROJECT_SOURCE_DIR}/includes)
 
 target_link_libraries(LibPathTracing m)
 
-add_executable(ppm src/ppm.c)
+add_executable(ppm src/ppm.c
+    src/image.c
+    src/ray.c
+    src/scene.c
+    src/tools.c
+    src/vector.c
+    src/light.c)
 target_link_libraries(ppm PRIVATE LibPathTracing)
 
 

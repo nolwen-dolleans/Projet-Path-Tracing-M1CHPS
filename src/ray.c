@@ -89,41 +89,35 @@ void create_sphere(Sphere* sph ,const float x, const float y, const float z, con
 
 bool intersect_sphere(Ray* const r, const Sphere* const s, Vector *hit)
 {
+	Vector oc;
+	sub_ext(&r->position, &s->position, &oc);
 	
-	Vector const oc = r->position;
-	Vector const u = r->direction;
-	
-	Vector w;
-	sub_ext(&oc,&s->position,&w);
-	const float A = dot(&u,&u);
-	const float B = 2.0f * dot(&u,&w);
-	const float C = dot(&w,&w) - s->radius*s->radius;
+
+	const float A = dot(&r->direction, &r->direction);
+	const float B = 2.0f * dot(&r->direction, &oc);
+	const float C = dot(&oc, &oc) - s->radius * s->radius;
 
 	const float delta = B*B - 4.0f*A*C;
-
 	const float EPS = 1e-6f;
-	
-	if(delta < 0.0f) return false;
-	
-	float t = -1; // t goes from -1 to 1
-	float t0 = 0.0f;
 
-	if(delta < EPS)
-		t0 = -B/(2.0f*A);
-		
-		
-	else if(delta > EPS){
-		t0 = (-B - sqrtf(delta))/(2.0f*A);
-		t0 = t0 > 0 ? t0 : (-B + sqrtf(delta))/(2.0f*A);
-	}
+	if (delta < 0.0f)
+		return false;
 
-	t = t0 > EPS ? t0 : t;
+	float sqrt_delta = sqrtf(delta);
+	float t0 = (-B - sqrt_delta) / (2.0f * A);
+	float t1 = (-B + sqrt_delta) / (2.0f * A);
 
-	// Sinon on calcule le point d’impact
+	float t = -1.0f;
+
+	if (t0 > EPS)
+		t = t0;
+	else if (t1 > EPS)
+		t = t1;
+	else
+		return false; // return false if each intersection point is negative
+
 	linear_ext(&r->position, &r->direction, t, hit);
-
 	return true;
-
 }
 
 void create_ray_box(AABB * const box, const uint32_t color_min, const uint32_t color_max, const uint32_t color_back, const uint32_t color_front, const uint32_t color_bottom, const uint32_t color_up)
@@ -160,8 +154,8 @@ bool intersect_box(Ray* const r, AABB* const box, Vector *hit)
         float t2 = (box->max.Data[i] - r->position.Data[i]) / r->direction.Data[i];
         if (t1 > t2) swap(&t1, &t2);
 
-        tmin = max(&tmin, &t1);
-        tmax = min(&tmax, &t2);
+        tmin = max(tmin, t1);
+        tmax = min(tmax, t2);
 
         if (tmin > tmax) return false;
     }
@@ -226,7 +220,7 @@ Vector get_normal_vector(const Vector * point, const Sphere * s){
 
 Vector get_normal_vector_(const Vector * point, const Primitive * p){
 
-
+	Vector defaults;
 	switch (p->type)
 	{
 	case SPHERE:
@@ -235,7 +229,8 @@ Vector get_normal_vector_(const Vector * point, const Primitive * p){
 	default:
 		break;
 	}
-
+	create_vector_default_ext(&defaults);
+	return defaults;
 }
 
 void free_ray(Ray* r)

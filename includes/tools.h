@@ -74,15 +74,34 @@ Quadratic_info* quadratic_resolution(const float a, const float b, const float c
 Linear_info* linear_resolution(const float a, const float b);
 
 
-void swap(float* const restrict a, float* const restrict b);
 
-float max(const float* const a, const float* const b);
-
-float min(const float* const a, const float* const b);
-
-float radian(const float degree);
-
-float degree(const float radian);
+static inline void swap(float* const restrict a, float* const restrict b)
+{
+	float c = *a;
+	*a = *b;
+	*b = c;
+}
 
 
+static inline float max(const float a, const float b)
+{
+	return a < b ? b : a;
+}
+
+static inline float min(const float a, const float b)
+{
+	return a > b ? b : a;
+}
+
+static inline float radian(const float degree)
+{
+	// pi/180 * degree
+	return 0.01745329251f * degree;
+}
+
+static inline float degree(const float radian)
+{
+	// 180/pi * radian
+	return 57.2957795131f * radian;
+}
 #endif

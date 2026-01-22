@@ -19,7 +19,13 @@ typedef struct Vector
  * @brief Create a single precision null 3D vector (AoS version)
  * @param u A single precision 3D vector
  */
-void create_vector_default_ext(Vector* u);
+static inline void create_vector_default_ext(Vector* u)
+{
+	u->Data[0] = 0.0f;
+	u->Data[1] = 0.0f;
+	u->Data[2] = 0.0f;
+}
+
 
 /**
  * @brief Create a random single precision 3D vector (AoS version)
@@ -41,8 +47,12 @@ void create_vector_random_ext(Vector* u, const float min, const float max);
  * @param y y componant
  * @param z z componant
  */
-void create_vector_ext(Vector* u, const float x, const float y, const float z);
-
+static inline void create_vector_ext(Vector* u, const float x, const float y, const float z)
+{
+	u->Data[0] = x;
+	u->Data[1] = y;
+	u->Data[2] = z;
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -51,7 +61,12 @@ void create_vector_ext(Vector* u, const float x, const float y, const float z);
  * @param v A single precision 3D vector
  * @return bool
  */
-bool is_null(const Vector * v);
+static inline bool is_null(const Vector * v){
+	for(int i = 0; i<3; ++i){
+		if(v->Data[i] != 0) return false;
+	}
+	return true;
+}
 
 /**
  * @brief Sum of two single precision 3D vector
@@ -59,7 +74,12 @@ bool is_null(const Vector * v);
  * @param v A single precision 3D vector
  * @param w A single precision 3D vector
  */
-void add_ext(const Vector* const u, const Vector* const v, Vector* w);
+static inline void add_ext(const Vector* const u, const Vector* const v, Vector* w)
+{
+	w->Data[0] = u->Data[0] + v->Data[0];
+	w->Data[1] = u->Data[1] + v->Data[1];
+	w->Data[2] = u->Data[2] + v->Data[2];
+}
 
 /**
  * @brief Substraction of two single precision 3D vector
@@ -67,7 +87,12 @@ void add_ext(const Vector* const u, const Vector* const v, Vector* w);
  * @param v A single precision 3D vector
  * @param w A single precision 3D vector
  */
-void sub_ext(const Vector* const u, const Vector* const v, Vector* w);
+static inline void sub_ext(const Vector* const u, const Vector* const v, Vector* w)
+{
+	w->Data[0] = u->Data[0] - v->Data[0];
+	w->Data[1] = u->Data[1] - v->Data[1];
+	w->Data[2] = u->Data[2] - v->Data[2];
+}
 
 /**
  * @brief Multiplication of a single precision 3D vector by a single precsion scalar
@@ -75,7 +100,12 @@ void sub_ext(const Vector* const u, const Vector* const v, Vector* w);
  * @param k A single precision scalar
  * @param w A single precision 3D vector
  */
-void mul_ext(const Vector* const u, const float k, Vector* w);
+static inline void mul_ext(const Vector* const u, const float k, Vector* w)
+{
+	w->Data[0] = u->Data[0] * k;
+	w->Data[1] = u->Data[1] * k;
+	w->Data[2] = u->Data[2] * k;
+}
 
 /**
  * @brief Multiplication of a single precision 3D vector by a single precsion scalar
@@ -84,7 +114,12 @@ void mul_ext(const Vector* const u, const float k, Vector* w);
  * @param k A single precision scalar
  * @param w A single precision 3D vector
  */
-void linear_ext(const Vector* const u, const Vector* const v, const float k, Vector* w);
+static inline void linear_ext(const Vector* const u, const Vector* const v, const float k, Vector* w)
+{
+	w->Data[0] = u->Data[0] + v->Data[0] * k;
+	w->Data[1] = u->Data[1] + v->Data[1] * k;
+	w->Data[2] = u->Data[2] + v->Data[2] * k;
+}
 
 /**
  * @brief Dot product of two single precision 3D vector
@@ -92,7 +127,13 @@ void linear_ext(const Vector* const u, const Vector* const v, const float k, Vec
  * @param v A single precision 3D vector
  * @return A single precision  scalar
  */
-float dot(const Vector* const u, const Vector* const v);
+static inline float dot(const Vector* const u, const Vector* const v)
+{
+	const float scalar = u->Data[0] * v->Data[0] + u->Data[1] * v->Data[1] + u->Data[2] * v->Data[2];
+
+	return scalar;
+}
+
 
 /**
  * @brief Cross product of two single precision 3D vector
@@ -100,7 +141,12 @@ float dot(const Vector* const u, const Vector* const v);
  * @param v A single precision 3D vector
  * @param w A single precision 3D vector
  */
-void cross_ext(const Vector* const u, const Vector* const v, Vector* w);
+static inline void cross_ext(const Vector* const u, const Vector* const v, Vector* w)
+{
+	w->Data[0] = u->Data[1] * v->Data[2] - u->Data[2] * v->Data[1];
+	w->Data[1] = u->Data[2] * v->Data[0] - u->Data[0] * v->Data[2];
+	w->Data[2] = u->Data[0] * v->Data[1] - u->Data[1] * v->Data[0];
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -109,14 +155,27 @@ void cross_ext(const Vector* const u, const Vector* const v, Vector* w);
  * @param u A single precision 3D vector
  * @return Single precision scalar 
  */
-float length(const Vector* const u);
+static inline float length(const Vector* const u)
+{
+	const float square = dot(u,u);
+	const float len = sqrtf(square);
+
+	return len;
+}
 
 /**
  * @brief Normalize a single precsion 3D vector
  * @param u A single single precision 3D vector
  * @param w A single single precision 3D vector
  */
-void norm_ext(const Vector* const u, Vector* w);
+static inline void norm_ext(const Vector* const u, Vector* w)
+{
+	const float len = length(u);
+
+	w->Data[0] = u->Data[0] / len;
+	w->Data[1] = u->Data[1] / len;
+	w->Data[2] = u->Data[2] / len;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
