@@ -53,19 +53,17 @@ void test_ray_create_sphere(void)
     const float pos[3] = {pos_x, pos_y, pos_z};
 
 	Sphere* r0 = malloc_check(sizeof(Sphere));;
-	create_sphere(r0,0, 0, 0, 0, NULL, false, 0);
+	create_sphere(r0,0, 0, 0, 0, NULL, 0, Lambertian);
 	Sphere* r1 = malloc_check(sizeof(Sphere));
-	create_sphere(r1,pos_x, pos_y, pos_z, r, NULL, true, 0);
+	create_sphere(r1,pos_x, pos_y, pos_z, r, NULL, 0, Lambertian);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(default_0, r0->position.Data, 3);
     TEST_ASSERT_EQUAL_FLOAT(0.0f, r0->radius);
 	TEST_ASSERT_NULL(&r0->color);
-	TEST_ASSERT_FALSE(r0->emitted);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(pos, r1->position.Data, 3);
     TEST_ASSERT_EQUAL_FLOAT(r, r1->radius);
 	TEST_ASSERT_NULL(&r1->color);
-	TEST_ASSERT_TRUE(r1->emitted);
 
     free_sphere(r0);
     free_sphere(r1);
@@ -92,7 +90,7 @@ void test_intersect_sphere(void)
 	Ray ray0;
 	create_ray_ext(&ray0,ox0, oy0, oz0, dx0,dy0,dz0);
 	Sphere* spr0 =malloc_check(sizeof(Sphere));
-	create_sphere(spr0,px0, py0, pz0, r0, NULL, false, 0);
+	create_sphere(spr0,px0, py0, pz0, r0, NULL, 0, Lambertian);
 
 	Vector points;
 	intersect_sphere(&ray0, spr0, &points);

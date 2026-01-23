@@ -22,6 +22,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+typedef enum {
+	Lambertian,
+	Specular,
+	Emissive
+} material_t;
+
 /**
  * @brief 3D ray
  * @var position Position/Start of the ray
@@ -44,11 +50,39 @@ typedef struct AABB
 {
 	Vector min;
 	Vector max;
-	uint32_t color[6];
-	uint8_t color_hit_r;
-	uint8_t color_hit_g;
-	uint8_t color_hit_b;
+	Vector color;
+	float albedo;
+	material_t type;
 }AABB;
+
+/**
+ * @brief A 3D Sphere
+ * @var radius Radius
+ * @var position Position of the sphere
+ */
+typedef struct Sphere
+{
+	float radius;
+	Vector position;
+	Vector color;
+	float albedo;
+	material_t type;
+}Sphere;
+
+typedef enum PRIM_TYPE
+{
+	SPHERE,
+	BOX
+}PRIM_TYPE;
+
+typedef struct Primitive
+{
+	Vector origin;
+	PRIM_TYPE type;
+	bool emitted;
+	float albedo;
+	void* subStruct;
+}Primitive;
 
 /**
  * @brief Camera
@@ -74,35 +108,6 @@ typedef struct Camera
 	float inv_height;
 	Ray ray;
 }Camera;
-
-/**
- * @brief A 3D Sphere
- * @var radius Radius
- * @var position Position of the sphere
- */
-typedef struct Sphere
-{
-    float radius;
-    Vector position;
-	Vector color;
-	bool emitted;
-	float albedo;
-}Sphere;
-
-typedef enum PRIM_TYPE
-{
-	SPHERE,
-	BOX
-}PRIM_TYPE;
-
-typedef struct Primitive
-{
-	Vector origin;
-	PRIM_TYPE type;
-	bool emitted;
-	float albedo;
-	void* subStruct;
-}Primitive;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -151,10 +156,9 @@ Ray random_Ray(Vector const * Origin);
  * @param z position at z-axis
  * @param rad Radius
  * @param color vector rgb with r,g,b in [0,255]
- * @param is_emitted bool if the sphere emitt or not
  * @param albedo reprense the albedo of the sphere, or the light intensity for an emitted one
  */
-void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, bool is_emitted, const float albedo);
+void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, const float albedo, const material_t type);
 
 /**
  * @brief Compute the intersection of a camra ray and a sphere

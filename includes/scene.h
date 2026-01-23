@@ -22,11 +22,8 @@
 typedef struct Scene{
 	Sphere ** objects;
 	Vector * background_color;
-	Vector * lightsources;
 	size_t size_objects;
-	size_t size_lightsources;
 }Scene;
-
 
 /**
  * @brief return a pointer of the intersection point between the ray and the closer object

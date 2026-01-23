@@ -44,51 +44,32 @@ int main(int argc, char** argv)
 	
 	Vector sphere_color1;
 	create_vector_ext(&sphere_color1, 255, 120, 20);
-	create_sphere(sphere1, -x, y,-z,r, &sphere_color1, false, 1);
+	create_sphere(sphere1, -x, y,-z,r, &sphere_color1, 1, Lambertian);
 	
 	Vector sphere_color2;
-	create_vector_ext(&sphere_color2, 120, 255, 20);
-	create_sphere(sphere2, +x,y,-(z+0.2),r, &sphere_color2, false, 1);
+	create_vector_ext(&sphere_color2, 255, 255, 255);
+	create_sphere(sphere2, +x,y,-(z+0.2),r, &sphere_color2, 0.91, Specular);
 	
 	Vector sphere_color3;
 	create_vector_ext(&sphere_color3, 255, 255, 20);
-	create_sphere(sphere3, 3.5*x,y,-(z+0.01),2*r, &sphere_color3, true, 3);
+	create_sphere(sphere3, 6*x,y,-(z+0.01),6*r, &sphere_color3, 4, Emissive);
 	
 	float r_ground = 1000.0;
 	
 	Vector sphere_color4;
-	create_vector_ext(&sphere_color4, 200, 200, 200);
-	create_sphere(sphere4, 0,-r_ground-2*r-esp,-z,r_ground, &sphere_color4, false, 1);
+	create_vector_ext(&sphere_color4, 193,168,154);
+	create_sphere(sphere4, 0,-r_ground-2*r-esp,-z,r_ground, &sphere_color4, 0.9, Lambertian);
 	
 	
 	Vector bg;
-	create_vector_ext(&bg, 119, 181, 254);
+	create_vector_ext(&bg, 220, 240, 255);
 	Scene * scene = create_scene_ptr(4, 0, &bg);
 	
 	scene->objects[0] = sphere1;
 	scene->objects[1] = sphere2;
 	scene->objects[2] = sphere3;
 	scene->objects[3] = sphere4;
-/*
-	scene->objects[0].subStruct = sphere1;
-	scene->objects[0].type = SPHERE;
-	scene->objects[0].emitted = false;
-	scene->objects[0].albedo = 0.8;
 
-	scene->objects[1].subStruct = sphere2;
-	scene->objects[1].type = SPHERE;
-	scene->objects[1].emitted = false;
-	scene->objects[1].albedo = 0.8;
-
-	scene->objects[2].subStruct = sphere3;
-	scene->objects[2].type = SPHERE;
-	scene->objects[2].emitted = true;
-	scene->objects[2].albedo = 5;
-
-	scene->objects[3].subStruct = sphere4;
-	scene->objects[3].type = SPHERE;
-	scene->objects[3].emitted = true;
-	scene->objects[3].albedo = 5;*/
 
 	Vector color;
 //#############################################################################

@@ -72,10 +72,7 @@ void ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax,
 		return;
 	}			// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
 	if (intersect_in_scene(r, S, &object, &hit) == false) {
-		if(d==0) {
-			*radiance = *S->background_color;// par défaut met la couleur de fond si le rayon est hors-limite
-		}
-		else *radiance = *S->background_color;
+		*radiance = *S->background_color;// par défaut met la couleur de fond si le rayon est hors-limite
 		return;
 	}
 	
@@ -84,29 +81,55 @@ void ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax,
 	
 	Vector n = get_normal_vector(&hit, S->objects[object]);
 	
-	if (obj->emitted) {
-		float weight = albedo;
-		mul_ext(&obj->color, weight, radiance);
-		return;
-	}
-	
 	Vector offset_origin;
 	Vector n_eps;
 	mul_ext(&n, 1e-3f, &n_eps); // n_eps = n * 1e-3
 	add_ext(&hit, &n_eps, &offset_origin);
 	
-	Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
+	switch (obj->type){
+		case Emissive:{
+			float weight = albedo;
+			mul_ext(&obj->color, weight, radiance);
+			return;
+		}
 	
-	Vector L_reflected_i;
-	ray_sampling(&r_new, S, cam, d+1, dmax, &L_reflected_i);
-	//const float cos_theta = dot(&n,&r_new.direction);
-	Vector weight;
-	mul_ext(&obj->color, albedo, &weight);
+		case Lambertian:{
+			Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
+			Vector L_reflected_i;
+			
+			ray_sampling(&r_new, S, cam, d+1, dmax, &L_reflected_i);
+			//const float cos_theta = dot(&n,&r_new.direction);
+			Vector weight;
+			mul_ext(&obj->color, albedo, &weight);
 
-	for (int i = 0; i < 3; ++i) {
-		radiance->Data[i] = L_reflected_i.Data[i] * weight.Data[i];
+			for (int i = 0; i < 3; ++i) {
+				radiance->Data[i] = L_reflected_i.Data[i] * weight.Data[i];
+			}
+			
+			return;
+		}
+		case Specular:{
+			float dotn = dot(&r->direction, &n);
+			
+			Vector wo;
+			wo.Data[0] = r->direction.Data[0] - 2.0f * dotn * n.Data[0];
+			wo.Data[1] = r->direction.Data[1] - 2.0f * dotn * n.Data[1];
+			wo.Data[2] = r->direction.Data[2] - 2.0f * dotn * n.Data[2];
+			
+			Ray r_new;
+			
+			r_new.direction = wo;
+			r_new.position = offset_origin;
+			
+			Vector L_reflected;
+			ray_sampling(&r_new, S, cam, d + 1, dmax, &L_reflected);
+			
+			for (int i = 0; i < 3; ++i)
+				radiance->Data[i] = L_reflected.Data[i] * obj->color.Data[i] * obj->albedo;
+			
+			return;
+		}
 	}
-	
 	return;
 }
 
@@ -132,7 +155,6 @@ Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y
 		}
 	}
 	float inv_N = (float)1/(N+1) * 255;
-skip:
 	for (int i = 0; i<3; ++i) {
 		
 		color.Data[i] = color.Data[i]*inv_N;
@@ -140,4 +162,3 @@ skip:
 	
 	return color;
 }
-
