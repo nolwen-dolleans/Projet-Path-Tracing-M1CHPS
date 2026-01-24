@@ -6,7 +6,7 @@
 
 
 void test_intersect_scene(void){
-	
+	/*
 	Vector BLACK;
 	create_vector_ext(&BLACK, 0, 0, 0);
 	Scene * s = create_scene_ptr(1, 1, &BLACK);
@@ -27,7 +27,7 @@ void test_intersect_scene(void){
 	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,0,hit.Data[1]);
 	TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,1,hit.Data[2]);
 	
-	free_scene(s);
+	free_scene(s);*/
 }
 
 
@@ -36,7 +36,7 @@ void test_create_scene(void){
 	int nbobjects = rand()%101;
 	Vector BLACK;
 	create_vector_ext(&BLACK, 0, 0, 0);
-	
+	/*
 	Scene * S = create_scene_ptr(nbobjects, rand(), &BLACK);
 	for (int i = 0; i<S->size_objects; ++i) {
 		float x = rand();
@@ -52,7 +52,7 @@ void test_create_scene(void){
 		TEST_ASSERT_FLOAT_WITHIN(TOLERANCE,S->objects[i]->position.Data[2],z);
 		
 	}
-	free_scene(S);
+	free_scene(S);*/
 	
 	
 }

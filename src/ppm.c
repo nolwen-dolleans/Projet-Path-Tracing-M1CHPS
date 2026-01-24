@@ -34,41 +34,56 @@ int main(int argc, char** argv)
 	Sphere * sphere2 = malloc(sizeof(Sphere));
 	Sphere * sphere3 = malloc(sizeof(Sphere));
 	Sphere * sphere4 = malloc(sizeof(Sphere));
-	AABB box;
+	AABB *  raybox = malloc(sizeof(AABB));
 
-	const float esp = 1e-3;
 	const float r = 0.05;
-	const float x = r+0.03+esp;
-	const float y = -r+esp;
-	const float z = 0.5+esp;
+	const float x = r+0.03+EPS;
+	const float y = -r+EPS;
+	const float z = 0.5+EPS;
 	
 	Vector sphere_color1;
 	create_vector_ext(&sphere_color1, 255, 120, 20);
-	create_sphere(sphere1, -x, y,-z,r, &sphere_color1, 1, Lambertian);
+	create_sphere(sphere1, r);
+	Primitive p1;
+	create_primitive_ext((void *) (sphere1), SPHERE, -x, y,-z, Lambertian, 1, &sphere_color1, &p1);
 	
 	Vector sphere_color2;
 	create_vector_ext(&sphere_color2, 255, 255, 255);
-	create_sphere(sphere2, +x,y,-(z+0.2),r, &sphere_color2, 0.91, Specular);
+	create_sphere(sphere2, r);
+	Primitive p2;
+	create_primitive_ext((void *) (sphere2), SPHERE, x,y,-(z+0.2), Specular, 0.91, &sphere_color2, &p2);
 	
 	Vector sphere_color3;
 	create_vector_ext(&sphere_color3, 255, 255, 20);
-	create_sphere(sphere3, 6*x,y,-(z+0.01),6*r, &sphere_color3, 4, Emissive);
+	create_sphere(sphere3, 6*r);
+	Primitive p3;
+	create_primitive_ext((void *) (sphere3), SPHERE, 6*x,y,-(z+0.01), Emissive, 4, &sphere_color3, &p3);
 	
 	float r_ground = 1000.0;
-	
 	Vector sphere_color4;
 	create_vector_ext(&sphere_color4, 193,168,154);
-	create_sphere(sphere4, 0,-r_ground-2*r-esp,-z,r_ground, &sphere_color4, 0.9, Lambertian);
+	Primitive p4;
+	create_sphere(sphere4, r_ground);
+	create_primitive_ext((void *) (sphere4), SPHERE, 0,-r_ground-2*r-EPS,-z, Lambertian, 1, &sphere_color4, &p4);
+	
+	
+	Vector box_color;
+	create_vector_ext(&box_color, 255, 255, 255);
+	Primitive p5;
+	create_box(raybox, -1.0f, -1.0f, 2.0f,  1.0f,  1.0f, -2.0f);
+	create_primitive_ext((void *) raybox, BOX, 10, 10,10, Lambertian, 0.9, &box_color, &p5);
 	
 	
 	Vector bg;
-	create_vector_ext(&bg, 220, 240, 255);
-	Scene * scene = create_scene_ptr(4, 0, &bg);
+	create_vector_ext(&bg, 255, 0, 0);
+	Scene scene;
+	create_scene_ext(5, &bg, &scene);
 	
-	scene->objects[0] = sphere1;
-	scene->objects[1] = sphere2;
-	scene->objects[2] = sphere3;
-	scene->objects[3] = sphere4;
+	add_primitive(&p1, &scene);
+	add_primitive(&p2, &scene);
+	add_primitive(&p3, &scene);
+	add_primitive(&p4, &scene);
+	add_primitive(&p5, &scene);
 
 
 	Vector color;
@@ -86,8 +101,7 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, scene, smpls);
-				//color = path_trace_(&cam, x1, y1, scene, smpls);
+				color = path_trace(&cam, x1, y1, &scene, smpls);
 
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = max(0, color.Data[0]);
@@ -100,7 +114,7 @@ int main(int argc, char** argv)
 			}
 		}
 		write_image_file_32bit(image);
-		free_scene(scene);
+		//free_scene(&scene);
 		free_image_32bit(image);
 
 	}
@@ -110,15 +124,13 @@ int main(int argc, char** argv)
 
 		Image_24bit* image = create_image_24bit(width, height);
 
-		//clear_frame_sky_color_32bit(image);
 		clear_frame_color_24bit(image,0,0,0);
 
 		for(size_t y1 = 0; y1 < height; ++y1)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, scene, smpls);
-				//color = path_trace_(&cam, x1, y1, scene, smpls);
+				color = path_trace(&cam, x1, y1, &scene, smpls);
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = max(0, color.Data[0]);
 				r = min(255, color.Data[0]);
@@ -130,7 +142,6 @@ int main(int argc, char** argv)
 			}
 		}
 		write_image_file_24bit(image);
-		free_scene(scene);
 		free_image_24bit(image);
 	}
 	else if(strcmp(argv[1], "24ptr") == 0)
@@ -145,7 +156,7 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, scene, smpls);
+				color = path_trace(&cam, x1, y1, &scene, smpls);
 				//color = path_trace_(&cam, x1, y1, scene, smpls);
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = max(0, color.Data[0]);
@@ -159,14 +170,18 @@ int main(int argc, char** argv)
 		}
 
 		write_image_file_24bit_ptr(image);
-
 		free_image_24bit_ptr(image);
 	}
 	else
 	{
 		fprintf(stderr, "Erreur : argument incorect");
 	}
-
+	
+	free(sphere1);
+	free(sphere2);
+	free(sphere3);
+	free(sphere4);
+	
 	return 0;
 }
 

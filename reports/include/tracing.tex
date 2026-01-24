@@ -2,7 +2,7 @@
 
 Nous définissons notre écran comme la formation d'une grille carré de pixels, la grille est de largeur $w$ (width) et de hauteur $h$ (height) en nombre de pixels. Chaque pixel a un centre qui intersecte la direction de chacun des rayons sortant de la caméra. La caméra est définie au point $\mathbf{E} \in \mathbb{R}^3$ et dans la base $(\vec{r}, \vec{u}, \vec{d})$ telle qu'explicitée dans l'\hyperref[subsec:mat_rot]{Annexe~\ref*{subsec:mat_rot}}. Le centre de l'écran est le point $\mathbf{C} \in \mathbb{R}^3$ résultant de $\mathbf{E}+\vec{d}$, il se trouve ainsi à distance $1$ de la caméra. Nous définissons finalement un angle $\theta \in [0,\pi]$ représetant la "Field Of View" (FOV). Généralement, l'oeil humain est au repos avec un FOV entre 50 et 60 degrés.
 
-Notons ici que l'écran forme un plan parrallèle à $(\vec{r},\vec{u})$ et qu'il dépend donc de l'orientation de la caméra.
+Notons ici que l'écran forme un plan parallèle à $(\vec{r},\vec{u})$ et qu'il dépend donc de l'orientation de la caméra.
 
 Exemple : Le résultat finale d'un écran tel que nous le définissons dans cette partie se visualise de la manière suivante :
 

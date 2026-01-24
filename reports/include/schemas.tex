@@ -401,27 +401,36 @@
     \begin{tikzpicture}[baseline, scale=3]
 	\draw[thick](-2,0) -- (2,0);
 	\draw[thick](-2,0) -- (2,0);
-	\draw[thick](0,0) -- (-1.414,1.414);
-	\draw[thick](1.414,1.414) -- (0,0);
-	\draw[thick, ->, red](-1,1) -- (-1.414,1.414);
-	\draw[thick, ->, red](1.414,1.414) -- (1,1);
 	
-	\node[right] at (1.8, 1) {$\Omega$};
+	\node[right] at (1, 1.8) {$\Omega$};
 	\node[above] at (-1.05, 1.15) {$\overrightarrow{\omega_o}$};
-	\node[above] at (0.95,1.05) {$\overrightarrow{\omega_i}$};
 	\node[below] at (0,-0.05) {$x$};
 	\node[above] at (0,2) {$\overrightarrow{n}$};
+	\draw[thick](0,0) -- (-1.414,1.414);
+	\draw[thick, ->, red](-1,1) -- (-1.414,1.414);
+	
+	
+	\node[above] at (0.95,1.05) {$\overrightarrow{\omega_i}$};
+	\node[right] at (1.414,1.414) {$L_i\left(x,\omega_i\right)$};
+	\node[above] at (0.2,0.45) {$\theta_i$};
+	\draw[thick](1.414,1.414) -- (0,0);
+	\draw[thick, ->, red](1.414,1.414) -- (1,1);
+	
+	\draw[thick](1.732,1) -- (0,0);
+	\draw[thick, ->, red](1.732,1) -- (1.22,0.71);
+	\node[above] at (1.22,0.75) {$\overrightarrow{\omega_i'}$};
+	\node[right] at (1.732,1) {$L_i'\left(x,\omega_i'\right)$};
+	\node[above] at (0.4,0.76) {$\theta_i'$};
+	\draw[dashed, ->](0,0.75) arc (90:30:0.75);
 	
 	
 	\node[left] at (-1.414,1.414) {$L_o\left(x,\omega_o\right)$};
-	\node[right] at (1.414,1.414) {$L_i\left(x,\omega_i\right)$};
 	\node[left] at (-0.5,0.5) {$L_e\left(x,\omega_o\right)$};
 	
 	\draw[dashed, ->](0,0) -- (0,2);
 	\draw[dashed](2,0) arc (0:180:2);
 	
 	\draw[dashed, ->](0,0.5) arc (90:45:0.5);
-	\node[above] at (0.2,0.45) {$\theta_i$};
 	
 	\end{tikzpicture}
 	\end{center}

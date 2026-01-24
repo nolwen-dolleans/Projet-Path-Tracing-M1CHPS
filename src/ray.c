@@ -76,29 +76,35 @@ Ray random_Ray(Vector const * Origin){
 	return ray;
 }
 
-
-void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, const float albedo, const material_t type)
+void create_sphere(Sphere* sph ,const float radius)
 {
-	float inv255 = 1.0f/255.0f;
-	create_vector_ext(&sph->position,x, y, z);
-	sph->radius = rad;
-	mul_ext(color, inv255, &sph->color);
-	sph->albedo = albedo;
-	sph->type = type;
+	sph->radius = radius;
 }
 
-bool intersect_sphere(Ray* const r, const Sphere* const s, Vector *hit)
+void create_box(AABB* box, float xmin, float ymin, float zmin, float xmax, float ymax, float zmax)
+{
+	
+	box->bmin.Data[0] = xmin;
+	box->bmin.Data[1] = ymin;
+	box->bmin.Data[2] = zmin;
+	
+	box->bmax.Data[0] = xmax;
+	box->bmax.Data[1] = ymax;
+	box->bmax.Data[2] = zmax;
+	
+}
+
+bool intersect_sphere(Ray* const r, Vector *center, float radius, Vector *hit)
 {
 	Vector oc;
-	sub_ext(&r->position, &s->position, &oc);
+	sub_ext(&r->position, center, &oc);
 	
 
 	const float A = dot(&r->direction, &r->direction);
 	const float B = 2.0f * dot(&r->direction, &oc);
-	const float C = dot(&oc, &oc) - s->radius * s->radius;
+	const float C = dot(&oc, &oc) - radius * radius;
 
 	const float delta = B*B - 4.0f*A*C;
-	const float EPS = 1e-6f;
 
 	if (delta < 0.0f)
 		return false;
@@ -119,7 +125,7 @@ bool intersect_sphere(Ray* const r, const Sphere* const s, Vector *hit)
 	linear_ext(&r->position, &r->direction, t, hit);
 	return true;
 }
-
+/*
 void create_ray_box(AABB * const box, const uint32_t color_min, const uint32_t color_max, const uint32_t color_back, const uint32_t color_front, const uint32_t color_bottom, const uint32_t color_up)
 {
 	create_vector_ext(&box->min, -100, -100, -1);
@@ -137,87 +143,106 @@ void create_ray_box(AABB * const box, const uint32_t color_min, const uint32_t c
 	box->color_hit_r = 155;
 	box->color_hit_g = 155;
 	box->color_hit_b = 155;
-}
+}*/
 
 
-bool intersect_box(Ray* const r, AABB* const box, Vector *hit)
-{
+bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int *face, int *is_intern) {
 
-	
-    float tmin = (box->min.Data[0] - r->position.Data[0]) / r->direction.Data[0];
-    float tmax = (box->max.Data[0] - r->position.Data[0]) / r->direction.Data[0];
+	float tmin = -INFINITY;
+	float tmax = INFINITY;
+	int enterAxis = -1;
+	int exitAxis = -1;
 
-    if (tmin > tmax) swap(&tmin, &tmax);
+	for (int i = 0; i < 3; ++i) {
+		float *origin = &r->position.Data[i];
+		float *direction = &r->direction.Data[i];
+		float *minA = &box->bmin.Data[i];
+		float *maxA = &box->bmax.Data[i];
 
-    for (size_t i = 1; i < 3; ++i) {
-        float t1 = (box->min.Data[i] - r->position.Data[i]) / r->direction.Data[i];
-        float t2 = (box->max.Data[i] - r->position.Data[i]) / r->direction.Data[i];
-        if (t1 > t2) swap(&t1, &t2);
+		if (fabsf(*direction) < EPS) {
+			if (*origin < *minA || *origin > *maxA) return false;
+			continue;
+		}
 
-        tmin = max(tmin, t1);
-        tmax = min(tmax, t2);
+		float invD = 1.0f / *direction;
+		float t1 = (*minA - *origin) * invD;
+		float t2 = (*maxA - *origin) * invD;
+		int axisEnterCandidate = i;
+		int axisExitCandidate  = i;
 
-        if (tmin > tmax) return false;
-    }
+		if (t1 > t2) {
+			float tmp = t1;
+			t1 = t2;
+			t2 = tmp;
+		}
 
+		if (t1 > tmin) {
+			tmin = t1;
+			enterAxis = axisEnterCandidate;
+		}
+		if (t2 < tmax) {
+			tmax = t2;
+			exitAxis  = axisExitCandidate;}
 
-	linear_ext(&r->position, &r->direction, tmax, hit);
-
-    bool test_left_face  = box->min.Data[0] == hit->Data[0];
-         test_left_face = test_left_face && box->min.Data[1] <= hit->Data[1] && hit->Data[1] <= box->max.Data[1];
-         test_left_face = test_left_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
-
-    bool test_right_face  = box->max.Data[0] == hit->Data[0];
-         test_right_face = test_right_face && box->min.Data[1] <= hit->Data[1] && hit->Data[1] <= box->max.Data[1];
-         test_right_face = test_right_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
-
-    bool test_up_face  = box->min.Data[0] <= hit->Data[0] && hit->Data[1] <= box->max.Data[0];
-         test_up_face = test_up_face && box->max.Data[1] == hit->Data[1];
-         test_up_face = test_up_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
-
-    bool test_bottom_face  = box->min.Data[0] <= hit->Data[0] && hit->Data[1] <= box->max.Data[0];
-         test_bottom_face = test_bottom_face && box->min.Data[1] == hit->Data[1];
-         test_bottom_face = test_bottom_face && box->min.Data[2] <= hit->Data[2] && hit->Data[2] <= box->max.Data[2];
-
-    bool test_back_face  = box->min.Data[0] <= hit->Data[0] && hit->Data[1] <= box->max.Data[0];
-         test_back_face = test_back_face && box->min.Data[1] <= hit->Data[1] && hit->Data[1] <= box->max.Data[1];
-         test_back_face = test_back_face && box->min.Data[2] == hit->Data[2];
-
-
-    if(test_left_face)
-		box->color[0] = 0 << 24 | 100 << 16 | 100 << 8 | 100;
-    else if(test_right_face)
-		box->color[1] = 0 << 24 | 100 << 16 | 100 << 8 | 100;
-    else if(test_up_face)
-		box->color[2] = 0 << 24 | 250 << 16 | 0 << 8 | 0;
-    else if(test_bottom_face)
-		box->color[3] = 0 << 24 | 0 << 16 | 255 << 8 | 0;
-    else if(test_back_face)
-		box->color[4] = 0 << 24 | 0 << 16 | 0 << 8 | 255;
-
-    return true;
-
-}
-
-bool intersect(Ray* const r, const Primitive* const p, Vector *hit)
-{
-	switch (p->type)
-	{
-	case SPHERE:
-		return intersect_sphere(r, (Sphere*)p->subStruct, hit);
-	case BOX:
-		return intersect_box(r, (AABB*)p->subStruct, hit);
+		if (tmin > tmax) return false;
 	}
+
+	float tHit;
+	bool inside = false;
+
+	// Si l'origine est à l'intérieur de la box
+	if (tmin < EPS && tmax > EPS) {
+		tHit = tmax;
+		*is_intern = 1;
+	}
+	else if (tmin > EPS) {
+		tHit = tmin;
+		*is_intern = 1;
+	}
+	else {
+		return false;
+	}
+
+	linear_ext(&r->position, &r->direction, tHit, hit);
+
+	int axis = (*is_intern == 1) ? exitAxis : enterAxis;
+	float dir = r->direction.Data[axis];
+	switch (axis) {
+		case 0: *face = (dir > 0) ? (inside ? MAX : MIN) : (inside ? MIN : MAX); break;
+		case 1: *face = (dir > 0) ? (inside ? UP : BOTTOM) : (inside ? BOTTOM : UP); break;
+		case 2: *face = (dir > 0) ? (inside ? FRONT : BACK) : (inside ? BACK : FRONT); break;
+	}
+	
+	return true;
 }
 
-
-Vector get_normal_vector(const Vector * point, const Sphere * s){
+Vector get_normal_vector_sphere(const Vector * point, const Vector * center){
 	Vector n;
-	sub_ext(point, &s->position, &n);
+	sub_ext(point, center, &n);
 	norm_ext(&n,&n);
 	return n;
 }
 
+
+Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, int is_intern){
+	if (*face<0 || *face>5) exit(EXIT_FAILURE);
+
+	Vector n = {0};
+
+	switch (*face) {
+		case MIN:    n.Data[0] = -1; break;
+		case MAX:    n.Data[0] =  1; break;
+		case BOTTOM: n.Data[1] = -1; break;
+		case UP:     n.Data[1] =  1; break;
+		case BACK:   n.Data[2] = -1; break;
+		case FRONT:  n.Data[2] =  1; break;
+	}
+
+	if(is_intern) mul_ext(&n, -1.0, &n);
+
+	return n;
+}
+/*
 Vector get_normal_vector_(const Vector * point, const Primitive * p){
 
 	Vector defaults;
@@ -232,7 +257,7 @@ Vector get_normal_vector_(const Vector * point, const Primitive * p){
 	create_vector_default_ext(&defaults);
 	return defaults;
 }
-
+*/
 void free_ray(Ray* r)
 {
     if(r) free(r);
