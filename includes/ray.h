@@ -113,8 +113,9 @@ typedef struct Camera
  * @param x0 Position x of the camera
  * @param y0 Position y of the camera
  * @param z0 Position z of the camera
+ * @param direction Camera base in spacial base where the camera is looking ((0,0,-1) by default)
  */
-void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0);
+void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0, Vector* direction);
 
 /**
  * @brief Create 3D ray with (0,0,0) as origin and direction
@@ -208,6 +209,7 @@ Vector get_normal_vector_sphere(const Vector * point, const Vector *center);
  */
 Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, int is_intern);
 
+void trace_ray(const size_t i, const size_t j, const Camera *c, Ray* const r);
 
 
 /**
@@ -222,7 +224,6 @@ void free_ray(Ray* r);
  */
 void free_sphere(Sphere* s);
 
-void trace_ray(const size_t i, const size_t j, const size_t width, const size_t height, const float angle, Ray* const r);
 
 
 #endif

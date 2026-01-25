@@ -2,22 +2,28 @@
 #include "light.h"
 
 
-void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0)
+void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0, Vector* direction)
 {
-	create_vector_ext(&cam->position, x0, y0, z0);
-	create_vector_ext(&cam->direction, 0.0f,0.0f,-1.0f);
-
-	create_vector_ext(&cam->up, 0.0f, 1.0f, 0.0f);
+	if (!direction) cam->direction = (Vector){0, 0, -1};
 	
-	cross_ext(&cam->up, &cam->direction, &cam->right);
-	norm_ext(&cam->right,&cam->right);
-
-	cross_ext(&cam->right, &cam->direction, &cam->up);
-	norm_ext(&cam->up,&cam->up);
-
+	else{
+		norm_ext(direction, direction);
+		cam->direction = *direction;
+	}
+	
+	Vector up;
+	if (fabs(cam->direction.Data[0]) < 1-EPS) up = (Vector){0.0f, 1.0f, 0.0f};
+	else up = (Vector){1.0f, 0.0f, 0.0f};
+	
+	cross_ext(&cam->direction, &up, &(cam->right));
+	norm_ext(&(cam->right),&(cam->right));
+	
+	cross_ext(&(cam->right), &cam->direction, &(cam->up));
+	
+	create_vector_ext(&cam->position, x0, y0, z0);
 	cam->width = width;
 	cam->height = height;
-	cam->fov = fov;
+	cam->fov = tanf(radian(fov * 0.5));
 
 	cam->inv_height = 1.0f/height;
 	cam->inv_width = 1.0f/width;
@@ -45,24 +51,19 @@ void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, c
 
 }
 
-void trace_ray(const size_t i, const size_t j, const size_t width, const size_t height, const float angle, Ray* const r)
+void trace_ray(const size_t i, const size_t j, const Camera *cam, Ray* const r)
 {
-    const float inv_height = 1.0f/ height;
-    const float fov = tanf(radian(angle * 0.5));
+   
 
-    float Pixel_x = (2.0f*i + 1.0f - width)   * inv_height * fov;
-    float Pixel_y = (height - 2.0f*j - 1.0f)  * inv_height * fov;
-    float Pixel_z =  -1;
+    float Pixel_x = (2.0f*i + 1.0f - cam->width) * cam->inv_height * cam->fov;
+    float Pixel_y = (cam->height - 2.0f*j - 1.0f) * cam->inv_height * cam->fov;
 	
 	
-	    
-    r->position.Data[0] = 0.0f;
-    r->position.Data[1] = 0.0f;
-    r->position.Data[2] = 0.0f;
+	r->position = cam->position;
 
-	r->direction.Data[0] = Pixel_x; 
-	r->direction.Data[1] = Pixel_y; 
-	r->direction.Data[2] = Pixel_z;
+	r->direction.Data[0] = cam->direction.Data[0] + Pixel_x * cam->right.Data[0] + Pixel_y * cam->up.Data[0];
+	r->direction.Data[1] = cam->direction.Data[1] + Pixel_y * cam->right.Data[1] + Pixel_y * cam->up.Data[1];
+	r->direction.Data[2] = cam->direction.Data[2] + Pixel_y * cam->right.Data[2] + Pixel_y * cam->up.Data[2];
 
 	norm_ext(&r->direction, &r->direction);
 }

@@ -23,18 +23,18 @@ int main(int argc, char** argv)
 //############ Camera ############
 	const float x0 = 0;
 	const float y0 = 0;
-	const float z0 = 8;
+	const float z0 = 0.1;
 	const float fov = 50;
 	
 	Camera cam;
-	create_camera(&cam, width, height, fov, x0, y0, z0);
+	create_camera(&cam, width, height, fov, x0, y0, z0, NULL);
 
 //############ Objects ############
 	Sphere * sphere1 = malloc(sizeof(Sphere));
 	Sphere * sphere2 = malloc(sizeof(Sphere));
 	Sphere * sphere3 = malloc(sizeof(Sphere));
 	Sphere * sphere4 = malloc(sizeof(Sphere));
-	AABB *  raybox = malloc(sizeof(AABB));
+	AABB   *  raybox = malloc(sizeof(AABB));
 
 	const float r = 0.05;
 	const float x = r+0.03+EPS;
