@@ -77,7 +77,7 @@ void ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax,
 	}			// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
 	Vector n;
 	if (!intersect_in_scene(r, S, &object, &hit, &n)) {
-		*radiance = (Vector){1, 0, 1};// par défaut met la couleur de fond si le rayon est hors-limite
+		create_vector_ext(radiance, 1.0f, 0, 1.0f);// par défaut met la couleur de fond si le rayon est hors-limite
 		return;
 	}
 	
@@ -160,7 +160,7 @@ Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y
 	create_vector_ext(&white, 1, 1, 1);
 	
 	for(size_t i = 0; i<N; ++i){
-		ray_sampling(&ray, S, cam, 0, 5, &radiance);
+		ray_sampling(&ray, S, cam, 0, 6, &radiance);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}

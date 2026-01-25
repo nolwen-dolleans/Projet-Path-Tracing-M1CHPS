@@ -230,12 +230,12 @@ Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, 
 	Vector n = {0};
 
 	switch (*face) {
-		case MIN:    n.Data[0] = -1; break;
-		case MAX:    n.Data[0] =  1; break;
-		case BOTTOM: n.Data[1] = -1; break;
-		case UP:     n.Data[1] =  1; break;
-		case BACK:   n.Data[2] = -1; break;
-		case FRONT:  n.Data[2] =  1; break;
+		case MIN:    n.Data[0] =  1; break;
+		case MAX:    n.Data[0] = -1; break;
+		case BOTTOM: n.Data[1] =  1; break;
+		case UP:     n.Data[1] = -1; break;
+		case BACK:   n.Data[2] =  1; break;
+		case FRONT:  n.Data[2] = -1; break;
 	}
 
 	if(is_intern) mul_ext(&n, -1.0, &n);

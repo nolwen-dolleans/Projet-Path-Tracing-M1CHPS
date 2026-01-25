@@ -7,6 +7,8 @@
 #include <time.h>
 #include <stdbool.h>
 
+#define EPS 1e-3
+
 /**
  * @brief State of quadratic resolution
  * @var TWO_SOLUTION two solution available

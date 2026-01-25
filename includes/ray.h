@@ -21,6 +21,11 @@
 #define BOTTOM 5
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef enum PRIM_TYPE
+{
+	SPHERE,
+	BOX
+}PRIM_TYPE;
 
 typedef enum {
 	Lambertian,
@@ -48,11 +53,8 @@ typedef struct Ray
  */
 typedef struct AABB
 {
-	Vector min;
-	Vector max;
-	Vector color;
-	float albedo;
-	material_t type;
+	Vector bmin;
+	Vector bmax;
 }AABB;
 
 /**
@@ -63,26 +65,18 @@ typedef struct AABB
 typedef struct Sphere
 {
 	float radius;
-	Vector position;
-	Vector color;
-	float albedo;
-	material_t type;
 }Sphere;
-
-typedef enum PRIM_TYPE
-{
-	SPHERE,
-	BOX
-}PRIM_TYPE;
 
 typedef struct Primitive
 {
-	Vector origin;
+	void * object;
+	Vector position;
+	Vector color;
 	PRIM_TYPE type;
-	bool emitted;
+	material_t m_type;
 	float albedo;
-	void* subStruct;
 }Primitive;
+
 
 /**
  * @brief Camera
@@ -151,14 +145,16 @@ Ray random_Ray(Vector const * Origin);
 /**
  * @brief Create a 3D sphere
  * @param sph Sphere to create
- * @param x position at x-axis
- * @param y position at y-axis
- * @param z position at z-axis
  * @param rad Radius
- * @param color vector rgb with r,g,b in [0,255]
- * @param albedo reprense the albedo of the sphere, or the light intensity for an emitted one
  */
-void create_sphere(Sphere* sph ,const float x, const float y, const float z, const float rad, const Vector * color, const float albedo, const material_t type);
+void create_sphere(Sphere* sph ,const float rad);
+
+/**
+ * @brief Create a 3D sphere
+ * @param sph Sphere to create
+ * @param rad Radius
+ */
+void create_box(AABB* box, float xmin, float ymin, float zmin, float xmax, float ymax, float zmax);
 
 /**
  * @brief Compute the intersection of a camra ray and a sphere
@@ -182,39 +178,37 @@ void create_ray_box(AABB * const box, const uint32_t color_min, const uint32_t c
 
 /**
  * @brief Compute the intersection of a camra ray and a AABB box
- * @param cam Camera that trace the ray
+ * @param r Ray
  * @param box AABB box
  * @return If there is an intersection
  */
-bool box_intersection(const Camera* const cam, AABB* const box);
+bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int * face, int * is_intern);
 
 /**
  * @brief Compute the intersection of a ray and a sphere
  * @param r Ray
- * @param s Sphere
+ * @param position Sphere position
+ * @param radius Sphere radius
  * @return Set of points
  */
-bool intersect_sphere(Ray* const r, const Sphere* const s, Vector *hit);
-
-
-/**
- * @brief Compute the intersection of a ray and a primitive
- * @param r Ray
- * @param s Sphere
- * @return Set of points
- */
-bool intersect(Ray* const r, const Primitive* const p, Vector *hit);
-
+bool intersect_sphere(Ray* const r, Vector *position, float radius, Vector *hit);
 
 /**
  * @brief Compute the sphere normal vector at a point
  * @param point pointer of the point
- * @param s pointer of sphere
+ * @param center sphere's center pointer
  * @return pointer to the normal vector
  */
-Vector get_normal_vector(const Vector * point, const Sphere * s);
+Vector get_normal_vector_sphere(const Vector * point, const Vector *center);
 
-Vector get_normal_vector_(const Vector * point, const Primitive * p);
+/**
+ * @brief Compute the sphere normal vector at a point
+ * @param point pointer of the point
+ * @param box pointer of box
+ * @return pointer to the normal vector
+ */
+Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, int is_intern);
+
 
 
 /**

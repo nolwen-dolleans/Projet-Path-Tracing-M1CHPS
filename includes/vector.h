@@ -63,7 +63,7 @@ static inline void create_vector_ext(Vector* u, const float x, const float y, co
  */
 static inline bool is_null(const Vector * v){
 	for(int i = 0; i<3; ++i){
-		if(v->Data[i] != 0) return false;
+		if(v->Data[i] <= EPS) return false;
 	}
 	return true;
 }

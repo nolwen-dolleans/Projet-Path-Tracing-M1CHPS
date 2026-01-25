@@ -20,19 +20,10 @@
 #include "ray.h"
 
 typedef struct Scene{
-	Sphere ** objects;
+	Primitive ** objects;
 	Vector * background_color;
 	size_t size_objects;
 }Scene;
-
-/**
- * @brief return a pointer of the intersection point between the ray and the closer object
- * @param r pointer of the incident ray
- * @param S pointer of the scene
- * @return index of the object
- * @return intersection:  The poter to the intersection point
- */
-bool intersect_in_scene(const struct Ray* const r, const Scene* const S, int * object, Vector *hit);
 
 /**
  * @brief Free scene
@@ -43,10 +34,27 @@ void free_scene(Scene * S);
 /**
  * @brief Alloc a scene of n\_objects objects, nb\_lightsources light sources and with a background color
  * @param n_objects number of objects
- * @param n_lightsources number of light sources
  * @param backgroundColor a uint32_t represent the background color
- * @return Scene
+ * @param s output Scene
  */
-Scene * create_scene_ptr(size_t n_objects, size_t n_lightsources, const Vector * backgroundColor);
+void create_scene_ext(size_t n_objects, const Vector * backgroundColor, Scene * s);
+
+void create_primitive_ext(void * shape, PRIM_TYPE type, float x, float y, float z, material_t m_type, float albedo, Vector *color, Primitive *prim);
+
+/**
+ * @brief Alloc a scene of n\_objects objects, nb\_lightsources light sources and with a background color
+ * @param object object to add
+ * @param s output Scene
+ */
+void add_primitive(Primitive * object, Scene * s);
+
+/**
+ * @brief return a pointer of the intersection point between the ray and the closer object
+ * @param r pointer of the incident ray
+ * @param S pointer of the scene
+ * @return index of the object
+ * @return intersection:  The poter to the intersection point
+ */
+bool intersect_in_scene(struct Ray* r, const Scene* const S, int * object, Vector *hit, Vector *n);
 
 #endif /* scene_h */
