@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(ppm LANGUAGES C)
-
-
 set(CMAKE_C_STANDARD 11)
+
 
 add_library(LibPathTracing
     src/image.c
@@ -12,6 +11,11 @@ add_library(LibPathTracing
     src/tools.c
     src/vector.c
     src/light.c
+)
+
+set(COMMON_COMPILE_FLAGS
+    $<$<CONFIG:Debug>:-Wall -Wextra -g -O0>
+    $<$<CONFIG:Release>:-O3 -march=native -Wno-all>
 )
 
 target_include_directories(LibPathTracing PUBLIC ${PROJECT_SOURCE_DIR}/includes)
@@ -28,9 +32,9 @@ add_executable(ppm src/ppm.c
 target_link_libraries(ppm PRIVATE LibPathTracing)
 
 
-target_compile_options(ppm PRIVATE -O3 -Wall -march=native -g)
+target_compile_options(ppm PRIVATE ${COMMON_COMPILE_FLAGS})
 
-add_executable(test_runner 
+add_executable(test_runner
                             test/test_runner.c 
                             test/test_vector.c 
                             test/test_ray.c
@@ -39,7 +43,7 @@ add_executable(test_runner
                             src/scene.c
                             src/ray.c
 )
-target_compile_options(test_runner PRIVATE -g -Wall -O3 -march=native)
+target_compile_options(test_runner PRIVATE ${COMMON_COMPILE_FLAGS})
 
 include(FetchContent)
 FetchContent_Declare(
@@ -61,3 +65,5 @@ add_custom_target(test test_runner
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Running unit tests..."
 )
+
+message(STATUS "Build type = ${CMAKE_BUILD_TYPE}")

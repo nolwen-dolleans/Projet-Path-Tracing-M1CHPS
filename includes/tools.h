@@ -7,7 +7,7 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define EPS 1e-3
+#define EPS 1e-4
 
 /**
  * @brief State of quadratic resolution

@@ -53,6 +53,8 @@ void trace_ray(const size_t i, const size_t j, const size_t width, const size_t 
     float Pixel_x = (2.0f*i + 1.0f - width)   * inv_height * fov;
     float Pixel_y = (height - 2.0f*j - 1.0f)  * inv_height * fov;
     float Pixel_z =  -1;
+	
+	
 	    
     r->position.Data[0] = 0.0f;
     r->position.Data[1] = 0.0f;

@@ -23,16 +23,20 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	const float atheta = sqrtf(u1);
 	const float phi = 2*M_PI*u2;
 	//les coordonnées dans la base locale
-	const float x = atheta*cosf(phi);
-	const float y = atheta*sinf(phi);
+	float x, y;
+	__sincosf(phi, &x, &y);
+	x *= atheta;
+	y *= atheta;
 	const float z = sqrtf(1 - u1);
 	
 	//coordonnées dans la base orthonormée (up,right,forward) https://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-13-normal-mapping/
 	Vector up;
-	Vector norm = *normal;
+	Vector norm;
+	Ray ray;
+	ray.position = *origin;
 	
 	
-	if (fabs(norm.Data[1])<0.999f){
+	if (fabs((*normal).Data[1])<1.0f-EPS){
 		create_vector_ext(&up, 0, 1, 0);
 	}
 	else{
@@ -40,28 +44,26 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	}
 	
 	Vector tangent;
-	cross_ext(&norm, &up, &tangent);
+	cross_ext(normal, &up, &tangent);
     norm_ext(&tangent, &tangent);
 	
 	Vector bitangent;
-	cross_ext(&tangent, &norm, &bitangent);
-	norm_ext(&bitangent, &bitangent);
+	cross_ext(&tangent, normal, &bitangent);
+	//norm_ext(&bitangent, &bitangent);
 	
 	//vecteur direction = x*tangent + y*bitangent + z*normal
 	Vector direction;
 	mul_ext(&tangent, x, &tangent);
 	mul_ext(&bitangent, y, &bitangent);
-	mul_ext(&norm, z, &norm);
+	mul_ext(normal, z, &norm);
 	
-	add_ext(&tangent, &bitangent, &direction);
-	add_ext(&direction, &norm, &direction);
-	norm_ext(&direction, &direction);
+	add_ext(&tangent, &bitangent, &ray.direction);
+	add_ext(&ray.direction, &norm, &ray.direction);
+	//norm_ext(&direction, &direction);
 	
 	
-	Ray ray;
-	ray.position = *origin;
-	ray.direction = direction;
-	norm_ext(&ray.direction, &ray.direction);
+	//ray.direction = direction;
+	//norm_ext(&ray.direction, &ray.direction);
 	
 	return ray;
 }
@@ -160,7 +162,7 @@ Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y
 	create_vector_ext(&white, 1, 1, 1);
 	
 	for(size_t i = 0; i<N; ++i){
-		ray_sampling(&ray, S, cam, 0, 6, &radiance);
+		ray_sampling(&ray, S, cam, 0, 100, &radiance);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}
