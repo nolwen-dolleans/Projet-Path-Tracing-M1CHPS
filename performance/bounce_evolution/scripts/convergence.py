@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 
 
 sns.set_theme(style="whitegrid", context="talk")
-N = 10
+
+index_images = [1, 2, 3, 4 ,5 , 6, 7, 8, 16, 30, 50]
+N = len(index_images)
 
 def load_image(path):
 	img = Image.open(path).convert("RGB")
@@ -28,30 +30,28 @@ def compare_images(image_path, reference_path):
 
 	
 arr_error = []
-sampling = []
-reference_path = "images/50 rebonds.ppm"
+reference_path = "images/1000 rebonds.ppm"
 
-for samples in (1, 2, 3, 4 ,5 , 6, 7, 8, 16, 30):
+for samples in index_images:
     path = f"images/{samples} rebonds.ppm"
 
     error = compare_images(path, reference_path)
-    sampling.append(samples)
     arr_error.append(error)
 
 arr_error = np.array(arr_error)
-sampling = np.array(sampling)
 
 data = pd.DataFrame(columns=["N", "Global Mean Error"])
 data["Global Mean Error"] = arr_error
-data["N"] = sampling
+data["N"] = np.array(index_images)
 
 reference = pd.DataFrame(columns=["N", "1/N^(1/2)"])
-reference["N"] = sampling
+reference["N"] = np.array(index_images)
 #reference["1/N^(1/2)"] = 1/np.sqrt(1*sampling)
 
 fig, ax = plt.subplots(figsize=(16, 8))
 
 sns.lineplot(x="N", y="Global Mean Error",label="Global Mean Error", data=data, color='green')
+sns.scatterplot(x="N", y="Global Mean Error",label="Global Mean Error", data=data, color='blue')
 #sns.lineplot(x="N", y="1/N^(1/2)",label="1/N^(1/2)", data=reference, color='blue')
 
 
