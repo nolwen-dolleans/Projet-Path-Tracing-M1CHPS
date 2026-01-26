@@ -2,23 +2,24 @@
 #include "light.h"
 
 
-void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0, Vector* direction)
+
+void create_camera(Camera * const cam, const size_t width, const size_t height, const float fov, const float x0, const float y0, const float z0, const float pitch, const float yaw)
 {
-	if (!direction) cam->direction = (Vector){0, 0, -1};
-	
-	else{
-		norm_ext(direction, direction);
-		cam->direction = *direction;
-	}
-	
+	float cosA, sinA, cosB, sinB;
 	Vector up;
+	const float alpha=radian(pitch);
+	const float beta=radian(yaw);
+	__sincosf(alpha, &sinA, &cosA);
+	__sincosf(beta, &sinB, &cosB);
+	
+	cam->direction = (Vector) {sinB, cosB*sinA, -cosA*cosB};
+	
 	if (fabs(cam->direction.Data[0]) < 1-EPS) up = (Vector){0.0f, 1.0f, 0.0f};
 	else up = (Vector){1.0f, 0.0f, 0.0f};
 	
 	cross_ext(&cam->direction, &up, &(cam->right));
-	norm_ext(&(cam->right),&(cam->right));
-	
 	cross_ext(&(cam->right), &cam->direction, &(cam->up));
+
 	
 	create_vector_ext(&cam->position, x0, y0, z0);
 	cam->width = width;
@@ -28,13 +29,6 @@ void create_camera(Camera * const cam, const size_t width, const size_t height, 
 	cam->inv_height = 1.0f/height;
 	cam->inv_width = 1.0f/width;
 
-}
-
-void to_world_space(Camera * const cam, Vector* u, Vector* w)
-{
-	w->Data[0] = cam->right.Data[0] * u->Data[0] + cam->up.Data[0] * u->Data[1] + cam->up.Data[0] * u->Data[2] - cam->position.Data[0];
-	w->Data[1] = cam->right.Data[1] * u->Data[0] + cam->up.Data[1] * u->Data[1] + cam->up.Data[1] * u->Data[2] - cam->position.Data[1];
-	w->Data[2] = cam->right.Data[2] * u->Data[0] + cam->up.Data[2] * u->Data[1] + cam->up.Data[2] * u->Data[2] - cam->position.Data[2];
 }
 
 void create_ray_default_ext(Ray * ray)
@@ -128,26 +122,6 @@ bool intersect_sphere(Ray* const r, Vector *center, float radius, Vector *hit)
 	linear_ext(&r->position, &r->direction, t, hit);
 	return true;
 }
-/*
-void create_ray_box(AABB * const box, const uint32_t color_min, const uint32_t color_max, const uint32_t color_back, const uint32_t color_front, const uint32_t color_bottom, const uint32_t color_up)
-{
-	create_vector_ext(&box->min, -100, -100, -1);
-	create_vector_ext(&box->max, 200, 200, -1);
-
-	box->color[MIN] = color_min;
-	
-	box->color[MAX] = color_max;
-	box->color[BACK] = color_back;
-
-	box->color[FRONT] = color_front;
-	box->color[BOTTOM] = color_bottom;
-	box->color[UP] = color_up;
-	
-	box->color_hit_r = 155;
-	box->color_hit_g = 155;
-	box->color_hit_b = 155;
-}*/
-
 
 bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int *face, int *is_intern) {
 
@@ -159,17 +133,17 @@ bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int *face, 
 	for (int i = 0; i < 3; ++i) {
 		float *origin = &r->position.Data[i];
 		float *direction = &r->direction.Data[i];
-		float *minA = &box->bmin.Data[i];
-		float *maxA = &box->bmax.Data[i];
+		float minA = box->bmin.Data[i];
+		float maxA = box->bmax.Data[i];
 
 		if (fabsf(*direction) < EPS) {
-			if (*origin < *minA || *origin > *maxA) return false;
+			if (*origin < minA || *origin > maxA) return false;
 			continue;
 		}
 
 		float invD = 1.0f / *direction;
-		float t1 = (*minA - *origin) * invD;
-		float t2 = (*maxA - *origin) * invD;
+		float t1 = (minA - *origin) * invD;
+		float t2 = (maxA - *origin) * invD;
 		int axisEnterCandidate = i;
 		int axisExitCandidate  = i;
 

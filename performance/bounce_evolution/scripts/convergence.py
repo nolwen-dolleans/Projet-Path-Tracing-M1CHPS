@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 sns.set_theme(style="whitegrid", context="talk")
 
-index_images = [1, 2, 3, 4 ,5 , 6, 7, 8, 16, 30, 50]
+index_images = [0, 1, 2, 3, 4 ,5 , 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 25, 26, 27, 30, 100]
 N = len(index_images)
 
 def load_image(path):
@@ -36,6 +36,9 @@ for samples in index_images:
     path = f"images/{samples} rebonds.ppm"
 
     error = compare_images(path, reference_path)
+    if error<=0.05:
+        print(f"{samples}: {error}")
+         
     arr_error.append(error)
 
 arr_error = np.array(arr_error)
