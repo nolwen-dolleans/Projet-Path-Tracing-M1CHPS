@@ -6,6 +6,9 @@
 #include <math.h>
 #include <time.h>
 #include <stdbool.h>
+#include <inttypes.h>
+#include <string.h>
+#include "float.h"
 
 #define EPS 1e-4
 

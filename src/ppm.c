@@ -3,10 +3,13 @@
 #include "light.h"
 #include "scene.h"
 #include "vector.h"
+#include <time.h>
+#include <unistd.h>
 
 int main(int argc, char** argv)
 {
-
+	struct timespec t0, t1;
+	clock_gettime(CLOCK_MONOTONIC, &t0);
 	srand((unsigned int)time(NULL));
 	if(argc != 5)
 	{
@@ -27,15 +30,15 @@ int main(int argc, char** argv)
 	const float fov = 50;
 	
 	Camera cam;
-	create_camera(&cam, width, height, fov, x0, y0, z0, 20, 0);
+	create_camera(&cam, width, height, fov, x0, y0, z0, 0, 0);
 
 //############ Objects ############
-	Sphere * sphere1 = malloc(sizeof(Sphere));
-	Sphere * sphere2 = malloc(sizeof(Sphere));
-	Sphere * sphere3 = malloc(sizeof(Sphere));
-	Sphere * sphere4 = malloc(sizeof(Sphere));
-	AABB   *  raybox = malloc(sizeof(AABB));
-
+	Vector bg;
+	create_vector_ext(&bg, 255, 0, 0);
+	Scene scene;
+	create_scene_ext(5, &bg, &scene);
+	
+	
 	const float r = 0.05;
 	const float x = r+0.03+EPS;
 	const float y = -r+EPS;
@@ -43,47 +46,35 @@ int main(int argc, char** argv)
 	
 	Vector sphere_color1;
 	create_vector_ext(&sphere_color1, 255, 120, 20);
-	create_sphere(sphere1, r);
 	Primitive p1;
-	create_primitive_ext((void *) (sphere1), SPHERE, -x, y,-z, Lambertian, 1, &sphere_color1, &p1);
+	create_sphere_(&p1, r, -x, y, -z, Lambertian, 1, &sphere_color1);
+	add_primitive(&p1, &scene);
 	
 	Vector sphere_color2;
 	create_vector_ext(&sphere_color2, 255, 255, 255);
-	create_sphere(sphere2, r);
 	Primitive p2;
-	create_primitive_ext((void *) (sphere2), SPHERE, x,y,-(z+0.2), Specular, 0.91, &sphere_color2, &p2);
+	create_sphere_(&p2, r, x,y,-(z+0.2), Specular, 0.91, &sphere_color2);
+	add_primitive(&p2, &scene);
 	
 	Vector sphere_color3;
 	create_vector_ext(&sphere_color3, 255, 255, 20);
-	create_sphere(sphere3, 6*r);
 	Primitive p3;
-	create_primitive_ext((void *) (sphere3), SPHERE, 6*x,y,-(z+0.01), Emissive, 4, &sphere_color3, &p3);
+	create_sphere_(&p3, 6*r, 6*x,y,-(z+0.01), Emissive, 2, &sphere_color3);
+	add_primitive(&p3, &scene);
 	
 	float r_ground = 1000.0;
 	Vector sphere_color4;
 	create_vector_ext(&sphere_color4, 193,168,154);
 	Primitive p4;
-	create_sphere(sphere4, r_ground);
-	create_primitive_ext((void *) (sphere4), SPHERE, 0,-r_ground-2*r-EPS,-z, Lambertian, 1, &sphere_color4, &p4);
-	
+	create_sphere_(&p4, r_ground, 0,-r_ground-2*r-EPS,-z, Lambertian, 1, &sphere_color4);
+	add_primitive(&p4, &scene);
 	
 	Vector box_color;
 	create_vector_ext(&box_color, 255, 255, 255);
 	Primitive p5;
-	create_box(raybox, -1.0f, -1.0f, 2.0f,  1.0f,  1.0f, -2.0f);
-	create_primitive_ext((void *) raybox, BOX, 10, 10,10, Lambertian, 0.9, &box_color, &p5);
-	
-	
-	Vector bg;
-	create_vector_ext(&bg, 255, 0, 0);
-	Scene scene;
-	create_scene_ext(5, &bg, &scene);
-	
-	add_primitive(&p1, &scene);
-	add_primitive(&p2, &scene);
-	add_primitive(&p3, &scene);
-	add_primitive(&p4, &scene);
+	create_box_(&p5, 2, 2, 4, 0, 0, 0, Lambertian, 1, &box_color);
 	add_primitive(&p5, &scene);
+	
 
 
 	Vector color;
@@ -176,12 +167,25 @@ int main(int argc, char** argv)
 	{
 		fprintf(stderr, "Erreur : argument incorect");
 	}
+	free_scene_objects(&scene);
+	clock_gettime(CLOCK_MONOTONIC, &t1);
 	
-	free(sphere1);
-	free(sphere2);
-	free(sphere3);
-	free(sphere4);
+	char* path="performance/measures/runtime_by_samplings.csv";
 	
+	bool exists = (access(path, F_OK) == 0);
+	
+	FILE *f = fopen(path, "a");
+	if (!f) {
+		perror("fopen");
+		return 1;
+	}
+	
+	if (!exists) {
+		fprintf(f, "nsamples,runtime\n");
+	}
+	double elapsed = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) * 1e-9;
+	fprintf(f, "%ld,%.6f\n", smpls, elapsed);
+	fclose(f);
 	return 0;
 }
 

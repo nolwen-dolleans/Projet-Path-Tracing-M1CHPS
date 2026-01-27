@@ -8,15 +8,8 @@
 #ifndef light_h
 #define light_h
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
-#include "image.h"
-#include "vector.h"
+
 #include "scene.h"
-#include "time.h"
-#include "ray.h"
 
 
 

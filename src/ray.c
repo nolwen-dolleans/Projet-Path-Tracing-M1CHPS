@@ -1,5 +1,4 @@
 #include "ray.h"
-#include "light.h"
 
 
 
@@ -28,7 +27,6 @@ void create_camera(Camera * const cam, const size_t width, const size_t height, 
 
 	cam->inv_height = 1.0f/height;
 	cam->inv_width = 1.0f/width;
-
 }
 
 void create_ray_default_ext(Ray * ray)
@@ -62,188 +60,8 @@ void trace_ray(const size_t i, const size_t j, const Camera *cam, Ray* const r)
 	norm_ext(&r->direction, &r->direction);
 }
 
-Ray random_Ray(Vector const * Origin){
-	Ray ray;
-	ray.position = *Origin;
-	for (int i = 0; i<3; ++i) {
-		ray.direction.Data[i] = rand();
-	}
-	norm_ext(&ray.direction, &ray.direction);
-	
-	return ray;
-}
-
-void create_sphere(Sphere* sph ,const float radius)
-{
-	sph->radius = radius;
-}
-
-void create_box(AABB* box, float xmin, float ymin, float zmin, float xmax, float ymax, float zmax)
-{
-	
-	box->bmin.Data[0] = xmin;
-	box->bmin.Data[1] = ymin;
-	box->bmin.Data[2] = zmin;
-	
-	box->bmax.Data[0] = xmax;
-	box->bmax.Data[1] = ymax;
-	box->bmax.Data[2] = zmax;
-	
-}
-
-bool intersect_sphere(Ray* const r, Vector *center, float radius, Vector *hit)
-{
-	Vector oc;
-	sub_ext(&r->position, center, &oc);
-	
-
-	const float A = dot(&r->direction, &r->direction);
-	const float B = 2.0f * dot(&r->direction, &oc);
-	const float C = dot(&oc, &oc) - radius * radius;
-
-	const float delta = B*B - 4.0f*A*C;
-
-	if (delta < 0.0f)
-		return false;
-
-	float sqrt_delta = sqrtf(delta);
-	float t0 = (-B - sqrt_delta) / (2.0f * A);
-	float t1 = (-B + sqrt_delta) / (2.0f * A);
-
-	float t = -1.0f;
-
-	if (t0 > EPS)
-		t = t0;
-	else if (t1 > EPS)
-		t = t1;
-	else
-		return false; // return false if each intersection point is negative
-
-	linear_ext(&r->position, &r->direction, t, hit);
-	return true;
-}
-
-bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int *face, int *is_intern) {
-
-	float tmin = -INFINITY;
-	float tmax = INFINITY;
-	int enterAxis = -1;
-	int exitAxis = -1;
-
-	for (int i = 0; i < 3; ++i) {
-		float *origin = &r->position.Data[i];
-		float *direction = &r->direction.Data[i];
-		float minA = box->bmin.Data[i];
-		float maxA = box->bmax.Data[i];
-
-		if (fabsf(*direction) < EPS) {
-			if (*origin < minA || *origin > maxA) return false;
-			continue;
-		}
-
-		float invD = 1.0f / *direction;
-		float t1 = (minA - *origin) * invD;
-		float t2 = (maxA - *origin) * invD;
-		int axisEnterCandidate = i;
-		int axisExitCandidate  = i;
-
-		if (t1 > t2) {
-			float tmp = t1;
-			t1 = t2;
-			t2 = tmp;
-		}
-
-		if (t1 > tmin) {
-			tmin = t1;
-			enterAxis = axisEnterCandidate;
-		}
-		if (t2 < tmax) {
-			tmax = t2;
-			exitAxis  = axisExitCandidate;}
-
-		if (tmin > tmax) return false;
-	}
-
-	float tHit;
-	bool inside = false;
-
-	// Si l'origine est à l'intérieur de la box
-	if (tmin < EPS && tmax > EPS) {
-		tHit = tmax;
-		*is_intern = 1;
-	}
-	else if (tmin > EPS) {
-		tHit = tmin;
-		*is_intern = 1;
-	}
-	else {
-		return false;
-	}
-
-	linear_ext(&r->position, &r->direction, tHit, hit);
-
-	int axis = (*is_intern == 1) ? exitAxis : enterAxis;
-	float dir = r->direction.Data[axis];
-	switch (axis) {
-		case 0: *face = (dir > 0) ? (inside ? MAX : MIN) : (inside ? MIN : MAX); break;
-		case 1: *face = (dir > 0) ? (inside ? UP : BOTTOM) : (inside ? BOTTOM : UP); break;
-		case 2: *face = (dir > 0) ? (inside ? FRONT : BACK) : (inside ? BACK : FRONT); break;
-	}
-	
-	return true;
-}
-
-Vector get_normal_vector_sphere(const Vector * point, const Vector * center){
-	Vector n;
-	sub_ext(point, center, &n);
-	norm_ext(&n,&n);
-	return n;
-}
-
-
-Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, int is_intern){
-	if (*face<0 || *face>5) exit(EXIT_FAILURE);
-
-	Vector n = {0};
-
-	switch (*face) {
-		case MIN:    n.Data[0] =  1; break;
-		case MAX:    n.Data[0] = -1; break;
-		case BOTTOM: n.Data[1] =  1; break;
-		case UP:     n.Data[1] = -1; break;
-		case BACK:   n.Data[2] =  1; break;
-		case FRONT:  n.Data[2] = -1; break;
-	}
-
-	if(is_intern) mul_ext(&n, -1.0, &n);
-
-	return n;
-}
-/*
-Vector get_normal_vector_(const Vector * point, const Primitive * p){
-
-	Vector defaults;
-	switch (p->type)
-	{
-	case SPHERE:
-		return get_normal_vector(point, (Sphere*)p->subStruct);
-	case BOX:
-	default:
-		break;
-	}
-	create_vector_default_ext(&defaults);
-	return defaults;
-}
-*/
 void free_ray(Ray* r)
 {
     if(r) free(r);
     else fprintf(stdout, "No need to free memory.\n");
 }
-
-void free_sphere(Sphere* s)
-{
-    if(s) free(s);
-    else fprintf(stdout, "No need to free memory.\n");
-}
-

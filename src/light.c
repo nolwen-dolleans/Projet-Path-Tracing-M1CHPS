@@ -7,16 +7,6 @@
 
 #include "light.h"
 
-static inline Ray random_Ray_demi_sphere(Vector * origin, Vector * normal){
-	Ray ray = random_Ray(origin);
-	if (dot(normal, &ray.direction)<0){
-		for (int i = 0; i<3; ++i) {
-			ray.direction.Data[i] = -ray.direction.Data[i];
-		}
-	}
-	return ray;
-}
-
 Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal){
 	const float u1 = (float)rand() / (float)RAND_MAX;
 	const float u2 = (float)rand() / (float)RAND_MAX;
@@ -24,7 +14,7 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	const float phi = 2*M_PI*u2;
 	//les coordonnées dans la base locale
 	float x, y;
-	__sincosf(phi, &x, &y);
+	__sincosf(phi, &y, &x);
 	x *= atheta;
 	y *= atheta;
 	const float z = sqrtf(1 - u1);
@@ -162,7 +152,7 @@ Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y
 	create_vector_ext(&white, 1, 1, 1);
 	
 	for(size_t i = 0; i<N; ++i){
-		ray_sampling(&ray, S, cam, 0, 10, &radiance);
+		ray_sampling(&ray, S, cam, 0, 26, &radiance);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}

@@ -14,7 +14,7 @@ add_library(LibPathTracing
 )
 
 set(COMMON_COMPILE_FLAGS
-    $<$<CONFIG:Debug>:-Wall -Wextra -g -O0>
+    $<$<CONFIG:Debug>:-Wall -Wextra -g -O0 -fno-inline -fno-omit-frame-pointer>
     $<$<CONFIG:Release>:-O3 -march=native -Wno-all>
 )
 

@@ -8,16 +8,52 @@
 #ifndef scene_h
 #define scene_h
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include "tools.h"
-#include "vector.h"
 #include "image.h"
 #include "ray.h"
+
+typedef enum PRIM_TYPE
+{
+	SPHERE,
+	BOX
+}PRIM_TYPE;
+
+typedef enum {
+	Lambertian,
+	Specular,
+	Emissive
+} material_t;
+
+/**
+ * @brief A 3D AAB
+ * @var min Minimum coordinate
+ * @var max Maximum coordinate
+ * @var color color faces
+ */
+typedef struct AABB
+{
+	Vector bmin;
+	Vector bmax;
+}AABB;
+
+/**
+ * @brief A 3D Sphere
+ * @var radius Radius
+ * @var position Position of the sphere
+ */
+typedef struct Sphere
+{
+	float radius;
+}Sphere;
+
+typedef struct Primitive
+{
+	void * object;
+	Vector position;
+	Vector color;
+	PRIM_TYPE type;
+	material_t m_type;
+	float albedo;
+}Primitive;
 
 typedef struct Scene{
 	Primitive ** objects;
@@ -32,6 +68,12 @@ typedef struct Scene{
 void free_scene(Scene * S);
 
 /**
+ * @brief Free pointer objects in the scene
+ * @param S A pointer of a scene
+ */
+void free_scene_objects(Scene * S);
+
+/**
  * @brief Alloc a scene of n\_objects objects, nb\_lightsources light sources and with a background color
  * @param n_objects number of objects
  * @param backgroundColor a uint32_t represent the background color
@@ -39,7 +81,10 @@ void free_scene(Scene * S);
  */
 void create_scene_ext(size_t n_objects, const Vector * backgroundColor, Scene * s);
 
-void create_primitive_ext(void * shape, PRIM_TYPE type, float x, float y, float z, material_t m_type, float albedo, Vector *color, Primitive *prim);
+
+void create_sphere_(Primitive* prim, const float radius, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
+
+void create_box_(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
 
 /**
  * @brief Alloc a scene of n\_objects objects, nb\_lightsources light sources and with a background color
@@ -47,6 +92,25 @@ void create_primitive_ext(void * shape, PRIM_TYPE type, float x, float y, float 
  * @param s output Scene
  */
 void add_primitive(Primitive * object, Scene * s);
+
+
+
+/**
+ * @brief Compute the intersection of a camra ray and a AABB box
+ * @param r Ray
+ * @param box AABB box
+ * @return If there is an intersection
+ */
+bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int * face, int * is_intern);
+
+/**
+ * @brief Compute the intersection of a ray and a sphere
+ * @param r Ray
+ * @param position Sphere position
+ * @param radius Sphere radius
+ * @return Set of points
+ */
+bool intersect_sphere(Ray* const r, Vector *position, float radius, Vector *hit);
 
 /**
  * @brief return a pointer of the intersection point between the ray and the closer object
@@ -57,4 +121,19 @@ void add_primitive(Primitive * object, Scene * s);
  */
 bool intersect_in_scene(struct Ray* r, const Scene* const S, int * object, Vector *hit, Vector *n);
 
+/**
+ * @brief Compute the sphere normal vector at a point
+ * @param point pointer of the point
+ * @param center sphere's center pointer
+ * @return pointer to the normal vector
+ */
+Vector get_normal_vector_sphere(const Vector * point, const Vector *center);
+
+/**
+ * @brief Compute the sphere normal vector at a point
+ * @param point pointer of the point
+ * @param box pointer of box
+ * @return pointer to the normal vector
+ */
+Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, int is_intern);
 #endif /* scene_h */
