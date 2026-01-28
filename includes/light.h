@@ -13,6 +13,7 @@
 
 
 
+
 /**
  * @brief  recursive path-tracing algorithm to compute a single sample with Lambertian materials.
  * @param r incident ray
@@ -31,9 +32,11 @@ void ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax,
  * @param N number of samples
  * @return color the color of the pixel
  */
-Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y, Scene const * S, size_t N);
+Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y, Scene const * S, size_t N, size_t bounces);
 
-Vector black;
-Vector white;
+int get_bounces(void);
+
+
+
 
 #endif /* light_h */

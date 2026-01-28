@@ -14,8 +14,8 @@ void free_scene(Scene * S){
 }
 
 void free_scene_objects(Scene * S){
-	for (int i = 0; i<S->size_objects; ++i) {
-		if(S->objects[i]->object) free(S->objects[i]->object);
+	for (size_t i = 0; i<S->size_objects; ++i) {
+		if(S->objects[i]) free(S->objects[i]->object);
 	}
 }
 
@@ -51,16 +51,11 @@ void add_primitive(Primitive * object, Scene * s){
             return;
         }
     }
-	printf("Error: too many objects");
+	printf("Error: too many objects\n");
 	exit(EXIT_FAILURE);
 }
 
-void create_sphere(Sphere* sph ,const float radius)
-{
-	sph->radius = radius;
-}
-
-void create_sphere_(Primitive* prim, const float radius, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color)
+void create_sphere(Primitive* prim, const float radius, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color)
 {
 	Sphere * sph = malloc(sizeof(Sphere));
 	sph->radius = radius;
@@ -78,20 +73,7 @@ void create_sphere_(Primitive* prim, const float radius, const float x, const fl
 	
 }
 
-void create_box(AABB* box, float xmin, float ymin, float zmin, float xmax, float ymax, float zmax)
-{
-	
-	box->bmin.Data[0] = xmin;
-	box->bmin.Data[1] = ymin;
-	box->bmin.Data[2] = zmin;
-	
-	box->bmax.Data[0] = xmax;
-	box->bmax.Data[1] = ymax;
-	box->bmax.Data[2] = zmax;
-	
-}
-
-void create_box_(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color)
+void create_box(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color)
 {
 	AABB* box = malloc(sizeof(AABB));
 	
@@ -102,6 +84,30 @@ void create_box_(Primitive* prim, const float width, const float height, const f
 	box->bmax.Data[0] = x+width/2;
 	box->bmax.Data[1] = y+height/2;
 	box->bmax.Data[2] = z-length/2;
+	
+	const float inv255 = 1 / 255.0f;
+	prim->type = BOX;
+	prim->m_type = m_type;
+	create_vector_ext(&prim->position, x, y, z);
+	prim->albedo = albedo;
+	prim->color = *color;
+	for (size_t i = 0; i < 3; ++i) {
+		prim->color.Data[i] = color->Data[i]*inv255;
+	}
+	prim->object = (void *) box;
+}
+
+void create_cube(Primitive* prim, const float width, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color)
+{
+	AABB* box = malloc(sizeof(AABB));
+	
+	box->bmin.Data[0] = x-width/2;
+	box->bmin.Data[1] = y-width/2;
+	box->bmin.Data[2] = z+width/2;
+	
+	box->bmax.Data[0] = x+width/2;
+	box->bmax.Data[1] = y+width/2;
+	box->bmax.Data[2] = z-width/2;
 	
 	const float inv255 = 1 / 255.0f;
 	prim->type = BOX;
@@ -223,7 +229,7 @@ Vector get_normal_vector_sphere(const Vector * point, const Vector * center){
 }
 
 
-Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, int is_intern){
+Vector get_normal_vector_box(int *face, int is_intern){
 	if (*face<0 || *face>5) exit(EXIT_FAILURE);
 
 	Vector n = {0};
@@ -251,7 +257,7 @@ bool intersect_in_scene(struct Ray* r, const Scene* const S, int *object, Vector
 	Vector best_hit;
 	double closest_t = 1e30;
 	
-	for (int i = 0; i < S->size_objects; ++i) {
+	for (size_t i = 0; i < S->size_objects; ++i) {
 		if(S->objects[i] == NULL) continue;
 		
 		switch (S->objects[i]->type) {
@@ -266,7 +272,7 @@ bool intersect_in_scene(struct Ray* r, const Scene* const S, int *object, Vector
 				
 				if (t2 < closest_t) {
 					closest_t = t2;
-					object_index = i;
+					object_index = (int)i;
 					best_hit = *hit;
 					*n = get_normal_vector_sphere(hit, &S->objects[i]->position);
 				}
@@ -287,9 +293,9 @@ bool intersect_in_scene(struct Ray* r, const Scene* const S, int *object, Vector
 
 				if (t2 < closest_t) {
 					closest_t = t2;
-					object_index = i;
+					object_index = (int) i;
 					best_hit = *hit;
-					*n = get_normal_vector_box(hit, box, &face, is_intern);
+					*n = get_normal_vector_box(&face, is_intern);
 				}
 				break;
 			}

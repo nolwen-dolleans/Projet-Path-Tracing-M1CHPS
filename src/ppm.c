@@ -20,6 +20,8 @@ int main(int argc, char** argv)
 	const size_t width  = atoi(argv[2]);
 	const size_t height = atoi(argv[3]);
 	const size_t smpls = atoi(argv[4]);
+	
+	size_t bounces = (size_t) get_bounces();
 
 	
 //######################### Create the entier scene ###########################
@@ -36,7 +38,7 @@ int main(int argc, char** argv)
 	Vector bg;
 	create_vector_ext(&bg, 255, 0, 0);
 	Scene scene;
-	create_scene_ext(5, &bg, &scene);
+	create_scene_ext(6, &bg, &scene);
 	
 	
 	const float r = 0.05;
@@ -47,34 +49,39 @@ int main(int argc, char** argv)
 	Vector sphere_color1;
 	create_vector_ext(&sphere_color1, 255, 120, 20);
 	Primitive p1;
-	create_sphere_(&p1, r, -x, y, -z, Lambertian, 1, &sphere_color1);
+	create_sphere(&p1, r, -x, y, -z, Lambertian, 1, &sphere_color1);
 	add_primitive(&p1, &scene);
 	
 	Vector sphere_color2;
 	create_vector_ext(&sphere_color2, 255, 255, 255);
 	Primitive p2;
-	create_sphere_(&p2, r, x,y,-(z+0.2), Specular, 0.91, &sphere_color2);
+	create_sphere(&p2, r, x,y,-(z+0.2), Specular, 0.91, &sphere_color2);
 	add_primitive(&p2, &scene);
 	
 	Vector sphere_color3;
 	create_vector_ext(&sphere_color3, 255, 255, 20);
 	Primitive p3;
-	create_sphere_(&p3, 6*r, 6*x,y,-(z+0.01), Emissive, 2, &sphere_color3);
+	create_sphere(&p3, 6*r, 6*x,y,-(z+0.01), Emissive, 1, &sphere_color3);
 	add_primitive(&p3, &scene);
 	
 	float r_ground = 1000.0;
 	Vector sphere_color4;
 	create_vector_ext(&sphere_color4, 193,168,154);
 	Primitive p4;
-	create_sphere_(&p4, r_ground, 0,-r_ground-2*r-EPS,-z, Lambertian, 1, &sphere_color4);
-	add_primitive(&p4, &scene);
+	create_sphere(&p4, r_ground, 0,-r_ground-2*r-EPS,-z, Lambertian, 1, &sphere_color4);
+	//add_primitive(&p4, &scene);
+	
+	Vector raybox_color;
+	create_vector_ext(&raybox_color, 255, 255, 255);
+	Primitive p5;
+	create_cube(&p5, 2, 0, 1-2*r, 0, Lambertian, 1, &raybox_color);
+	add_primitive(&p5, &scene);
 	
 	Vector box_color;
 	create_vector_ext(&box_color, 255, 255, 255);
-	Primitive p5;
-	create_box_(&p5, 2, 2, 4, 0, 0, 0, Lambertian, 1, &box_color);
-	add_primitive(&p5, &scene);
-	
+	Primitive p6;
+	create_box(&p6, 3*EPS, 2, 2, -x-0.07, y, -z, Specular, 0.91, &box_color);
+	add_primitive(&p6, &scene);
 
 
 	Vector color;
@@ -92,7 +99,7 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, &scene, smpls);
+				color = path_trace(&cam, x1, y1, &scene, smpls, bounces);
 
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = max(0, color.Data[0]);
@@ -105,7 +112,6 @@ int main(int argc, char** argv)
 			}
 		}
 		write_image_file_32bit(image);
-		//free_scene(&scene);
 		free_image_32bit(image);
 
 	}
@@ -121,7 +127,7 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, &scene, smpls);
+				color = path_trace(&cam, x1, y1, &scene, smpls, bounces);
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = max(0, color.Data[0]);
 				r = min(255, color.Data[0]);
@@ -147,7 +153,7 @@ int main(int argc, char** argv)
 		{
 			for(size_t x1 = 0; x1 < width; ++x1)
 			{
-				color = path_trace(&cam, x1, y1, &scene, smpls);
+				color = path_trace(&cam, x1, y1, &scene, smpls, bounces);
 				//color = path_trace_(&cam, x1, y1, scene, smpls);
 				float r=color.Data[0],g=color.Data[1],b=color.Data[2];
 				r = max(0, color.Data[0]);
@@ -181,10 +187,10 @@ int main(int argc, char** argv)
 	}
 	
 	if (!exists) {
-		fprintf(f, "nsamples,runtime\n");
+		fprintf(f, "nsamples,bounces,runtime\n");
 	}
 	double elapsed = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) * 1e-9;
-	fprintf(f, "%ld,%.6f\n", smpls, elapsed);
+	fprintf(f, "%ld,%ld,%.6f\n", smpls, bounces, elapsed);
 	fclose(f);
 	return 0;
 }

@@ -7,6 +7,10 @@
 
 #include "light.h"
 
+Vector black;
+Vector white;
+
+
 Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal){
 	const float u1 = (float)rand() / (float)RAND_MAX;
 	const float u2 = (float)rand() / (float)RAND_MAX;
@@ -39,21 +43,13 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	
 	Vector bitangent;
 	cross_ext(&tangent, normal, &bitangent);
-	//norm_ext(&bitangent, &bitangent);
 	
-	//vecteur direction = x*tangent + y*bitangent + z*normal
-	Vector direction;
 	mul_ext(&tangent, x, &tangent);
 	mul_ext(&bitangent, y, &bitangent);
 	mul_ext(normal, z, &norm);
 	
 	add_ext(&tangent, &bitangent, &ray.direction);
 	add_ext(&ray.direction, &norm, &ray.direction);
-	//norm_ext(&direction, &direction);
-	
-	
-	//ray.direction = direction;
-	//norm_ext(&ray.direction, &ray.direction);
 	
 	return ray;
 }
@@ -136,7 +132,7 @@ void ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax,
 	return;
 }
 
-Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y, Scene const * S, size_t N)
+Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y, Scene const * S, size_t N, size_t bounces)
 {
  	Ray ray;
 	trace_ray(pixel_x, pixel_y, cam, &ray);
@@ -152,7 +148,7 @@ Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y
 	create_vector_ext(&white, 1, 1, 1);
 	
 	for(size_t i = 0; i<N; ++i){
-		ray_sampling(&ray, S, cam, 0, 26, &radiance);
+		ray_sampling(&ray, S, cam, 0, (int)bounces, &radiance);
 		for(int j = 0; j<3; ++j){
 			color.Data[j] += radiance.Data[j];
 		}
@@ -164,4 +160,11 @@ Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y
 	}
 	
 	return color;
+}
+
+int get_bounces(void){
+	char * env = getenv("BOUNCES");
+	if(!env) return 26;
+	else return atoi(env);
+	return 0;
 }

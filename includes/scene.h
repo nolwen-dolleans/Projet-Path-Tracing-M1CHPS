@@ -82,9 +82,11 @@ void free_scene_objects(Scene * S);
 void create_scene_ext(size_t n_objects, const Vector * backgroundColor, Scene * s);
 
 
-void create_sphere_(Primitive* prim, const float radius, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
+void create_sphere(Primitive* prim, const float radius, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
 
-void create_box_(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
+void create_box(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
+
+void create_cube(Primitive* prim, const float width, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
 
 /**
  * @brief Alloc a scene of n\_objects objects, nb\_lightsources light sources and with a background color
@@ -131,9 +133,7 @@ Vector get_normal_vector_sphere(const Vector * point, const Vector *center);
 
 /**
  * @brief Compute the sphere normal vector at a point
- * @param point pointer of the point
- * @param box pointer of box
  * @return pointer to the normal vector
  */
-Vector get_normal_vector_box(const Vector * point, const AABB * box, int *face, int is_intern);
+Vector get_normal_vector_box(int *face, int is_intern);
 #endif /* scene_h */
