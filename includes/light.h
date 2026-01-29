@@ -36,7 +36,8 @@ Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y
 
 int get_bounces(void);
 
-
+static Vector black;
+static Vector white;
 
 
 #endif /* light_h */

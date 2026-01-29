@@ -14,7 +14,8 @@
 typedef enum PRIM_TYPE
 {
 	SPHERE,
-	BOX
+	BBOX, //the Bounding Box
+	BOX //regular Box
 }PRIM_TYPE;
 
 typedef enum {
@@ -24,7 +25,7 @@ typedef enum {
 } material_t;
 
 /**
- * @brief A 3D AAB
+ * @brief A 3D AABB
  * @var min Minimum coordinate
  * @var max Maximum coordinate
  * @var color color faces
@@ -34,6 +35,24 @@ typedef struct AABB
 	Vector bmin;
 	Vector bmax;
 }AABB;
+
+/**
+ * @brief A 3D OBB
+ * @var center Center
+ * @var obb_right Axis right
+ * @var obb_up Axis up
+ * @var obb_direction Axis direction
+ * @var size Distance center to extremity
+ * @var color color faces
+ */
+typedef struct OBB
+{
+	Vector center;
+	Vector obb_right;
+	Vector obb_up;
+	Vector obb_direction;
+	Vector size;
+}OBB;
 
 /**
  * @brief A 3D Sphere
@@ -84,7 +103,7 @@ void create_scene_ext(size_t n_objects, const Vector * backgroundColor, Scene * 
 
 void create_sphere(Primitive* prim, const float radius, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
 
-void create_box(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
+void create_box(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color, const float pitch, const float yaw);
 
 void create_cube(Primitive* prim, const float width, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color);
 
@@ -104,6 +123,14 @@ void add_primitive(Primitive * object, Scene * s);
  * @return If there is an intersection
  */
 bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int * face, int * is_intern);
+
+/**
+ * @brief Compute the intersection of a camra ray and a OBB box
+ * @param r Ray
+ * @param box OBB box
+ * @return If there is an intersection
+ */
+bool intersect_obb(Ray* const r, const OBB* const box, Vector *hit, int *face, int *is_intern);
 
 /**
  * @brief Compute the intersection of a ray and a sphere
@@ -136,4 +163,7 @@ Vector get_normal_vector_sphere(const Vector * point, const Vector *center);
  * @return pointer to the normal vector
  */
 Vector get_normal_vector_box(int *face, int is_intern);
+
+static const float inv255 = 1 / 255.0f;
+
 #endif /* scene_h */
