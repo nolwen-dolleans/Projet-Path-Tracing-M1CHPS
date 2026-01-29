@@ -20,7 +20,6 @@ void free_scene_objects(Scene * S){
 }
 
 void create_scene_ext(size_t n_objects, const Vector * backgroundColor, Scene * s){
-	float inv255 = 1.0f / 255.0f; // normalisation de la couleur
 	s->objects = malloc(sizeof(Primitive)*n_objects);
     for (size_t i = 0; i < n_objects; ++i) {
         s->objects[i] = NULL;
@@ -31,7 +30,6 @@ void create_scene_ext(size_t n_objects, const Vector * backgroundColor, Scene * 
 }
 
 void create_primitive_ext(void * shape, PRIM_TYPE type, float x, float y, float z, material_t m_type, float albedo, Vector *color, Primitive *prim){
-	const float inv255 = 1 / 255.0f;
 	prim->type = type;
 	prim->m_type = m_type;
 	create_vector_ext(&prim->position, x, y, z);
@@ -60,7 +58,6 @@ void create_sphere(Primitive* prim, const float radius, const float x, const flo
 	Sphere * sph = malloc(sizeof(Sphere));
 	sph->radius = radius;
 	
-	const float inv255 = 1 / 255.0f;
 	prim->type = SPHERE;
 	prim->m_type = m_type;
 	create_vector_ext(&prim->position, x, y, z);
@@ -73,19 +70,34 @@ void create_sphere(Primitive* prim, const float radius, const float x, const flo
 	
 }
 
-void create_box(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color)
+void create_box(Primitive* prim, const float width, const float height, const float length, const float x, const float y, const float z, material_t m_type, float albedo, Vector *color, const float pitch, const float yaw)
 {
-	AABB* box = malloc(sizeof(AABB));
+	OBB* box = malloc(sizeof(OBB));
 	
-	box->bmin.Data[0] = x-width/2;
-	box->bmin.Data[1] = y-height/2;
-	box->bmin.Data[2] = z+length/2;
+	create_vector_ext(&box->center, x, y, z);
+
+	float cosA, sinA, cosB, sinB;
+	Vector up;
+	const float alpha=radian(pitch);
+	const float beta=radian(yaw);
+	sinA = sinf(alpha);
+	cosA = cosf(alpha);
+	sinB = sinf(beta);
+	cosB = cosf(beta);
+
+	box->obb_direction = (Vector) {sinB, cosB*sinA, -cosA*cosB};
+
+	if (fabs(box->obb_direction.Data[0]) < 1-EPS) up = (Vector){0.0f, 1.0f, 0.0f};
+	else up = (Vector){1.0f, 0.0f, 0.0f};
 	
-	box->bmax.Data[0] = x+width/2;
-	box->bmax.Data[1] = y+height/2;
-	box->bmax.Data[2] = z-length/2;
+	cross_ext(&box->obb_direction, &up, &(box->obb_right));
+	norm_ext(&(box->obb_right),&(box->obb_right));
 	
-	const float inv255 = 1 / 255.0f;
+	cross_ext(&(box->obb_right), &box->obb_direction, &(box->obb_up));
+	norm_ext(&box->obb_up, &box->obb_up);
+
+	create_vector_ext(&box->size, width*0.5, height*0.5, length*0.5);
+	
 	prim->type = BOX;
 	prim->m_type = m_type;
 	create_vector_ext(&prim->position, x, y, z);
@@ -103,14 +115,13 @@ void create_cube(Primitive* prim, const float width, const float x, const float 
 	
 	box->bmin.Data[0] = x-width/2;
 	box->bmin.Data[1] = y-width/2;
-	box->bmin.Data[2] = z+width/2;
+	box->bmin.Data[2] = z-width/2;
 	
 	box->bmax.Data[0] = x+width/2;
 	box->bmax.Data[1] = y+width/2;
-	box->bmax.Data[2] = z-width/2;
+	box->bmax.Data[2] = z+width/2;
 	
-	const float inv255 = 1 / 255.0f;
-	prim->type = BOX;
+	prim->type = BBOX;
 	prim->m_type = m_type;
 	create_vector_ext(&prim->position, x, y, z);
 	prim->albedo = albedo;
@@ -202,7 +213,7 @@ bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int *face, 
 	}
 	else if (tmin > EPS) {
 		tHit = tmin;
-		*is_intern = 1;
+		*is_intern = 0;
 	}
 	else {
 		return false;
@@ -219,6 +230,51 @@ bool intersect_box(Ray* const r, const AABB* const box, Vector *hit, int *face, 
 	}
 	
 	return true;
+}
+
+bool intersect_obb(Ray* const r, const OBB* const box, Vector *hit, int *face, int *is_intern) {
+
+	Vector o;
+    sub_ext(&r->position, &box->center, &o);
+
+	Vector rotated_origin;
+	Vector rotated_dir;
+    rotated_origin.Data[0] = dot(&o, &box->obb_right);
+	rotated_origin.Data[1] = dot(&o, &box->obb_up);
+	rotated_origin.Data[2] = dot(&o, &box->obb_direction);
+    rotated_dir.Data[0] = dot(&r->direction, &box->obb_right);
+	rotated_dir.Data[1] = dot(&r->direction, &box->obb_up);
+	rotated_dir.Data[2] = dot(&r->direction, &box->obb_direction);
+
+    Ray rotated_ray;
+	rotated_ray.position = rotated_origin;
+	rotated_ray.direction = rotated_dir;
+
+    // Nous reutilisons les proprietees de l'AABB sur la rotated basis
+    AABB rotated_box;
+	Vector rotated_hit;
+    int rotated_face;
+    int rotated_inside;
+
+	rotated_box.bmin.Data[0] = -box->size.Data[0];
+	rotated_box.bmin.Data[1] = -box->size.Data[1];
+	rotated_box.bmin.Data[2] = -box->size.Data[2];
+	rotated_box.bmax.Data[0] = box->size.Data[0];
+	rotated_box.bmax.Data[1] = box->size.Data[1];
+	rotated_box.bmax.Data[2] = box->size.Data[2];
+	
+    if (!intersect_box(&rotated_ray, &rotated_box, &rotated_hit, &rotated_face, &rotated_inside)) return false;
+
+	//Nous recontruisons le point d'intersection sur les trois coordonnees en partant de la position initiale du cube
+    Vector box_hit = box->center;
+    linear_ext(&box_hit, &box->obb_right, rotated_hit.Data[0], &box_hit);
+    linear_ext(&box_hit, &box->obb_up, rotated_hit.Data[1], &box_hit);
+    linear_ext(&box_hit, &box->obb_direction, rotated_hit.Data[2], &box_hit);
+    *hit = box_hit;
+    *face = rotated_face;
+    *is_intern = rotated_inside;
+
+    return true;
 }
 
 Vector get_normal_vector_sphere(const Vector * point, const Vector * center){
@@ -279,7 +335,7 @@ bool intersect_in_scene(struct Ray* r, const Scene* const S, int *object, Vector
 				break;
 			}
 				
-			case BOX: {
+			case BBOX: {
 				AABB *box = (AABB *)S->objects[i]->object;
 				int face;
 				int is_intern;
@@ -299,6 +355,39 @@ bool intersect_in_scene(struct Ray* r, const Scene* const S, int *object, Vector
 				}
 				break;
 			}
+			case BOX: {
+				OBB *box = (OBB *)S->objects[i]->object;
+				int face;
+				int is_intern;
+
+				if (!intersect_obb(r, box, hit, &face, &is_intern))
+					continue;
+
+				Vector diff;
+				sub_ext(hit, origin, &diff);
+				double t2 = dot(&diff, &diff);
+
+				Vector normal;
+				if (t2 < closest_t) {
+					closest_t = t2;
+					object_index = (int) i;
+					best_hit = *hit;
+					switch (face) {
+					case MIN:    normal = box->obb_right;   mul_ext(&normal, -1, &normal); break;
+					case MAX:    normal = box->obb_right;   break;
+					case BOTTOM: normal = box->obb_up;      mul_ext(&normal, -1, &normal); break;
+					case UP:     normal = box->obb_up;      break;
+					case BACK:   normal = box->obb_direction; mul_ext(&normal, -1, &normal); break;
+					case FRONT:  normal = box->obb_direction; break;
+				}
+
+				if (is_intern)
+					mul_ext(&normal, -1.0f, &normal);
+
+				*n = normal;
+				}
+				break;
+			}
 		}
 		
 	}
@@ -310,4 +399,3 @@ bool intersect_in_scene(struct Ray* r, const Scene* const S, int *object, Vector
 	*hit = best_hit;
 	return true;
 }
-

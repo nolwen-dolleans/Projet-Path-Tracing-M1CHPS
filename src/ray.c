@@ -8,17 +8,20 @@ void create_camera(Camera * const cam, const size_t width, const size_t height, 
 	Vector up;
 	const float alpha=radian(pitch);
 	const float beta=radian(yaw);
-	__sincosf(alpha, &sinA, &cosA);
-	__sincosf(beta, &sinB, &cosB);
-	
+	sinA = sinf(alpha);
+	cosA = cosf(alpha);
+	sinB = sinf(beta);
+	cosB = cosf(beta);
+
 	cam->direction = (Vector) {sinB, cosB*sinA, -cosA*cosB};
 	
 	if (fabs(cam->direction.Data[0]) < 1-EPS) up = (Vector){0.0f, 1.0f, 0.0f};
 	else up = (Vector){1.0f, 0.0f, 0.0f};
 	
 	cross_ext(&cam->direction, &up, &(cam->right));
+	norm_ext(&(cam->right),&(cam->right));
+	
 	cross_ext(&(cam->right), &cam->direction, &(cam->up));
-
 	
 	create_vector_ext(&cam->position, x0, y0, z0);
 	cam->width = width;
@@ -27,6 +30,7 @@ void create_camera(Camera * const cam, const size_t width, const size_t height, 
 
 	cam->inv_height = 1.0f/height;
 	cam->inv_width = 1.0f/width;
+
 }
 
 void create_ray_default_ext(Ray * ray)
@@ -45,7 +49,9 @@ void create_ray_ext(Ray * ray, const float x0, const float y0, const float z0, c
 
 void trace_ray(const size_t i, const size_t j, const Camera *cam, Ray* const r)
 {
-	float Pixel_x = (2.0f*i + 1.0f - cam->width) * cam->inv_height * cam->fov;
+   
+
+    float Pixel_x = (2.0f*i + 1.0f - cam->width) * cam->inv_height * cam->fov;
     float Pixel_y = (cam->height - 2.0f*j - 1.0f) * cam->inv_height * cam->fov;
 	
 	

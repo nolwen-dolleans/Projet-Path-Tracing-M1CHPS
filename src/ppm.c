@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 	srand((unsigned int)time(NULL));
 	if(argc != 5)
 	{
-		fprintf(stderr,"Error : Incomplete arguments.\n Please using: %s width height samples",argv[0]);
+		fprintf(stderr,"Error : Incomplete arguments.\n Please using: %s width height samples\n",argv[0]);
 		exit(1);
 	}
 
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 //############ Camera ############
 	const float x0 = 0;
 	const float y0 = 0;
-	const float z0 = 0;
+	const float z0 = 1.5;
 	const float fov = 50;
 	
 	Camera cam;
@@ -41,13 +41,13 @@ int main(int argc, char** argv)
 	create_scene_ext(6, &bg, &scene);
 	
 	
-	const float r = 0.05;
-	const float x = r+0.03+EPS;
+	const float r = 0.15;
+	const float x = r+0.09+EPS;
 	const float y = -r+EPS;
 	const float z = 0.5+EPS;
 	
 	Vector sphere_color1;
-	create_vector_ext(&sphere_color1, 255, 120, 20);
+	create_vector_ext(&sphere_color1, 20, 120, 255);
 	Primitive p1;
 	create_sphere(&p1, r, -x, y, -z, Lambertian, 1, &sphere_color1);
 	add_primitive(&p1, &scene);
@@ -59,28 +59,21 @@ int main(int argc, char** argv)
 	add_primitive(&p2, &scene);
 	
 	Vector sphere_color3;
-	create_vector_ext(&sphere_color3, 255, 255, 20);
+	create_vector_ext(&sphere_color3, 255, 255, 255);
 	Primitive p3;
-	create_sphere(&p3, 6*r, 6*x,y,-(z+0.01), Emissive, 1, &sphere_color3);
+	create_sphere(&p3, 9*r, 9*x,y,-(z+0.01), Emissive, 1, &sphere_color3);
 	add_primitive(&p3, &scene);
 	
-	float r_ground = 1000.0;
-	Vector sphere_color4;
-	create_vector_ext(&sphere_color4, 193,168,154);
-	Primitive p4;
-	create_sphere(&p4, r_ground, 0,-r_ground-2*r-EPS,-z, Lambertian, 1, &sphere_color4);
-	//add_primitive(&p4, &scene);
-	
 	Vector raybox_color;
-	create_vector_ext(&raybox_color, 255, 255, 255);
+	create_vector_ext(&raybox_color, 255, 230, 230);
 	Primitive p5;
-	create_cube(&p5, 2, 0, 1-2*r, 0, Lambertian, 1, &raybox_color);
+	create_cube(&p5, 5, 0, 2.5*(1-2*r), 0, Lambertian, 1, &raybox_color);
 	add_primitive(&p5, &scene);
 	
 	Vector box_color;
 	create_vector_ext(&box_color, 255, 255, 255);
 	Primitive p6;
-	create_box(&p6, 3*EPS, 2, 2, -x-0.07, y, -z, Specular, 0.91, &box_color);
+	create_box(&p6, 0.15, 0.15, 0.3, -x, y-0.4, -z, Lambertian, 1, &box_color, 45, 45);
 	add_primitive(&p6, &scene);
 
 
@@ -171,7 +164,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		fprintf(stderr, "Erreur : argument incorect");
+		fprintf(stderr, "Erreur : argument incorect\n");
 	}
 	free_scene_objects(&scene);
 	clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -194,4 +187,3 @@ int main(int argc, char** argv)
 	fclose(f);
 	return 0;
 }
-

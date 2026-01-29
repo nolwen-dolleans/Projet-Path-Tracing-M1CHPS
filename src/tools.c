@@ -15,7 +15,7 @@ void* malloc_check(const size_t size)
     return data;
 }
 
-float generate_random_value(const float max, const float min)
+const float generate_random_value(const float max, const float min)
 {
     const float delta = max - min;
     const float RMAX = 1.0f/RAND_MAX;

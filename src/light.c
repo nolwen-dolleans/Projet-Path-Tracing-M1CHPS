@@ -7,10 +7,6 @@
 
 #include "light.h"
 
-Vector black;
-Vector white;
-
-
 Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal){
 	const float u1 = (float)rand() / (float)RAND_MAX;
 	const float u2 = (float)rand() / (float)RAND_MAX;
@@ -18,7 +14,8 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	const float phi = 2*M_PI*u2;
 	//les coordonnées dans la base locale
 	float x, y;
-	__sincosf(phi, &y, &x);
+	y = sinf(phi);
+	x = cosf(phi);
 	x *= atheta;
 	y *= atheta;
 	const float z = sqrtf(1 - u1);
@@ -43,13 +40,21 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	
 	Vector bitangent;
 	cross_ext(&tangent, normal, &bitangent);
+	//norm_ext(&bitangent, &bitangent);
 	
+	//vecteur direction = x*tangent + y*bitangent + z*normal
+	Vector direction;
 	mul_ext(&tangent, x, &tangent);
 	mul_ext(&bitangent, y, &bitangent);
 	mul_ext(normal, z, &norm);
 	
 	add_ext(&tangent, &bitangent, &ray.direction);
 	add_ext(&ray.direction, &norm, &ray.direction);
+	//norm_ext(&direction, &direction);
+	
+	
+	//ray.direction = direction;
+	//norm_ext(&ray.direction, &ray.direction);
 	
 	return ray;
 }
