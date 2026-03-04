@@ -1,6 +1,7 @@
 #include "image.h"
 #include "vector.h"
 
+<<<<<<< HEAD
 Image_24bit* create_image_24bit(const size_t width, const size_t height)
 {
     Image_24bit* img = (Image_24bit*)malloc(width * height * sizeof(Image_24bit));
@@ -76,6 +77,11 @@ Image_24bit_ptr* create_image_24bit_ptr(const size_t width, const size_t height)
 Image_32bit* create_image_32bit(const size_t width, const size_t height, const size_t samples)
 {
     Image_32bit* img = (Image_32bit*)malloc(width * height * sizeof(Image_32bit));
+=======
+Image_32bit* create_image_32bit(const size_t width, const size_t height, const size_t samples)
+{
+    Image_32bit* img = (Image_32bit*)malloc(sizeof(Image_32bit));
+>>>>>>> a6707ad (Initial commit on MPI branch)
     if(img == NULL)
     {
         fprintf(stderr,"Failed to allocate memory.\n");
@@ -86,7 +92,16 @@ Image_32bit* create_image_32bit(const size_t width, const size_t height, const s
     img->height = height;
 	char path[100];
 	sprintf(path, "image/image_32bit%ld.ppm", samples);
+<<<<<<< HEAD
     img->img_file = fopen(path, "w");
+=======
+    if (mpi_rank == 0) {
+        img->img_file = fopen(path, "w");
+    }
+    else {
+        img->img_file = fopen(path, "a");
+    }
+>>>>>>> a6707ad (Initial commit on MPI branch)
 
     if(img->img_file == NULL)
     {
@@ -113,6 +128,7 @@ uint32_t get_color_32bit(const uint8_t r, const uint8_t g, const uint8_t b, cons
     return a << 24 | r << 16 | g << 8 | b;
 }
 
+<<<<<<< HEAD
 void set_color_24bit(uint24_t* color,const uint8_t r, const uint8_t g, const uint8_t b)
 {
     color->byte[0] = r;
@@ -126,12 +142,15 @@ void set_color_24bit_ptr(uint24_t_ptr* color,const size_t i,const uint8_t r, con
     color->bytes[1][i] = g;
     color->bytes[2][i] = b;
 }
+=======
+>>>>>>> a6707ad (Initial commit on MPI branch)
 
 void put_color_at_32bit(Image_32bit* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
    img->buffer[y * img->width + x] = get_color_32bit(r,g,b,a);
 }
 
+<<<<<<< HEAD
 void put_color_at_24bit_ptr(Image_24bit_ptr* const img, const size_t x, const size_t y, const uint8_t r, const uint8_t g, const uint8_t b)
 {
    img->buffer.bytes[0][y * img->width + x] = r;
@@ -157,6 +176,8 @@ void write_pixel_color_24bit(FILE* img, uint24_t* color)
     fprintf(img, "%d ", color->byte[1]);
     fprintf(img, "%d ", color->byte[2]);
 }
+=======
+>>>>>>> a6707ad (Initial commit on MPI branch)
 
 void write_pixel_color_32bit(FILE* img, const uint32_t color)
 {
@@ -165,6 +186,7 @@ void write_pixel_color_32bit(FILE* img, const uint32_t color)
     fprintf(img, "%d ", (color & 0x0000FF));
 }
 
+<<<<<<< HEAD
 void clear_frame_color_24bit(Image_24bit *const img, const uint8_t r, const uint8_t g, const uint8_t b)
 {
     for(size_t i = 0; i < img->height * img->width; ++i)
@@ -185,12 +207,15 @@ void clear_frame_color_24bit_ptr(Image_24bit_ptr *const img, const uint8_t r, co
     }
 }
 
+=======
+>>>>>>> a6707ad (Initial commit on MPI branch)
 void clear_frame_color_32bit(Image_32bit *const img, const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
     const uint32_t color = get_color_32bit(r, g, b, a);
     memset(img->buffer, color, img->height * img->width * sizeof(uint32_t));
 }
 
+<<<<<<< HEAD
 void clear_frame_sky_color_24bit(Image_24bit *const img)
 {
     for(size_t i = 0; i < img->height; ++i)
@@ -229,6 +254,14 @@ void write_image_file_24bit_ptr(Image_24bit_ptr *const img)
 void write_image_file_32bit(Image_32bit *const img)
 {
     fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->width, img->height, 255);
+=======
+void write_image_file_32bit(Image_32bit *const img)
+{
+    if (mpi_rank == 0) {
+        fprintf(img->img_file, "P3\n%ld %ld\n%d\n", img->width, img->height*mpi_size, 255);
+        fflush(img->img_file);
+    }
+>>>>>>> a6707ad (Initial commit on MPI branch)
 
     for(size_t i = 0; i < img->height * img->width; ++i)
     {
@@ -237,6 +270,7 @@ void write_image_file_32bit(Image_32bit *const img)
     }
 }
 
+<<<<<<< HEAD
 void free_image_24bit(Image_24bit* img)
 {
     if(img)
@@ -277,6 +311,8 @@ void free_image_24bit_ptr(Image_24bit_ptr* img)
     
 }
 
+=======
+>>>>>>> a6707ad (Initial commit on MPI branch)
 void free_image_32bit(Image_32bit* img)
 {
     if(img)
