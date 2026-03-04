@@ -1,0 +1,47 @@
+[
+{
+  "bounces": 1,
+  "cpu_cycles": 858275958921,
+  "instructions": 1234285590256,
+  "cache_references": 117868519,
+  "cache_misses": 7416781,
+  "elapsed_time_sec": 39.85,
+  "max_memory_kb": 11136
+},
+{
+  "bounces": 5,
+  "cpu_cycles": 3992929574468,
+  "instructions": 5615014272502,
+  "cache_references": 602622730,
+  "cache_misses": 33933172,
+  "elapsed_time_sec": 183.59,
+  "max_memory_kb": 11136
+},
+{
+  "bounces": 10,
+  "cpu_cycles": 7111536625908,
+  "instructions": 10071636174726,
+  "cache_references": 1234549059,
+  "cache_misses": 86832924,
+  "elapsed_time_sec": 335.71,
+  "max_memory_kb": 11264
+},
+{
+  "bounces": 15,
+  "cpu_cycles": 9272167500351,
+  "instructions": 13068637308085,
+  "cache_references": 1606520614,
+  "cache_misses": 79338940,
+  "elapsed_time_sec": 418.35,
+  "max_memory_kb": 11136
+},
+{
+  "bounces": 20,
+  "cpu_cycles": 11036854768739,
+  "instructions": 15548490375640,
+  "cache_references": 2031690817,
+  "cache_misses": 112091640,
+  "elapsed_time_sec": 502.89,
+  "max_memory_kb": 11008
+}
+]
