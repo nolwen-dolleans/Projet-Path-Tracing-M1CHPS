@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.15)
 project(ppm LANGUAGES C)
 set(CMAKE_C_STANDARD 11)
 
+<<<<<<< HEAD
+=======
+find_package(MPI REQUIRED)
+>>>>>>> a6707ad (Initial commit on MPI branch)
 
 add_library(LibPathTracing
     src/image.c
@@ -22,6 +26,7 @@ target_include_directories(LibPathTracing PUBLIC ${PROJECT_SOURCE_DIR}/includes)
 
 target_link_libraries(LibPathTracing m)
 
+<<<<<<< HEAD
 add_executable(ppm src/ppm.c
     src/image.c
     src/ray.c
@@ -30,6 +35,10 @@ add_executable(ppm src/ppm.c
     src/vector.c
     src/light.c)
 target_link_libraries(ppm PRIVATE LibPathTracing)
+=======
+add_executable(ppm src/ppm.c)
+target_link_libraries(ppm PRIVATE LibPathTracing MPI::MPI_C)
+>>>>>>> a6707ad (Initial commit on MPI branch)
 
 
 target_compile_options(ppm PRIVATE ${COMMON_COMPILE_FLAGS})
@@ -40,8 +49,11 @@ add_executable(test_runner
                             test/test_ray.c
                             test/test_tools.c
                             test/test_scene.c
+<<<<<<< HEAD
                             src/scene.c
                             src/ray.c
+=======
+>>>>>>> a6707ad (Initial commit on MPI branch)
 )
 target_compile_options(test_runner PRIVATE ${COMMON_COMPILE_FLAGS})
 
