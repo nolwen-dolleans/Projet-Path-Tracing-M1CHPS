@@ -1,11 +1,17 @@
-### Utilisation de l'executable ppm
-#### <br>
+### Monte Carlo Path Tracing
+A path tracer using Monte Carlo for image rendering written in C.
+
+#### Build: <br>
+   cmake -B build
+   make -C build
+<br>
+
+#### Run: <br>
     mkdir -p image
-    ./build/ppm 24 width height
-    #ou
-    ./build/ppm 32 width height
-    #ou 
-    ./build/ppm 24ptr width height
-    #ou 
-    ./build/ppm path width height
+    mkdir -p performance
+
+    export BOUNCES=number_of_bounces (facultative)
+    ./build/ppm width height amount_of_samples
+
+    
 <br>
