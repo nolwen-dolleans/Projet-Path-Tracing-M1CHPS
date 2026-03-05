@@ -4,6 +4,7 @@ A path tracer using Monte Carlo for image rendering written in C.
 #### Build: <br>
    cmake -B build
    make -C build
+   
 <br>
 
 #### Run: <br>
@@ -11,7 +12,6 @@ A path tracer using Monte Carlo for image rendering written in C.
     mkdir -p performance
 
     export BOUNCES=number_of_bounces (facultative)
-    ./build/ppm width height amount_of_samples
-
+    ./build/ppm width height amount_of_sample
     
 <br>
