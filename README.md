@@ -45,17 +45,17 @@ The goal of this experiment is to measure the performances of the Path Tracer by
 
 #### Time Mesurement
 The measure of runtime is already in the path tracer, using the clock.h library. Indeed, the time will be get with the function:
-'''c
+```c
 clock_gettime();
-'''
+```
 called 2 times to get time at start and the end. then, they will be substracted to get the runtime:
-'''c
+```c
 int start, end;
 clock_gettime(CLOCK_MONOTONIC, &start);
 ...
 clock_gettime(CLOCK_MONOTONIC, &end);
 int runtime = end - start;
-'''
+```
 
 
 The runtime will be exported in the file runtime_by_samplings.csv in performance/measures converted in seconds.
