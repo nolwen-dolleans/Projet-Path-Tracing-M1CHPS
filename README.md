@@ -24,8 +24,12 @@ A path tracer using Monte Carlo for image rendering written in C.
 
 
 ## Experiments
-We decide to focus our model on runtime optimization. For that, we use 2 protocols : one for the runtime itself and another for the convergence speed measurment. In fact, some optimizations to decrease the runtime can drastically affect the convergence speed.
+We focus our study on runtime optimization.
+Two experimental protocols are used:
+   - runtime measurement
+	- convergence speed measurement
 
+Some optimizations that reduce runtime can negatively impact convergence speed.
 
 ### Protocol 1: The runtime
 
@@ -37,30 +41,55 @@ The goal of this experiment is to measure the performances of the Path Tracer by
    - CMake
    - mpich 4.3.0
 
-#### Setting up
-   - Width and Height resolution: WxH
+#### Setup
+Build the project in Release mode:
+   ```bash
+   cmake -B build -DCMAKE_BUILD_TYPE=Release
+   make -C build
+   ```
+   - Image resolution: WxH
    - Number of samples: N
    - Number of bounces: B
-   - Benshmark, homemaid or an inclued one
+   - Benchmark scene: either homemade or predefined
 
-#### Time Mesurement
-The measure of runtime is already in the path tracer, using the clock.h library. Indeed, the time will be get with the function:
+#### Time Measurement
+Runtime measurement is implemented directly in the path tracer using:
 ```c
 clock_gettime();
 ```
-called 2 times to get time at start and the end. then, they will be substracted to get the runtime:
+The function is called twice:
 ```c
-int start, end;
+struct timespec start, end;
+
 clock_gettime(CLOCK_MONOTONIC, &start);
-...
+
+/* rendering computation */
+
 clock_gettime(CLOCK_MONOTONIC, &end);
-int runtime = end - start;
 ```
 
+Run the experiment:
+```bash
+   export BOUNCES=b
+   mpirun -n "number of mpi processes" ./build/ppm W H N
+   ```
 
-The runtime will be exported in the file runtime_by_samplings.csv in performance/measures converted in seconds.
-     
+Runtime measurements are exported to:
+```code
+performance/measures/runtime_by_samplings.csv
+```
+All runtimes are stored in seconds.
 
+By default, the executable generates:
+   - one rendered image
+   - one runtime measurement
+To perform multiple measurements during a single execution, use:
+     ```bash
+   mpirun -n "number of mpi processes" ./build/ppm W H N number_of_measures
+   ```
+where number_of_measures specifies how many measurements are taken between 1 and N samples.
 
+To generate only the final image instead of all intermediate images, use "no_image" option. 
+#### 
 
 
