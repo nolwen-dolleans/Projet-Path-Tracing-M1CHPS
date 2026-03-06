@@ -12,6 +12,9 @@
 
 #define EPS 1e-4
 
+extern int mpi_rank;
+extern int mpi_size;
+
 /**
  * @brief State of quadratic resolution
  * @var TWO_SOLUTION two solution available

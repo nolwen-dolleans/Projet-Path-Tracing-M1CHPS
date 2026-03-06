@@ -1,6 +1,7 @@
 #include "tools.h"
 
-
+int mpi_rank = 0;
+int mpi_size = 1;
 
 void* malloc_check(const size_t size)
 {

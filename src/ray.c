@@ -58,8 +58,8 @@ void trace_ray(const size_t i, const size_t j, const Camera *cam, Ray* const r)
 	r->position = cam->position;
 
 	r->direction.Data[0] = cam->direction.Data[0] + Pixel_x * cam->right.Data[0] + Pixel_y * cam->up.Data[0];
-	r->direction.Data[1] = cam->direction.Data[1] + Pixel_y * cam->right.Data[1] + Pixel_y * cam->up.Data[1];
-	r->direction.Data[2] = cam->direction.Data[2] + Pixel_y * cam->right.Data[2] + Pixel_y * cam->up.Data[2];
+	r->direction.Data[1] = cam->direction.Data[1] + Pixel_x * cam->right.Data[1] + Pixel_y * cam->up.Data[1];
+	r->direction.Data[2] = cam->direction.Data[2] + Pixel_x * cam->right.Data[2] + Pixel_y * cam->up.Data[2];
 
 	norm_ext(&r->direction, &r->direction);
 }
