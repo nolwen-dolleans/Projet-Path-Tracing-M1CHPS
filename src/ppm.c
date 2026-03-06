@@ -30,10 +30,23 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 	
+	
 
 	const int width  = atoi(argv[1]);
 	const int height = atoi(argv[2]);
 	const size_t smpls = atoi(argv[3]);
+	size_t limit = 1;
+	int can_print_image = 1;
+	if(argc > 4){
+		limit = atoi(argv[4]);
+		if(argc == 6) {
+			if(strcmp(argv[5], "no_image")){
+				printf("Error: please use \"no_image\" insted of \"%s\".", argv[5]);
+				exit(1);
+			}
+			can_print_image = 0;
+		}
+	}
 	
 	size_t bounces = (size_t) get_bounces();
 
@@ -45,6 +58,9 @@ int main(int argc, char** argv)
 	Vector color;
 //#############################################################################
 	
+	if(!limit) exit(1);
+	size_t print_rate = smpls / limit;
+	if(print_rate == 0) print_rate = 1;
 	
 	Image_32bit *image = create_image_32bit(width, height, smpls);
 
@@ -61,7 +77,7 @@ int main(int argc, char** argv)
 	for(size_t i = 1; i <= smpls; ++i) {
 		path_trace(width, height, &scene, bounces, smpls, local_color_buffer);
 
-		if (i % 10 == 0) {
+		if (i % print_rate == 0) {
 			float inv_samples = 255.f / (float)(i + 1);
 
 			for(size_t y = 0; y < per_t_height; ++y) {
@@ -83,8 +99,11 @@ int main(int argc, char** argv)
 
 			if (mpi_size != 1){
 				if (mpi_rank == 0) {
-					MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, image->buffer, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
-					write_image_file_32bit(image, i);
+					if((can_print_image)||(i==smpls)){
+						MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, image->buffer, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
+						write_image_file_32bit(image, i);
+					}
+					
 					
 					
 					
@@ -113,7 +132,8 @@ int main(int argc, char** argv)
 					
 				}
 				else {
-					MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, NULL, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
+					if(can_print_image || i==smpls)
+						MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, NULL, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
 				}
 			}
 			else {
