@@ -7,7 +7,7 @@
 
 #include "scene.h"
 
-void free_scene(Scene * S){
+void free_scene(Scene* S){
 	free_scene_objects(S);
 	if(S->objects) free(S);
 	
@@ -16,6 +16,7 @@ void free_scene(Scene * S){
 void free_scene_objects(Scene * S){
 	for (size_t i = 0; i<S->size_objects; ++i) {
 		if(S->objects[i]) free(S->objects[i]->object);
+		if(S->objects[i]) free(S->objects[i]);
 	}
 }
 

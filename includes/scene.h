@@ -78,6 +78,7 @@ typedef struct Scene{
 	Primitive ** objects;
 	Vector * background_color;
 	size_t size_objects;
+	Camera camera;
 }Scene;
 
 /**

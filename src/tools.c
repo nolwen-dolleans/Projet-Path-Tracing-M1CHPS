@@ -1,11 +1,7 @@
 #include "tools.h"
 
-<<<<<<< HEAD
-
-=======
 int mpi_rank = 0;
 int mpi_size = 1;
->>>>>>> a6707ad (Initial commit on MPI branch)
 
 void* malloc_check(const size_t size)
 {

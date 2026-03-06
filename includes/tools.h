@@ -12,12 +12,9 @@
 
 #define EPS 1e-4
 
-<<<<<<< HEAD
-=======
 extern int mpi_rank;
 extern int mpi_size;
 
->>>>>>> a6707ad (Initial commit on MPI branch)
 /**
  * @brief State of quadratic resolution
  * @var TWO_SOLUTION two solution available

@@ -12,7 +12,9 @@
 #include "scene.h"
 
 
-
+void benchmark1(Scene* scene, size_t width, size_t height);
+void benchmark_medium(Scene* scene, size_t width, size_t height);
+void benchmark_huge(Scene* scene, size_t width, size_t height);
 
 /**
  * @brief  recursive path-tracing algorithm to compute a single sample with Lambertian materials.
@@ -22,17 +24,17 @@
  * @param dmax maximum bounces number
  * @param radiance color of the pixels at the e object
  */
-void ray_sampling(Ray * r, const Scene * S, const Camera * cam, int d, int dmax, Vector * radiance);
+void ray_sampling(Ray * r, const Scene * S, int d, int dmax, Vector * radiance);
 
 /**
  * @brief Trace 3D ray from the camera with Path Tracing with N samples
- * @param pixel_x index x of the pixel
- * @param pixel_y index y of the pixel
- * @param S the scene of objects
- * @param N number of samples
- * @return color the color of the pixel
+ * @param pixel_x input: index x of the pixel
+ * @param pixel_y input: index y of the pixel
+ * @param S input: the scene of objects
+ * @param N input: number of samples
+ * @param color output: the color of the pixel
  */
-Vector path_trace(Camera * const cam, const size_t pixel_x, const size_t pixel_y, Scene const * S, size_t N, size_t bounces);
+void path_trace(const int width, const int height, Scene const * S, const size_t bounces, const size_t N, float* color_buffer);
 
 int get_bounces(void);
 
