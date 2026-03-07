@@ -89,10 +89,12 @@ To perform multiple measurements during a single execution, use:
    ```
 where number_of_measures specifies how many measurements are taken between 1 and N samples.
 
-To generate only the final image instead of all intermediate images, use "no_image" option. Example
+To generate only the final image instead of all intermediate images, use "no_image" option.
+
+Example:
 ```bash
 export BOUNCES=10
-mpirun -n "number of mpi processes" ./build/ppm 800 600 1000 100 no_image
+mpirun -n 4 ./build/ppm 800 600 1000 100 no_image
 ```
 #### 
 
