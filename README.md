@@ -68,28 +68,32 @@ clock_gettime(CLOCK_MONOTONIC, &start);
 clock_gettime(CLOCK_MONOTONIC, &end);
 ```
 
-Run the experiment:
-```bash
-   export BOUNCES=b
-   mpirun -n "number of mpi processes" ./build/ppm W H N
-   ```
-
 Runtime measurements are exported to:
 ```code
 performance/measures/runtime_by_samplings.csv
 ```
 All runtimes are stored in seconds.
 
+Run the experiment:
+```bash
+   export BOUNCES=b
+   mpirun -n "number of mpi processes" ./build/ppm W H N
+   ```
+
 By default, the executable generates:
    - one rendered image
    - one runtime measurement
 To perform multiple measurements during a single execution, use:
-     ```bash
+ ```bash
    mpirun -n "number of mpi processes" ./build/ppm W H N number_of_measures
    ```
 where number_of_measures specifies how many measurements are taken between 1 and N samples.
 
-To generate only the final image instead of all intermediate images, use "no_image" option. 
+To generate only the final image instead of all intermediate images, use "no_image" option. Example
+```bash
+export BOUNCES=10
+mpirun -n "number of mpi processes" ./build/ppm 800 600 1000 100 no_image
+```
 #### 
 
 
