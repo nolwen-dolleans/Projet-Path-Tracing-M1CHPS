@@ -40,6 +40,7 @@ The goal of this experiment is to measure the performances of the Path Tracer by
    - Compiler: gcc / clang
    - CMake
    - mpich 4.3.0
+   - Open MP
 
 #### Setup
 Build the project in Release mode:
@@ -50,6 +51,8 @@ Build the project in Release mode:
    - Image resolution: WxH
    - Number of samples: N
    - Number of bounces: B
+   - Number of processes MPI: M
+   - Number of threads Open MP: O
    - Benchmark scene: either homemade or predefined
 
 #### Time Measurement
@@ -76,8 +79,9 @@ All runtimes are stored in seconds.
 
 Run the experiment:
 ```bash
+   export OMP_NUM_THREADS=M
    export BOUNCES=b
-   mpirun -n "number of mpi processes" ./build/ppm W H N
+   mpirun -n O ./build/ppm W H N
    ```
 
 By default, the executable generates:
@@ -85,7 +89,7 @@ By default, the executable generates:
    - one runtime measurement
 To perform multiple measurements during a single execution, use:
  ```bash
-   mpirun -n "number of mpi processes" ./build/ppm W H N number_of_measures
+   mpirun -n O ./build/ppm W H N "number_of_measures"
    ```
 where number_of_measures specifies how many measurements are taken between 1 and N samples.
 
@@ -93,6 +97,7 @@ To generate only the final image instead of all intermediate images, use "no_ima
 
 Example:
 ```bash
+export OMP_NUM_THREADS=8
 export BOUNCES=10
 mpirun -n 4 ./build/ppm 800 600 1000 100 no_image
 ```
