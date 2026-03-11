@@ -27,7 +27,7 @@ A path tracer using Monte Carlo for image rendering written in C.
 We focus our study on runtime optimization.
 Two experimental protocols are used:
    - runtime measurement
-	- convergence speed measurement
+   - convergence speed measurement
 
 Some optimizations that reduce runtime can negatively impact convergence speed.
 
