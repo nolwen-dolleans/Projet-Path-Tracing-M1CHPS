@@ -10,7 +10,9 @@
 
 
 #include "scene.h"
+#include <omp.h>
 
+extern unsigned int seed_per_thread;
 
 void benchmark1(Scene* scene, size_t width, size_t height);
 void benchmark_medium(Scene* scene, size_t width, size_t height);
@@ -24,7 +26,7 @@ void benchmark_huge(Scene* scene, size_t width, size_t height);
  * @param dmax maximum bounces number
  * @param radiance color of the pixels at the e object
  */
-void ray_sampling(Ray * r, const Scene * S, int d, int dmax, Vector * radiance);
+void ray_sampling(Ray * r, const Scene * S, int dmax, Vector * radiance);
 
 /**
  * @brief Trace 3D ray from the camera with Path Tracing with N samples

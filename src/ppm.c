@@ -1,30 +1,17 @@
-#include "image.h"
-#include "ray.h"
 #include "light.h"
-#include "scene.h"
-#include "vector.h"
 #include <time.h>
 #include <unistd.h>
 
-#if(APPLE)
 #include "mpi.h"
-#else
-#include <mpi.h>
-#endif
 
 
 int main(int argc, char** argv)
 {
-	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
 	setvbuf(stdout, NULL, _IONBF, 0);
 	int tag = 1000;
 	
-	struct timespec t0, t1;
-	clock_gettime(CLOCK_MONOTONIC, &t0);
 	srand((unsigned int)time(NULL));
-	if(argc != 4)
+	if(argc < 4)
 	{
 		fprintf(stderr,"Error : Incomplete arguments.\n Please using: %s width height samples\n",argv[0]);
 		exit(1);
@@ -53,7 +40,7 @@ int main(int argc, char** argv)
 	
 //######################### Create the entier scene ###########################
 	Scene scene;
-	benchmark_medium(&scene, width, height);
+	benchmark1(&scene, width, height);
 
 	Vector color;
 //#############################################################################
@@ -61,11 +48,19 @@ int main(int argc, char** argv)
 	if(!limit) exit(1);
 	size_t print_rate = smpls / limit;
 	if(print_rate == 0) print_rate = 1;
+	int first = 1;
+	
+	MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
 	
 	Image_32bit *image = create_image_32bit(width, height, smpls);
-
+	
+	struct timespec t0, t1;
 	if (mpi_rank == 0) {
 		fprintf(stdout,"Using path tracing image %dx%d.\n", width, height);
+		
+		clock_gettime(CLOCK_MONOTONIC, &t0);
 	}
 
 	const size_t per_t_height = height / mpi_size;
@@ -74,6 +69,7 @@ int main(int argc, char** argv)
 
 	uint32_t *local_pixels_buffer = malloc(width * per_t_height * sizeof(uint32_t));
 
+	
 	for(size_t i = 1; i <= smpls; ++i) {
 		path_trace(width, height, &scene, bounces, smpls, local_color_buffer);
 
@@ -83,11 +79,11 @@ int main(int argc, char** argv)
 			for(size_t y = 0; y < per_t_height; ++y) {
 				for(size_t x = 0; x < width; ++x) {
 					size_t idx = y * width + x;
-					size_t c = idx * 3;
+					size_t idx_rgb = idx * 3;
 
-					float r = local_color_buffer[c+0] * inv_samples;
-					float g = local_color_buffer[c+1] * inv_samples;
-					float b = local_color_buffer[c+2] * inv_samples;
+					float r = local_color_buffer[idx_rgb]   * inv_samples;
+					float g = local_color_buffer[idx_rgb+1] * inv_samples;
+					float b = local_color_buffer[idx_rgb+2] * inv_samples;
 
 					r = max(0.f, min(255.f, r));
 					g = max(0.f, min(255.f, g));
@@ -99,14 +95,6 @@ int main(int argc, char** argv)
 
 			if (mpi_size != 1){
 				if (mpi_rank == 0) {
-					if((can_print_image)||(i==smpls)){
-						MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, image->buffer, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
-						write_image_file_32bit(image, i);
-					}
-					
-					
-					
-					
 					clock_gettime(CLOCK_MONOTONIC, &t1);
 					
 					if (mpi_rank == 0) {
@@ -121,14 +109,20 @@ int main(int argc, char** argv)
 						}
 						
 						if (!exists) {
-							fprintf(f, "nsamples,bounces,runtime\n");
+							fprintf(f, "MPI,OMP,nsamples,bounces,runtime\n");
 						}
+						
 						double elapsed = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) * 1e-9;
-						fprintf(f, "%ld,%ld,%.6f\n", i, bounces, elapsed);
+						fprintf(f, "%d,%d,%ld,%ld,%.6f\n",mpi_size, omp_get_num_threads(), i, bounces, elapsed);
+						if(i == smpls) fprintf(f, "\n");
 						fclose(f);
 					}
 					
 					
+					if((can_print_image)||(i==smpls)){
+						MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, image->buffer, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
+						write_image_file_32bit(image, i);
+					}
 					
 				}
 				else {
@@ -142,9 +136,6 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-	
-	
-	
 	MPI_Finalize();
 	
 	

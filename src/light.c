@@ -7,9 +7,12 @@
 
 #include "light.h"
 
+unsigned int seed_per_thread;
+
 Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal){
-	const float u1 = (float)rand() / (float)RAND_MAX;
-	const float u2 = (float)rand() / (float)RAND_MAX;
+	
+	const float u1 = rand_r(&seed_per_thread) / (float)RAND_MAX;
+	const float u2 = rand_r(&seed_per_thread) / (float)RAND_MAX;
 	const float atheta = sqrtf(u1);
 	const float phi = 2*M_PI*u2;
 	//les coordonnées dans la base locale
@@ -59,7 +62,96 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	return ray;
 }
 
+void ray_sampling(Ray *r, const Scene * S, int dmax, Vector * radiance){
+	Vector L_reflected_i = {1.f, 1.f, 1.f};
+	Ray current_ray = *r;
+	
+	for (int i = 0; i < 3; ++i){
+			radiance->Data[i] = 0.0f;
+	}
+	
+	for (int d = 0; d<dmax; ++d) {
+		
+		Vector n;
+		Vector hit;
+		int object = -1;
+		if (!intersect_in_scene(&current_ray, S, &object, &hit, &n)) {
+			//printf("bite\n");
+			for (int i = 0; i < 3; ++i) {
+				radiance->Data[i] += L_reflected_i.Data[i] * S->background_color->Data[i];
+			}
+			return;
+		}
+		
+		if (dot(&n, &current_ray.direction) > 0.0f) {
+			mul_ext(&n, -1.0f, &n);
+		}
+		
+		const Primitive *obj = S->objects[object];
+		const float albedo = obj->albedo;
+		
+		
+		Vector offset_origin;
+		Vector n_eps;
+		mul_ext(&n, EPS, &n_eps);
+		add_ext(&hit, &n_eps, &offset_origin);
+		
+		
+		switch (obj->m_type){
+			case Emissive:{
+				for (int i = 0; i < 3; ++i){
+					radiance->Data[i] += L_reflected_i.Data[i] * obj->color.Data[i] * albedo;
+				}
+				return;
+			}
+				
+			case Lambertian:
+			{
+				
+				if (dot(&n, &current_ray.direction) > 0.0f) {
+					mul_ext(&n, -1.0f, &n);
+					mul_ext(&n, 1e-4, &n_eps);
+					add_ext(&hit, &n_eps, &offset_origin);
+				}
+				Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
+				
+				for (int i = 0; i < 3; ++i){
+					L_reflected_i.Data[i] *= obj->color.Data[i] * albedo;
+				}
+				current_ray = r_new;
+				break;
+			}
+			case Specular:{
+				float dotn = dot(&current_ray.direction, &n);
+				
+				
+				Vector wo;
+				wo.Data[0] = current_ray.direction.Data[0] - 2.0f * dotn * n.Data[0];
+				wo.Data[1] = current_ray.direction.Data[1] - 2.0f * dotn * n.Data[1];
+				wo.Data[2] = current_ray.direction.Data[2] - 2.0f * dotn * n.Data[2];
+				
+				norm_ext(&wo, &wo);
+				
+				Ray r_new;
+				r_new.direction = wo;
+				r_new.position = offset_origin;
+				
+				
+				for (int i = 0; i < 3; ++i){
+					L_reflected_i.Data[i] *= obj->color.Data[i] * obj->albedo;
+				}
+				
+				current_ray = r_new;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < 3; ++i){
+			radiance->Data[i] = 0.0f;
+	}
+}
 
+/*
 void ray_sampling(Ray * r, const Scene * S, int d, int dmax, Vector * radiance){
 	Vector hit;
 	int object = -1;
@@ -138,32 +230,34 @@ void ray_sampling(Ray * r, const Scene * S, int d, int dmax, Vector * radiance){
 	}
 	return;
 }
-
+*/
 void path_trace(const int width, const int height, Scene const * S, const size_t bounces, const size_t N, float* color_buffer)
 {
 	Vector color;
 	
 	const size_t per_t_height = height/mpi_size;
 	
-	for(size_t y1 = per_t_height*mpi_rank; y1 < per_t_height*(mpi_rank+1); ++y1)
+#pragma omp parallel
 	{
+		seed_per_thread = time(NULL) ^ (mpi_rank << 8) ^ omp_get_thread_num();
+#pragma omp for collapse(2) scheduling(dynamic)
+	for(size_t y1 = per_t_height*mpi_rank; y1 < per_t_height*(mpi_rank+1); ++y1){
 		size_t local_y = y1 - per_t_height * mpi_rank;
-		for(size_t x1 = 0; x1 < width; ++x1)
-		{
-			
+		for(size_t x1 = 0; x1 < width; ++x1){
 			Ray ray;
-		    trace_ray(x1, y1, &S->camera, &ray);
- 
-		    Vector radiance;
-		    ray_sampling(&ray, S, 0, (int)bounces, &radiance);
- 
-		    size_t index = (local_y * width + x1) * 3;
- 
+			trace_ray(x1, y1, &S->camera, &ray);
+			
+			Vector radiance;
+			ray_sampling(&ray, S, (int)bounces, &radiance);
+			
+			size_t index = (local_y * width + x1) * 3;
+			
 			color_buffer[index+0] += radiance.Data[0];
 			color_buffer[index+1] += radiance.Data[1];
 			color_buffer[index+2] += radiance.Data[2];
 		}
 	}
+}
 	return;
 }
 
@@ -218,9 +312,9 @@ void benchmark_huge(Scene* scene, size_t width, size_t height){
 		}
 	}
 	
-	Vector black = {0.f,0.f,0.f};
+	Vector color_bg = {200.f,200.f,200.f};
 	Primitive* p = malloc(sizeof(Primitive));
-	create_cube(p, dist*2+0.5, 0, 0, 0, Lambertian, 1, &black);
+	create_cube(p, dist*2+0.5, 0, 0, 0, Lambertian, 1, &color_bg);
 	add_primitive(p, scene);
 }
 
@@ -228,12 +322,12 @@ void benchmark_huge(Scene* scene, size_t width, size_t height){
 void benchmark1(Scene* scene, size_t width, size_t height){
 	
 	const float x0  =  0.0;
-	const float y0  = -0.2;
-	const float z0  =  0.9;
+	const float y0  = -0.4;
+	const float z0  =  0.0;
 	const float fov =  50;
 	
 	Camera cam;
-	create_camera(&cam, width, height, fov, x0, y0, z0, 10, 0);
+	create_camera(&cam, width, height, fov, x0, y0, z0, 15, 0);
 	scene->camera = cam;
 	
 	Vector bg;
@@ -267,23 +361,23 @@ void benchmark1(Scene* scene, size_t width, size_t height){
 	create_sphere(p4, 0.10, -0.18, 0.12, -1.03, Lambertian, 1, &white);
 	add_primitive(p4, scene);
 	
-	create_sphere(p5, 0.06, -0.18, 0.10, -0.98, Lambertian, 1, &black);
+	create_sphere(p5, 0.06, -0.18, 0.10, -0.99, Lambertian, 1, &black);
 	add_primitive(p5, scene);
 	
-	create_sphere(p6, 0.06, 0.18, 0.10, -0.98, Lambertian, 1, &black);
+	create_sphere(p6, 0.06, 0.18, 0.10, -0.99, Lambertian, 1, &black);
 	add_primitive(p6, scene);
 	
 	create_sphere(p7, 0.10, 0.18, 0.12, -1.03, Lambertian, 1, &white);
 	add_primitive(p7, scene);
 	
-	create_sphere(p8, 0.10, 0.0, -0.02, -0.99, Lambertian, 1, &black);
+	create_sphere(p8, 0.10, 0.0, -0.02, -0.98, Lambertian, 1, &black);
 	add_primitive(p8, scene);
 	
 	Vector cheeks_color = {255, 150, 150};
-	create_sphere(p9, 0.07, -0.30, -0.05, -1.05, Lambertian, 1, &cheeks_color);
+	create_sphere(p9, 0.07, -0.30, -0.05, -1.09, Lambertian, 1, &cheeks_color);
 	add_primitive(p9, scene);
 	
-	create_sphere(p10, 0.07, 0.30, -0.05, -1.05, Lambertian, 1, &cheeks_color);
+	create_sphere(p10, 0.07, 0.30, -0.05, -1.09, Lambertian, 1, &cheeks_color);
 	add_primitive(p10, scene);
 	
 	Vector raybox_color;
