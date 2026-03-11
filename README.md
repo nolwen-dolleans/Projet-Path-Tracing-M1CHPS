@@ -79,18 +79,18 @@ All runtimes are stored in seconds.
 
 Run the experiment:
 ```bash
-   export OMP_NUM_THREADS=M
-   export BOUNCES=b
-   mpirun -n O ./build/ppm W H N
-   ```
+export OMP_NUM_THREADS=M
+export BOUNCES=b
+mpirun -n O ./build/ppm W H N
+```
 
 By default, the executable generates:
    - one rendered image
    - one runtime measurement
 To perform multiple measurements during a single execution, use:
  ```bash
-   mpirun -n O ./build/ppm W H N "number_of_measures"
-   ```
+ mpirun -n O ./build/ppm W H N "number_of_measures"
+ ```
 where number_of_measures specifies how many measurements are taken between 1 and N samples.
 
 To generate only the final image instead of all intermediate images, use "no_image" option.
