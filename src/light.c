@@ -7,12 +7,11 @@
 
 #include "light.h"
 
-unsigned int seed_per_thread;
 
-Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal){
+Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector * normal, unsigned int* seed){
 	
-	const float u1 = rand_r(&seed_per_thread) / (float)RAND_MAX;
-	const float u2 = rand_r(&seed_per_thread) / (float)RAND_MAX;
+	const float u1 = rand_r(seed) / (float)RAND_MAX;
+	const float u2 = rand_r(seed) / (float)RAND_MAX;
 	const float atheta = sqrtf(u1);
 	const float phi = 2*M_PI*u2;
 	//les coordonnées dans la base locale
@@ -43,26 +42,18 @@ Ray random_Ray_demi_sphere_cosine_weighted(const Vector * origin, const Vector *
 	
 	Vector bitangent;
 	cross_ext(&tangent, normal, &bitangent);
-	//norm_ext(&bitangent, &bitangent);
 	
-	//vecteur direction = x*tangent + y*bitangent + z*normal
-	Vector direction;
 	mul_ext(&tangent, x, &tangent);
 	mul_ext(&bitangent, y, &bitangent);
 	mul_ext(normal, z, &norm);
 	
 	add_ext(&tangent, &bitangent, &ray.direction);
 	add_ext(&ray.direction, &norm, &ray.direction);
-	//norm_ext(&direction, &direction);
-	
-	
-	//ray.direction = direction;
-	//norm_ext(&ray.direction, &ray.direction);
 	
 	return ray;
 }
 
-void ray_sampling(Ray *r, const Scene * S, int dmax, Vector * radiance){
+void ray_sampling(Ray *r, const Scene * S, int dmax, Vector * radiance, unsigned int* seed){
 	Vector L_reflected_i = {1.f, 1.f, 1.f};
 	Ray current_ray = *r;
 	
@@ -113,7 +104,7 @@ void ray_sampling(Ray *r, const Scene * S, int dmax, Vector * radiance){
 					mul_ext(&n, 1e-4, &n_eps);
 					add_ext(&hit, &n_eps, &offset_origin);
 				}
-				Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
+				Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n, seed);
 				
 				for (int i = 0; i < 3; ++i){
 					L_reflected_i.Data[i] *= obj->color.Data[i] * albedo;
@@ -151,113 +142,22 @@ void ray_sampling(Ray *r, const Scene * S, int dmax, Vector * radiance){
 	}
 }
 
-/*
-void ray_sampling(Ray * r, const Scene * S, int d, int dmax, Vector * radiance){
-	Vector hit;
-	int object = -1;
-	
-	if (d == dmax) {
-		for (int i = 0; i < 3; ++i) radiance->Data[i] = 0.0f; // default to black if max bounces reached
-		return;
-	}			// O le point d'intersection du rayon sur l'objet et object l'objet rencontré
-	Vector n;
-	if (!intersect_in_scene(r, S, &object, &hit, &n)) {
-		for (int i = 0; i < 3; ++i) {
-			radiance->Data[i] = S->background_color->Data[i];
-		}
-		return;
-	}
-	
-	const Primitive *obj = S->objects[object];
-	const float albedo = obj->albedo;
-	
-	
-	Vector offset_origin;
-	Vector n_eps;
-	mul_ext(&n, EPS, &n_eps);
-	add_ext(&hit, &n_eps, &offset_origin);
-	
-	
-	switch (obj->m_type){
-		case Emissive:{
-			float weight = albedo;
-			mul_ext(&obj->color, weight, radiance);
-			return;
-		}
-	
-		case Lambertian:{
-			
-			if (dot(&n, &r->direction) > 0.0f) {
-				mul_ext(&n, -1.0f, &n);
-				mul_ext(&n, 1e-4, &n_eps);
-				add_ext(&hit, &n_eps, &offset_origin);
-			}
-			Ray r_new = random_Ray_demi_sphere_cosine_weighted(&offset_origin, &n);
-			Vector L_reflected_i;
-			
-			ray_sampling(&r_new, S, d+1, dmax, &L_reflected_i);
-			//const float cos_theta = dot(&n,&r_new.direction);
-			Vector weight;
-			mul_ext(&obj->color, albedo, &weight);
-
-			for (int i = 0; i < 3; ++i) {
-				radiance->Data[i] = L_reflected_i.Data[i] * weight.Data[i];
-			}
-			
-			return;
-		}
-		case Specular:{
-			float dotn = dot(&r->direction, &n);
-			
-			Vector wo;
-			wo.Data[0] = r->direction.Data[0] - 2.0f * dotn * n.Data[0];
-			wo.Data[1] = r->direction.Data[1] - 2.0f * dotn * n.Data[1];
-			wo.Data[2] = r->direction.Data[2] - 2.0f * dotn * n.Data[2];
-			
-			Ray r_new;
-			
-			r_new.direction = wo;
-			r_new.position = offset_origin;
-			
-			Vector L_reflected;
-			ray_sampling(&r_new, S, d + 1, dmax, &L_reflected);
-			
-			for (int i = 0; i < 3; ++i)
-				radiance->Data[i] = L_reflected.Data[i] * obj->color.Data[i] * obj->albedo;
-			
-			return;
-		}
-	}
-	return;
-}
-*/
-void path_trace(const int width, const int height, Scene const * S, const size_t bounces, const size_t N, float* color_buffer)
+void path_trace(const int x1, const int y1, const int local_y, const int width, Scene const * S, const size_t bounces, float* color_buffer, unsigned int* seed)
 {
-	Vector color;
 	
-	const size_t per_t_height = height/mpi_size;
+	Ray ray;
+	trace_ray(x1, y1, &S->camera, &ray);
 	
-#pragma omp parallel
-	{
-		seed_per_thread = time(NULL) ^ (mpi_rank << 8) ^ omp_get_thread_num();
-#pragma omp for collapse(2) scheduling(dynamic)
-	for(size_t y1 = per_t_height*mpi_rank; y1 < per_t_height*(mpi_rank+1); ++y1){
-		size_t local_y = y1 - per_t_height * mpi_rank;
-		for(size_t x1 = 0; x1 < width; ++x1){
-			Ray ray;
-			trace_ray(x1, y1, &S->camera, &ray);
-			
-			Vector radiance;
-			ray_sampling(&ray, S, (int)bounces, &radiance);
-			
-			size_t index = (local_y * width + x1) * 3;
-			
-			color_buffer[index+0] += radiance.Data[0];
-			color_buffer[index+1] += radiance.Data[1];
-			color_buffer[index+2] += radiance.Data[2];
-		}
-	}
-}
+	Vector radiance;
+	ray_sampling(&ray, S, (int)bounces, &radiance, seed);
+	
+	size_t index = (local_y * width + x1) * 3;
+	
+	color_buffer[index+0] += radiance.Data[0];
+	color_buffer[index+1] += radiance.Data[1];
+	color_buffer[index+2] += radiance.Data[2];
+	 
+	
 	return;
 }
 
@@ -402,9 +302,6 @@ void benchmark_medium(Scene* scene, size_t width, size_t height){
 	create_scene_ext(15, &bg, scene);
 	
 	const float r = 0.15;
-	const float x = 0.21;
-	const float y = -0.15;
-	const float z = 0.5;
 	
 	Primitive*  p1 = malloc(sizeof(Primitive));
 	Primitive*  p2 = malloc(sizeof(Primitive));

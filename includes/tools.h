@@ -63,7 +63,7 @@ void* malloc_check(const size_t size);
  * @param min Min value
  * @return a single precision scalar
  */
-const float generate_random_value(const float max, const float min);
+float generate_random_value(const float max, const float min);
 
 /**
  * @brief Resolve a quadratic equation

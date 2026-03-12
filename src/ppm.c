@@ -4,11 +4,45 @@
 
 #include "mpi.h"
 
+static inline void color_float_to_int(float* const local_color_buffer, const int idx_rgb, uint32_t* local_pixels_buffer, const int idx, float const inv_samples){
+	
+	float r = local_color_buffer[idx_rgb]   * inv_samples;
+	float g = local_color_buffer[idx_rgb+1] * inv_samples;
+	float b = local_color_buffer[idx_rgb+2] * inv_samples;
+	
+	r = max(0.f, min(255.f, r));
+	g = max(0.f, min(255.f, g));
+	b = max(0.f, min(255.f, b));
+	
+	local_pixels_buffer[idx] = get_color_32bit(r, g, b, 0);
+}
+
+static inline void print_time(struct timespec const* t0, struct timespec* t1, size_t const i, size_t const smpls, size_t const bounces){
+	clock_gettime(CLOCK_MONOTONIC, t1);
+	char* path="performance/measures/runtime_by_samplings.csv";
+	
+	bool exists = (access(path, F_OK) == 0);
+	
+	FILE *f = fopen(path, "a");
+	if (!f) {
+		perror("fopen");
+		exit(1);
+	}
+	
+	if (!exists) {
+		fprintf(f, "MPI,OMP,nsamples,bounces,runtime\n");
+	}
+	
+	double elapsed = (t1->tv_sec - t0->tv_sec) + (t1->tv_nsec - t0->tv_nsec) * 1e-9;
+	fprintf(f, "%d,%d,%ld,%ld,%.6f\n",mpi_size, atoi(getenv("OMP_NUM_THREADS")), i, bounces, elapsed);
+	if(i == smpls) fprintf(f, "\n");
+	fclose(f);
+	
+}
 
 int main(int argc, char** argv)
 {
 	setvbuf(stdout, NULL, _IONBF, 0);
-	int tag = 1000;
 	
 	srand((unsigned int)time(NULL));
 	if(argc < 4)
@@ -41,14 +75,12 @@ int main(int argc, char** argv)
 //######################### Create the entier scene ###########################
 	Scene scene;
 	benchmark1(&scene, width, height);
-
-	Vector color;
+	
 //#############################################################################
 	
 	if(!limit) exit(1);
 	size_t print_rate = smpls / limit;
 	if(print_rate == 0) print_rate = 1;
-	int first = 1;
 	
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
@@ -63,76 +95,61 @@ int main(int argc, char** argv)
 		clock_gettime(CLOCK_MONOTONIC, &t0);
 	}
 
-	const size_t per_t_height = height / mpi_size;
+	const int per_t_height = height / mpi_size;
 
 	float *local_color_buffer = calloc(width * per_t_height * 3, sizeof(float));
 
 	uint32_t *local_pixels_buffer = malloc(width * per_t_height * sizeof(uint32_t));
 
-	
-	for(size_t i = 1; i <= smpls; ++i) {
-		path_trace(width, height, &scene, bounces, smpls, local_color_buffer);
-
-		if (i % print_rate == 0) {
-			float inv_samples = 255.f / (float)(i + 1);
-
-			for(size_t y = 0; y < per_t_height; ++y) {
-				for(size_t x = 0; x < width; ++x) {
-					size_t idx = y * width + x;
-					size_t idx_rgb = idx * 3;
-
-					float r = local_color_buffer[idx_rgb]   * inv_samples;
-					float g = local_color_buffer[idx_rgb+1] * inv_samples;
-					float b = local_color_buffer[idx_rgb+2] * inv_samples;
-
-					r = max(0.f, min(255.f, r));
-					g = max(0.f, min(255.f, g));
-					b = max(0.f, min(255.f, b));
-
-					local_pixels_buffer[idx] = get_color_32bit(r, g, b, 0);
+#pragma omp parallel
+	{
+		unsigned int seed_per_threads = time(NULL) ^ (mpi_rank << 8) ^ omp_get_thread_num();
+		for(size_t i = 1; i <= smpls; ++i) {
+#pragma omp for schedule(dynamic)
+			for(int y1 = per_t_height*mpi_rank; y1 < per_t_height*(mpi_rank+1); ++y1){
+				const int per_t_height = height/mpi_size;
+				int local_y = y1 - per_t_height * mpi_rank;
+				
+				for(int x1 = 0; x1 < width; ++x1){
+					path_trace(x1, y1, local_y, width, &scene, bounces, local_color_buffer, &seed_per_threads);
 				}
 			}
-
-			if (mpi_size != 1){
-				if (mpi_rank == 0) {
-					clock_gettime(CLOCK_MONOTONIC, &t1);
-					
+#pragma omp barrier
+#pragma omp single
+			if (i % print_rate == 0) {
+				if (mpi_rank == 0) clock_gettime(CLOCK_MONOTONIC, &t1);
+				
+				float inv_samples = 255.f / (float)i;
+				
+				for(int y = 0; y < per_t_height; ++y) {
+					for(int x = 0; x < width; ++x) {
+						int idx = y * width + x;
+						int idx_rgb = idx * 3;
+						color_float_to_int(local_color_buffer, idx_rgb, local_pixels_buffer, idx, inv_samples);
+						
+					}
+				}
+				
+				if (mpi_size != 1){
 					if (mpi_rank == 0) {
-						char* path="performance/measures/runtime_by_samplings.csv";
-						
-						bool exists = (access(path, F_OK) == 0);
-					
-						FILE *f = fopen(path, "a");
-						if (!f) {
-							perror("fopen");
-							return 1;
+						print_time(&t0, &t1, i, smpls, bounces);
+						if((can_print_image)||(i==smpls)){
+							MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, image->buffer, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
+							write_image_file_32bit(image, i);
 						}
 						
-						if (!exists) {
-							fprintf(f, "MPI,OMP,nsamples,bounces,runtime\n");
-						}
-						
-						double elapsed = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) * 1e-9;
-						fprintf(f, "%d,%d,%ld,%ld,%.6f\n",mpi_size, omp_get_num_threads(), i, bounces, elapsed);
-						if(i == smpls) fprintf(f, "\n");
-						fclose(f);
 					}
+					else {
+						if(can_print_image || i==smpls)
+							MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, NULL, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
 					
-					
-					if((can_print_image)||(i==smpls)){
-						MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, image->buffer, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
-						write_image_file_32bit(image, i);
 					}
-					
 				}
 				else {
-					if(can_print_image || i==smpls)
-						MPI_Gather(local_pixels_buffer, width * per_t_height, MPI_INT32_T, NULL, width * per_t_height, MPI_INT32_T, 0, MPI_COMM_WORLD);
+					memcpy(image->buffer, local_pixels_buffer, width * per_t_height * sizeof(uint32_t));
+					write_image_file_32bit(image, i);
+					print_time(&t0, &t1, i, smpls, bounces);
 				}
-			}
-			else {
-				memcpy(image->buffer, local_pixels_buffer, width * per_t_height * sizeof(uint32_t));
-				write_image_file_32bit(image, i);
 			}
 		}
 	}
