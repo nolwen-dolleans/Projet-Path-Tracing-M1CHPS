@@ -1,10 +1,3 @@
-//
-//  scene.h
-//  Projet PPN
-//
-//  Created by Nolwen Dolléans on 13/11/2025.
-//
-
 #ifndef scene_h
 #define scene_h
 

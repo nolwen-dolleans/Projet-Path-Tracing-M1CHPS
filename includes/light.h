@@ -1,10 +1,3 @@
-//
-//  BRDF.h
-//  Projet PPN
-//
-//  Created by Nolwen Dolléans on 12/11/2025.
-//
-
 #ifndef light_h
 #define light_h
 
