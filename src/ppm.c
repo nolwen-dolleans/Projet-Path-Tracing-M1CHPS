@@ -76,6 +76,7 @@ int main(int argc, char** argv)
 	Scene scene;
 	benchmark1(&scene, width, height);
 	
+	object_tree_t* tree = initialize_root_tree_v2(&scene);
 //#############################################################################
 	
 	if(!limit) exit(1);
@@ -96,27 +97,27 @@ int main(int argc, char** argv)
 	}
 
 	const int per_t_height = height / mpi_size;
-
 	float *local_color_buffer = calloc(width * per_t_height * 3, sizeof(float));
-
 	uint32_t *local_pixels_buffer = malloc(width * per_t_height * sizeof(uint32_t));
-
+	
+	int start = per_t_height*mpi_rank;
+	int end = per_t_height*(mpi_rank+1);
+	
 #pragma omp parallel
 	{
 		unsigned int seed_per_threads = time(NULL) ^ (mpi_rank << 8) ^ omp_get_thread_num();
 		for(size_t i = 1; i <= smpls; ++i) {
 #pragma omp for schedule(dynamic)
-			for(int y1 = per_t_height*mpi_rank; y1 < per_t_height*(mpi_rank+1); ++y1){
-				const int per_t_height = height/mpi_size;
-				int local_y = y1 - per_t_height * mpi_rank;
-				
+			for(int y1 = start; y1 < end; ++y1){
 				for(int x1 = 0; x1 < width; ++x1){
+					int local_y = y1 - per_t_height * mpi_rank;
 					path_trace(x1, y1, local_y, width, &scene, bounces, local_color_buffer, &seed_per_threads);
+					//path_trace_t(x1, y1, local_y, width, &scene, bounces, local_color_buffer, &seed_per_threads, tree);
 				}
 			}
-#pragma omp barrier
 #pragma omp single
 			if (i % print_rate == 0) {
+				
 				if (mpi_rank == 0) clock_gettime(CLOCK_MONOTONIC, &t1);
 				
 				float inv_samples = 255.f / (float)i;
@@ -146,9 +147,9 @@ int main(int argc, char** argv)
 					}
 				}
 				else {
+					print_time(&t0, &t1, i, smpls, bounces);
 					memcpy(image->buffer, local_pixels_buffer, width * per_t_height * sizeof(uint32_t));
 					write_image_file_32bit(image, i);
-					print_time(&t0, &t1, i, smpls, bounces);
 				}
 			}
 		}
@@ -157,13 +158,8 @@ int main(int argc, char** argv)
 	
 	
 	
-	free_scene_objects(&scene);
+	free_scene_objects(&scene); free_tree_objects(&tree);
 	free_image_32bit(image); free(local_pixels_buffer); free(local_color_buffer);
+	
 	return 0;
 }
-
-/*
-make
-BOUNCES=10 mpirun -np 8 ./ppm 32 800 600 10 && powershell.exe -Command "[console]::beep(250,300)"
-display -geometry 800x600+1920+1 image/image_32bit10.ppm
-*/

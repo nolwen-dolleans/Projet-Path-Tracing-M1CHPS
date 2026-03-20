@@ -4,6 +4,10 @@
 #include "image.h"
 #include "ray.h"
 
+
+#define NULL_AABB (AABB) {{ {  MAXFLOAT,  MAXFLOAT,  MAXFLOAT } },{ { -MAXFLOAT, -MAXFLOAT, -MAXFLOAT }}}
+
+
 typedef enum PRIM_TYPE
 {
 	SPHERE,
@@ -73,6 +77,17 @@ typedef struct Scene{
 	size_t size_objects;
 	Camera camera;
 }Scene;
+
+typedef struct object_tree_t{
+	AABB box;
+	Primitive** objects;
+	int objects_count;
+	
+	struct object_tree_t* right;
+	struct object_tree_t* left;
+} object_tree_t;
+
+
 
 /**
  * @brief Free scene
@@ -156,7 +171,13 @@ Vector get_normal_vector_sphere(const Vector * point, const Vector *center);
  * @brief Compute the sphere normal vector at a point
  * @return pointer to the normal vector
  */
-Vector get_normal_vector_box(int *face, int is_intern);
+Vector get_normal_vector_box(int face, int is_intern);
+
+object_tree_t* initialize_root_tree(Scene* S);
+object_tree_t* initialize_root_tree_v2(Scene* S);
+void free_tree_objects(object_tree_t** root);
+
+int intersect_in_tree(object_tree_t* const tree, const Ray* r, float* closest_t, Primitive** intersected_object, int* is_intern, int* face);
 
 static const float inv255 = 1 / 255.0f;
 
