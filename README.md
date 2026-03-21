@@ -104,3 +104,8 @@ mpirun -n 4 ./build/ppm 800 600 1000 100 no_image
 #### 
 
 
+
+### Protocol 2: The convergence speed and the mean error
+
+
+
