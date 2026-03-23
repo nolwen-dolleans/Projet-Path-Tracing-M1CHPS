@@ -5,7 +5,7 @@
 #include "ray.h"
 
 
-#define NULL_AABB (AABB) {{ {  MAXFLOAT,  MAXFLOAT,  MAXFLOAT } },{ { -MAXFLOAT, -MAXFLOAT, -MAXFLOAT }}}
+#define NULL_AABB (AABB) {{ {  FLT_MAX,  FLT_MAX,  FLT_MAX } },{ { -FLT_MAX, -FLT_MAX, -FLT_MAX }}}
 
 
 typedef enum PRIM_TYPE

@@ -1,7 +1,7 @@
 #include "scene.h"
 
 #ifndef MAX_OBJECTS
-#define MAX_OBJECTS 3
+#define MAX_OBJECTS 10
 #endif
 
 #define MAX_DEPTH 100
@@ -93,10 +93,10 @@ void create_box(Primitive* prim, const float width, const float height, const fl
 	sinB = sinf(beta);
 	cosB = cosf(beta);
 
-	box->obb_direction = (Vector) {sinB, cosB*sinA, -cosA*cosB};
+	box->obb_direction = (Vector) {{sinB, cosB*sinA, -cosA*cosB}};
 
-	if (fabs(box->obb_direction.Data[0]) < 1-EPS) up = (Vector){0.0f, 1.0f, 0.0f};
-	else up = (Vector){1.0f, 0.0f, 0.0f};
+	if (fabs(box->obb_direction.Data[0]) < 1-EPS) up = (Vector){{0.0f, 1.0f, 0.0f}};
+	else up = (Vector){{1.0f, 0.0f, 0.0f}};
 	
 	cross_ext(&box->obb_direction, &up, &(box->obb_right));
 	norm_ext(&(box->obb_right),&(box->obb_right));
@@ -417,9 +417,9 @@ void centeroid_aabb(AABB const* box, Vector* centeroid){
 	if (!box) return;
 	if (!centeroid) return;
 	
-	*centeroid = (Vector){(box->bmax.Data[0] + box->bmin.Data[0]) * 0.5f,
-						  (box->bmax.Data[1] + box->bmin.Data[1]) * 0.5f,
-						  (box->bmax.Data[2] + box->bmin.Data[2]) * 0.5f};
+	*centeroid = (Vector){{(box->bmax.Data[0] + box->bmin.Data[0]) * 0.5f,
+		(box->bmax.Data[1] + box->bmin.Data[1]) * 0.5f,
+		(box->bmax.Data[2] + box->bmin.Data[2]) * 0.5f}};
 }
 
 AABB compute_aabb_sphere(Primitive* p){
@@ -587,6 +587,7 @@ void add_object_to_node(object_tree_t* node, Primitive* p, int depth) {
 typedef struct obj_arrange{
 	Primitive* p;
 	float coord;
+	AABB hitbox;
 }obj_arrange;
 
 int compare_float(const void* a, const void* b) {
@@ -645,50 +646,70 @@ void add_object_to_node_v2(object_tree_t* node, Primitive** p, int object_count,
 		AABB p_hitbox = compute_hitbox(p[i]);
 		references[i].p = p[i];
 		references[i].coord = (p_hitbox.bmin.Data[axis] + p_hitbox.bmax.Data[axis]) * 0.5f;
+		references[i].hitbox = p_hitbox;
 	}
 	qsort(references, object_count, sizeof(obj_arrange), &compare);
 
 	float split = references[object_count / 2].coord;
 
 	int n_left = 0, n_right = 0;
-		for (int i = 0; i < object_count; ++i) {
-			Vector centroid;
-			AABB hb = compute_hitbox(references[i].p);
-			centeroid_aabb(&hb, &centroid);
+	for (int i = 0; i < object_count; ++i) {
+		Vector centroid;
+		centeroid_aabb(&references[i].hitbox, &centroid);
 
-			// Si l’objet chevauche le split, il peut aller dans les deux enfants
-			if ((centroid.Data[axis] < split) ||
-				(overlaps_with_split(&hb, axis, split) && node->objects_count > MAX_OBJECTS)) {
-				n_left++;
-			}
-			if ((centroid.Data[axis] >= split) ||
-				(overlaps_with_split(&hb, axis, split) && node->objects_count > MAX_OBJECTS)) {
-				n_right++;
-			}
+		// Si l’objet chevauche le split, il peut aller dans les deux enfants
+		if ((centroid.Data[axis] < split)) {
+			n_left++;
 		}
+		else  {
+			n_right++;
+		}
+	}
+	
+	float ratio_min = fminf(n_left, n_right) / (float) object_count;
+	float ratio_max = fmaxf(n_left, n_right) / (float) object_count;
+	if (ratio_min < 0.2f || (ratio_max > 0.9f)) {
+		n_left = object_count / 2;
+		n_right = object_count / 2 + object_count % 2;
+	}
 
-		Primitive** buffer_left = malloc(sizeof(Primitive*) * n_left);
-		Primitive** buffer_right = malloc(sizeof(Primitive*) * n_right);
+	Primitive** buffer_left = malloc(sizeof(Primitive*) * n_left);
+	Primitive** buffer_right = malloc(sizeof(Primitive*) * n_right);
+	if (ratio_min < 0.2f || (ratio_max > 0.9f)) {
+		int i = 0;
 		int l = 0, r = 0;
-
-		for (int i = 0; i < object_count; ++i) {
-			Vector centroid;
-			AABB hb = compute_hitbox(references[i].p);
-			centeroid_aabb(&hb, &centroid);
-
-			// Ajouter dans l’enfant gauche si nécessaire
-			if ((centroid.Data[axis] < split) ||
-				(overlaps_with_split(&hb, axis, split) && node->objects_count > MAX_OBJECTS)) {
-				buffer_left[l++] = references[i].p;
-			}
-
-			// Ajouter dans l’enfant droit si nécessaire
-			if ((centroid.Data[axis] >= split) ||
-				(overlaps_with_split(&hb, axis, split) && node->objects_count > MAX_OBJECTS)) {
-				buffer_right[r++] = references[i].p;
-			}
+		for (;i < object_count/2; ++i) {
+			buffer_left[l++] = references[i].p;
 		}
+		for (;i < object_count; ++i) {
+			buffer_right[r++] = references[i].p;
+		}
+		
+		add_object_to_node_v2(node->left, buffer_left, n_left, depth + 1);
+		add_object_to_node_v2(node->right, buffer_right, n_right, depth + 1);
 
+		update_aabb_from_children(node);
+
+		free(buffer_left);
+		free(buffer_right);
+		free(references);
+		return;
+	}
+	int l = 0, r = 0;
+	
+	for (int i = 0; i < object_count; ++i) {
+		Vector centroid;
+		centeroid_aabb(&references[i].hitbox, &centroid);
+		
+		if ((centroid.Data[axis] < split)) {
+			buffer_left[l++] = references[i].p;
+		}
+		
+		else  {
+			buffer_right[r++] = references[i].p;
+		}
+	}
+	
 
 	if (depth > MAX_DEPTH)
 		abort();
@@ -701,83 +722,6 @@ void add_object_to_node_v2(object_tree_t* node, Primitive** p, int object_count,
 	free(buffer_right);
 	free(references);
 }
-
-/*void add_object_to_node_v2(object_tree_t* node, Primitive** p, int object_count, int depth) {
-	if (!node || !p) return;
-
-	for (int j = 0; j < object_count; ++j) {
-		AABB p_hitbox = compute_hitbox(p[j]);
-		for (int i = 0; i < 3; i++) {
-			node->box.bmin.Data[i] = fminf(node->box.bmin.Data[i], p_hitbox.bmin.Data[i]);
-			node->box.bmax.Data[i] = fmaxf(node->box.bmax.Data[i], p_hitbox.bmax.Data[i]);
-		}
-	}
-
-	if (object_count <= MAX_OBJECTS) {
-		node->objects_count = 0;
-		for (int i = 0; i < object_count; ++i) {
-			if (p[i] && p[i]->object)
-				node->objects[node->objects_count++] = p[i];
-		}
-		return;
-	}
-
-	add_node(node, 0);
-	add_node(node, 1);
-
-	float size[3] = {
-		node->box.bmax.Data[0] - node->box.bmin.Data[0],
-		node->box.bmax.Data[1] - node->box.bmin.Data[1],
-		node->box.bmax.Data[2] - node->box.bmin.Data[2]
-	};
-	int axis = 0;
-	if (size[1] > size[0] && size[1] >= size[2]) axis = 1;
-	else if (size[2] > size[0] && size[2] > size[1]) axis = 2;
-
-	obj_arrange* references = malloc(sizeof(obj_arrange) * object_count);
-	for (int i = 0; i < object_count; ++i) {
-		AABB p_hitbox = compute_hitbox(p[i]);
-		references[i].p = p[i];
-		references[i].coord = (p_hitbox.bmin.Data[axis] + p_hitbox.bmax.Data[axis]) * 0.5f;
-	}
-	qsort(references, object_count, sizeof(obj_arrange), &compare);
-
-	float split = references[object_count / 2].coord;
-
-	int n_left = 0, n_right = 0;
-	for (int i = 0; i < object_count; ++i) {
-		Vector centroid;
-		AABB hb = compute_hitbox(references[i].p);
-		centeroid_aabb(&hb, &centroid);
-		if (centroid.Data[axis] < split) n_left++;
-		else n_right++;
-	}
-
-	Primitive** buffer_left = malloc(sizeof(Primitive*) * n_left);
-	Primitive** buffer_right = malloc(sizeof(Primitive*) * n_right);
-	
-	int l = 0, r = 0;
-	for (int i = 0; i < object_count; ++i) {
-		Vector centroid;
-		AABB hb = compute_hitbox(references[i].p);
-		centeroid_aabb(&hb, &centroid);
-		if (centroid.Data[axis] < split)
-			buffer_left[l++] = references[i].p;
-		else
-			buffer_right[r++] = references[i].p;
-	}
-
-	if (depth > MAX_DEPTH)
-		abort();
-	add_object_to_node_v2(node->left, buffer_left, n_left, depth + 1);
-	add_object_to_node_v2(node->right, buffer_right, n_right, depth + 1);
-
-	update_aabb_from_children(node);
-
-	free(buffer_left);
-	free(buffer_right);
-	free(references);
-}*/
 
 void print_tree(object_tree_t* node, int depth) {
 	if (!node) return;
@@ -1048,8 +992,7 @@ float intersect_obb_t(const Ray* r, const OBB* box, int* is_intern, int* face) {
 	return intersect_box_t(&rotated_ray, &local_box, is_intern, face);
 }
 
-int intersect_in_tree(object_tree_t* const tree, const Ray* r, float* closest_t, Primitive** intersected_object, int* is_intern, int* face)
-{
+int intersect_in_tree(object_tree_t* const tree, const Ray* r, float* closest_t, Primitive** intersected_object, int* is_intern, int* face) {
 	if (!tree || !closest_t) return 0;
 
 	int hit = 0;
@@ -1091,15 +1034,18 @@ int intersect_in_tree(object_tree_t* const tree, const Ray* r, float* closest_t,
 			hit = 1;
 		}
 	}
+	if (tree->objects_count > 0.f) return hit;
+	
 	float tleft = -1.f, tright = -1.f;
 
-	if (tree->left)
-		tleft = intersect_box_t(r, &tree->left->box, NULL, NULL);
+	tleft = intersect_box_t(r, &tree->left->box, NULL, NULL);
 
-	if (tree->right)
-		tright = intersect_box_t(r, &tree->right->box, NULL, NULL);
+	tright = intersect_box_t(r, &tree->right->box, NULL, NULL);
 
-	// aucun hit
+	if (tleft < EPS) tleft = -1.f;
+	if (tright < EPS) tright = -1.f;
+	
+	// aucun hit dans les noeuds suivants
 	if (tleft < 0.f && tright < 0.f)
 		return hit;
 
@@ -1119,10 +1065,10 @@ int intersect_in_tree(object_tree_t* const tree, const Ray* r, float* closest_t,
 		tsecond = tleft;
 	}
 
-	if (first /*&& tfirst < *closest_t*/)
+	if (first && tfirst >= 0.f/* && 1e-1*tfirst < *closest_t*/)
 		hit |= intersect_in_tree(first, r, closest_t, intersected_object, is_intern, face);
 
-	if (second /*&& tsecond >= 0.f && tsecond < *closest_t*/)
+	if (second && tsecond >= 0.f/* && 1e-1*tsecond < *closest_t */)
 		hit |= intersect_in_tree(second, r, closest_t, intersected_object, is_intern, face);
 	return hit;
 }

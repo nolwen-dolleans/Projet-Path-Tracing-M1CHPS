@@ -32,9 +32,10 @@ static inline void print_time(struct timespec const* t0, struct timespec* t1, si
 	if (!exists) {
 		fprintf(f, "MPI,OMP,nsamples,bounces,runtime\n");
 	}
-	
+	char* omp_num_threads = getenv("OMP_NUM_THREADS");
+	int threads = omp_num_threads ? atoi(omp_num_threads) : 1;
 	double elapsed = (t1->tv_sec - t0->tv_sec) + (t1->tv_nsec - t0->tv_nsec) * 1e-9;
-	fprintf(f, "%d,%d,%ld,%ld,%.6f\n",mpi_size, atoi(getenv("OMP_NUM_THREADS")), i, bounces, elapsed);
+	fprintf(f, "%d,%d,%ld,%ld,%.6f\n",mpi_size, threads, i, bounces, elapsed);
 	if(i == smpls) fprintf(f, "\n");
 	fclose(f);
 	
@@ -74,10 +75,10 @@ int main(int argc, char** argv)
 	
 //######################### Create the entier scene ###########################
 	Scene scene;
-	benchmark1(&scene, width, height);
+	benchmark_big(&scene, width, height);
 	
 	object_tree_t* tree = initialize_root_tree_v2(&scene);
-//#############################################################################
+//############################################################################
 	
 	if(!limit) exit(1);
 	size_t print_rate = smpls / limit;
@@ -107,17 +108,17 @@ int main(int argc, char** argv)
 	{
 		unsigned int seed_per_threads = time(NULL) ^ (mpi_rank << 8) ^ omp_get_thread_num();
 		for(size_t i = 1; i <= smpls; ++i) {
-#pragma omp for schedule(dynamic)
+#pragma omp for schedule(static)
 			for(int y1 = start; y1 < end; ++y1){
 				for(int x1 = 0; x1 < width; ++x1){
 					int local_y = y1 - per_t_height * mpi_rank;
-					path_trace(x1, y1, local_y, width, &scene, bounces, local_color_buffer, &seed_per_threads);
-					//path_trace_t(x1, y1, local_y, width, &scene, bounces, local_color_buffer, &seed_per_threads, tree);
+					//path_trace(x1, y1, local_y, width, &scene, bounces, local_color_buffer, &seed_per_threads);
+					path_trace_t(x1, y1, local_y, width, &scene, bounces, local_color_buffer, &seed_per_threads, tree);
 				}
 			}
 #pragma omp single
 			if (i % print_rate == 0) {
-				
+	
 				if (mpi_rank == 0) clock_gettime(CLOCK_MONOTONIC, &t1);
 				
 				float inv_samples = 255.f / (float)i;

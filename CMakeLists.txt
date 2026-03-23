@@ -36,10 +36,10 @@ else()
         include_directories(${LIBOMP_PREFIX}/include)
         link_directories(${LIBOMP_PREFIX}/lib)
 
-        set(OpenMP_LIBRARIES omp)
 
     endif()
 
+        set(OpenMP_LIBRARIES omp)
 endif()
 
 # --------------------------------------------------
@@ -53,19 +53,32 @@ add_library(LibPathTracing
     src/tools.c
     src/vector.c
     src/light.c
+    src/benchmarks.c
 )
 
 target_include_directories(LibPathTracing PUBLIC ${PROJECT_SOURCE_DIR}/includes)
 
-target_link_libraries(LibPathTracing
-    m
-    MPI::MPI_C
-    ${OpenMP_LIBRARIES}
-)
 
-target_compile_options(LibPathTracing PRIVATE
+
+if(APPLE)
+	target_link_libraries(LibPathTracing
+		m
+		MPI::MPI_C
+		${OpenMP_LIBRARIES}
+	)
+	target_compile_options(LibPathTracing PRIVATE
     -Wall -Wextra -lc
-)
+	)
+else()
+	target_link_libraries(LibPathTracing
+		m
+		MPI::MPI_C
+		OpenMP::OpenMP_C
+	)
+	target_compile_options(LibPathTracing PRIVATE
+    -Wall -Wextra -lc -fopenmp
+	)
+endif()
 
 # --------------------------------------------------
 # EXECUTABLE
