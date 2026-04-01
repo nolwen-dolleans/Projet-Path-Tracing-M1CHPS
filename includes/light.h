@@ -31,7 +31,7 @@ void ray_sampling(Ray * r, const Scene * S, int dmax, Vector * radiance, unsigne
  */
 void path_trace(const int x1, const int y1, const int local_y, const int width, Scene const * S, const size_t bounces, float* color_buffer, unsigned int* seed);
 void path_trace_t(const int x1, const int y1, const int local_y, const int width, Scene const * S, const size_t bounces, float* color_buffer, unsigned int* seed, object_tree_t* const tree);
-
+void path_trace_clusters(const int x1, const int y1, const int local_y, const int width, Scene const * S, const size_t bounces, float* color_buffer, unsigned int* seed, Large_BVH_t* const tree);
 
 int get_bounces(void);
 

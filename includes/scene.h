@@ -88,6 +88,13 @@ typedef struct object_tree_t{
 } object_tree_t;
 
 
+typedef struct Large_BVH_t{
+	AABB box;
+	int K;
+	struct object_tree_t** clusters;
+	
+} Large_BVH_t;
+
 
 /**
  * @brief Free scene
@@ -176,8 +183,12 @@ Vector get_normal_vector_box(int face, int is_intern);
 object_tree_t* initialize_root_tree(Scene* S);
 object_tree_t* initialize_root_tree_v2(Scene* S);
 void free_tree_objects(object_tree_t** root);
+int intersect_in_clusters(Large_BVH_t* const tree, const Ray* r, float* closest_t, Primitive** intersected_object, int* is_intern, int* face);
+Large_BVH_t* initialize_tree_clustering(const Scene* S, unsigned int* seed, const int K);
 
 int intersect_in_tree(object_tree_t* const tree, const Ray* r, float* closest_t, Primitive** intersected_object, int* is_intern, int* face);
+
+void free_clusters(Large_BVH_t** root);
 
 static const float inv255 = 1 / 255.0f;
 
